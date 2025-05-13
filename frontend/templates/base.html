@@ -1,0 +1,90 @@
+{% load webpack_loader static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <!-- Other meta stuff -->
+  <link rel="apple-touch-icon" href="{% static 'vendors/images/logo.png' %}" />
+  <link rel="apple-touch-icon" href="{% static 'vendors/images/logo.png' %}" />
+  <link rel="icon" type="image/png" sizes="16x16 32x32 500x500" href="{% static 'vendors/images/logo.png' %}" />
+
+  {% block meta %}
+  <title>Ask HN Digest</title>
+  <meta name="description" content="Get Summaries of the most engaging discussions on Hacker News" />
+  <meta name="keywords" content="django" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://{{ request.get_host }}/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Ask HN Digest" />
+  <meta property="og:url" content="https://{{ request.get_host }}/" />
+  <meta property="og:description" content="Get Summaries of the most engaging discussions on Hacker News" />
+  <meta property="og:image" content="https://osig.app/g?site=meta&style=logo&font=markerfelt&title=Ask HN Digest&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
+  <meta property="og:locale" content="en_US" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:creator" content="@rasulkireev" />
+  <meta name="twitter:site" content="@rasulkireev" />
+  <meta name="twitter:title" content="Ask HN Digest" />
+  <meta name="twitter:description" content="Get Summaries of the most engaging discussions on Hacker News" />
+  <meta name="twitter:image" content="https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
+  {% endblock meta %}
+
+  {% stylesheet_pack 'index' %}
+  {% javascript_pack 'index' attrs='defer' %}
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-orange-50 to-white">
+  {% block default_messages %}
+    {% include 'components/messages.html' with messages=messages %}
+  {% endblock default_messages %}
+
+  <!-- Include the feedback component -->
+  {% if user.is_authenticated %}
+    {% include 'components/feedback.html' %}
+  {% endif %}
+
+  <div class="flex flex-col min-h-screen">
+    <main class="flex flex-col flex-1 justify-center">
+      <div class="px-2 sm:px-0">
+        {% block content %}
+        {% endblock content %}
+      </div>
+    </main>
+    <footer class="mt-12 shadow-inner bg-white/80">
+      <div class="flex flex-col justify-center items-center px-6 py-8 mx-auto max-w-7xl lg:px-8">
+        <p class="text-xs leading-5 text-center text-gray-500">
+          &copy; 2025 <a href="https://lvtd.dev?ref={{ request.get_host }}" class="transition hover:text-orange-600">LVTD, LLC</a>. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  {% block schema %}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Ask HN Digest",
+      "description": "Get Summaries of the most engaging discussions on Hacker News",
+      "thumbnailUrl": "https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.png' %},
+      "url": "https://{{ request.get_host }}/",
+      "author": {
+        "@type": "Person",
+        "givenName": "Rasul",
+        "familyName": "Kireev",
+        "url": "https://rasulkireev.com/"
+      }
+    }
+    </script>
+  {% endblock schema %}
+
+</body>
+
+</html>

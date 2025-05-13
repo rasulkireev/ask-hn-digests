@@ -1,0 +1,118 @@
+services:
+  db:
+    image: rasulkireev/custom-postgres:17
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=ask_hn_digest
+      - POSTGRES_USER=ask_hn_digest
+      - POSTGRES_PASSWORD=ask_hn_digest
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ask_hn_digest"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --requirepass ask_hn_digest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    environment:
+      - REDIS_PASSWORD=ask_hn_digest
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile-python
+    working_dir: /app
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      frontend:
+        condition: service_started
+    env_file:
+      - .env
+
+  workers:
+    build:
+      context: .
+      dockerfile: Dockerfile-python
+    working_dir: /app
+    command: python manage.py qcluster
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    env_file:
+      - .env
+
+  frontend:
+    image: node:18
+    working_dir: /app
+    command: sh -c "npm install && npm run start"
+    volumes:
+      - .:/app
+    ports:
+      - "9091:9091"
+
+  mailhog:
+    image: mailhog/mailhog
+    expose:
+      - 1025
+      - 8025
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ROOT_USER: ask_hn_digest
+      MINIO_ROOT_PASSWORD: ask_hn_digest
+    command: server --console-address ":9001" /data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5 &&
+      /usr/bin/mc config host add myminio http://minio:9000 ask_hn_digest ask_hn_digest &&
+      /usr/bin/mc mb myminio/ask_hn_digest-dev &&
+      /usr/bin/mc anonymous set download myminio/ask_hn_digest-dev &&
+      exit 0;
+      "
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
