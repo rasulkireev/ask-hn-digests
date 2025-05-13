@@ -43,3 +43,11 @@ class ProfileUpdateForm(forms.ModelForm):
             user.save()
             profile.save()
         return profile
+
+
+class SummarizeHNDiscussionForm(forms.Form):
+    discussion_ids = forms.CharField(
+        label="Hacker News Discussion IDs",
+        help_text="Enter one or more discussion IDs, separated by commas. E.g. 12345,67890",
+        widget=forms.TextInput(attrs={"placeholder": "e.g. 12345,67890"})
+    )

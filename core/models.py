@@ -66,7 +66,6 @@ class NewsletterSubscriber(BaseModel):
         return False
 
 
-
 class BlogPost(BaseModel):
     title = models.CharField(max_length=250)
     description = models.TextField(blank=True)
@@ -127,3 +126,25 @@ class Feedback(BaseModel):
             recipient_list = [settings.DEFAULT_FROM_EMAIL]
 
             send_mail(subject, message, from_email, recipient_list, fail_silently=True)
+
+
+class HNDiscussionSummary(BaseModel):
+    discussion_id = models.BigIntegerField(unique=True, help_text="Hacker News discussion ID")
+    comment_ids = models.JSONField(help_text="List of all comment IDs for this discussion")
+    date_analyzed = models.DateTimeField(auto_now_add=True, help_text="Date and time when the discussion was analyzed")
+
+    # for email
+    short_summary = models.TextField(help_text="Short summary of the discussion")
+
+    # for post
+    slug = models.SlugField(max_length=250, unique=True, help_text="Slug for the blog post")
+    title = models.CharField(max_length=250, help_text="Title of the blog post")
+    description = models.TextField(blank=True, help_text="Description of the blog post")
+    tags = models.TextField(blank=True, help_text="Tags for the blog post")
+    long_summary = models.TextField(help_text="Long summary of the discussion")
+
+    def __str__(self):
+        return f"HN Discussion {self.discussion_id} analyzed on {self.date_analyzed}"
+
+    def get_absolute_url(self):
+        return reverse("blog_post", kwargs={"slug": self.slug})

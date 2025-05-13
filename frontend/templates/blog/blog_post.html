@@ -30,7 +30,7 @@
     <h1 class="mb-6 text-3xl font-bold">{{ blog_post.title }}</h1>
 
     <div class="max-w-none prose-lg">
-      {{ blog_post.content|markdown|safe }}
+      {{ blog_post.long_summary|markdown|safe }}
     </div>
   </div>
 </article>

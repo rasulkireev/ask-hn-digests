@@ -61,15 +61,15 @@ INSTALLED_APPS = [
     "webpack_boilerplate",
     "widget_tweaks",
     "anymail",
-    
+
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    
+
     "django_q",
     "django_extensions",
     "mjml",
-    
+
     "django_structlog",
     "core.apps.CoreConfig",
 ]
@@ -215,7 +215,7 @@ if ENVIRONMENT == "prod":
     ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
 SOCIALACCOUNT_PROVIDERS = {
-    
+
 }
 
 ANYMAIL = {
@@ -315,14 +315,10 @@ SENTRY_DSN = env("SENTRY_DSN")
 if ENVIRONMENT == "prod" and SENTRY_DSN:
     sentry_sdk.init(dsn=env("SENTRY_DSN"))
 
-
 POSTHOG_API_KEY = env("POSTHOG_API_KEY")
 
-
 BUTTONDOWN_API_KEY=env("BUTTONDOWN_API_KEY")
-
-
-
+GEMINI_API_KEY=env("GEMINI_API_KEY")
 
 MJML_BACKEND_MODE = "httpserver"
 MJML_HTTPSERVERS = [
@@ -331,4 +327,3 @@ MJML_HTTPSERVERS = [
         "HTTP_AUTH": (env('MJML_APPLICATION_ID'), env("MJML_SECRET")),
     }
 ]
-

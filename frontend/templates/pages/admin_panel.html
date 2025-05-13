@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block meta %}
+  <title>Admin Panel</title>
+{% endblock meta %}
+
+{% block content %}
+  <div class="container px-4 py-8 mx-auto max-w-3xl bg-white lg:min-w-0 md:pt-10 lg:flex-1">
+    <h1 class="mb-4 text-3xl font-bold">Admin Panel</h1>
+    <p>Welcome, superuser! This is the admin panel. You can add admin-only features here.</p>
+
+    <div class="mt-8">
+      <h2 class="mb-2 text-xl font-semibold">Summarize HN Discussion</h2>
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        {{ summarize_form.non_field_errors }}
+        <div>
+          <label for="id_discussion_ids" class="block text-sm font-medium text-gray-700">Hacker News Discussion IDs</label>
+          {{ summarize_form.discussion_ids.errors }}
+          {{ summarize_form.discussion_ids|add_class:'block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm' }}
+          {% if summarize_form.discussion_ids.help_text %}
+            <p class="mt-1 text-xs text-gray-500">{{ summarize_form.discussion_ids.help_text }}</p>
+          {% endif %}
+        </div>
+        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-md border border-transparent shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
+          Summarize
+        </button>
+      </form>
+    </div>
+  </div>
+{% endblock content %}

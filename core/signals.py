@@ -2,9 +2,9 @@ from allauth.account.signals import email_confirmed, user_signed_up
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django_q.tasks import async_task
+# from django_q.tasks import async_task
 
-from core.tasks import add_email_to_buttondown
+# from core.tasks import add_email_to_buttondown
 from core.models import Profile
 from ask_hn_digest.utils import get_ask_hn_digest_logger
 
@@ -15,7 +15,7 @@ logger = get_ask_hn_digest_logger(__name__)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         profile = Profile.objects.create(user=instance)
-        
+
 
     if instance.id == 1:
         # Use update() to avoid triggering the signal again
@@ -35,8 +35,4 @@ def add_email_to_buttondown_on_confirm(sender, **kwargs):
         kwargs=kwargs,
         sender=sender,
     )
-    async_task(add_email_to_buttondown, kwargs["email_address"], tag="user")
-
-
-
-
+    # async_task(add_email_to_buttondown, kwargs["email_address"], tag="user")
