@@ -12,10 +12,13 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import os
 from pathlib import Path
+from ask_hn_digest.sentry_utils import CustomLoggingIntegration
 import environ
 import structlog
 import logging
 import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
+
 import structlog
 from structlog_sentry import SentryProcessor
 
@@ -313,7 +316,16 @@ if ENVIRONMENT == "prod":
 
 SENTRY_DSN = env("SENTRY_DSN")
 if ENVIRONMENT == "prod" and SENTRY_DSN:
-    sentry_sdk.init(dsn=env("SENTRY_DSN"))
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[
+            LoggingIntegration(
+                level=None,
+                event_level=None
+            ),
+            CustomLoggingIntegration(event_level=logging.ERROR)
+        ],
+    )
 
 POSTHOG_API_KEY = env("POSTHOG_API_KEY")
 
