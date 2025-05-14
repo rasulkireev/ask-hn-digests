@@ -2,10 +2,7 @@ from django.contrib import sitemaps
 from django.urls import reverse
 from django.contrib.sitemaps import GenericSitemap
 
-
-from core.models import BlogPost
-
-
+from core.models import HNDiscussionSummary
 
 class StaticViewSitemap(sitemaps.Sitemap):
     """Generate Sitemap for the site"""
@@ -22,8 +19,8 @@ class StaticViewSitemap(sitemaps.Sitemap):
         return [
             "home",
             "uses",
-            
-            
+
+
             "blog_posts",
         ]
 
@@ -40,9 +37,11 @@ class StaticViewSitemap(sitemaps.Sitemap):
 
 sitemaps = {
     "static": StaticViewSitemap,
-    
     "blog": GenericSitemap(
-        {"queryset": BlogPost.objects.all(), "date_field": "created_at"},
+        {
+            "queryset": HNDiscussionSummary.objects.all(),
+            "date_field": "created_at",
+        },
         priority=0.85,
         protocol="https",
     ),
