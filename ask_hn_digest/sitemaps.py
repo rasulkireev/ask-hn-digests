@@ -19,8 +19,6 @@ class StaticViewSitemap(sitemaps.Sitemap):
         return [
             "home",
             "uses",
-
-
             "blog_posts",
         ]
 
