@@ -27,7 +27,12 @@ def summarize_hn_discussion(discussion_id):
     discussion_data = discussion_resp.json()
 
     if not discussion_data or "kids" not in discussion_data:
-        return {"error": "Invalid discussion ID or no comments found"}
+        logger.error(
+            "Invalid discussion ID or no comments found",
+            discussion_id=discussion_id,
+            discussion_data=discussion_data
+        )
+        raise
 
     title = discussion_data.get("title", "Untitled Discussion")
     original_post_text = discussion_data.get("text", "")
