@@ -157,27 +157,3 @@ def send_buttondown_newsletter(ids: list[int]):
     response = requests.post(url, headers=headers, json=data)
     logger.info(f"Buttondown API response: {response.status_code} {response.text}")
     return response.json()
-
-
-def send_buttondown_draft(email_id: str):
-    """
-    Sends a draft email via Buttondown to specified subscribers and recipients.
-
-    Args:
-        email_id (str): The ID of the Buttondown email draft to send.
-        subscribers (list[str]): List of subscriber UUIDs to send the draft to.
-        recipients (list[str]): List of email addresses to send the draft to.
-    Returns:
-        dict: API response from Buttondown
-    """
-    url = f"https://api.buttondown.com/v1/emails/{email_id}/send-draft"
-    headers = {
-        "Authorization": f"Token {settings.BUTTONDOWN_API_KEY}"
-    }
-    data = {
-        "recipients": ["kireevr1996@gmail.com"]
-    }
-
-    response = requests.post(url, headers=headers, json=data)
-    logger.info(f"Buttondown send-draft API response: {response.status_code} {response.text}")
-    return response.json()
