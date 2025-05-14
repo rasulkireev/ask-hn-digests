@@ -65,9 +65,10 @@ def summarize_hn_discussion(discussion_id):
     - "description" (A 1-2 sentence summary of the discussion, suitable for meta description tags. Should entice a reader to click and read the post.)
     - "tags" (A comma-separated list of tags for the blog post. Use the tags from the discussion and the comments.)
 
-    IMPORTANT: All summaries and fields should be in valid markdown format where appropriate.
-    IMPORTANT: Only return the JSON object, nothing else.
-    IMPORTANT: Return your analysis as a JSON object with the following format:
+    All summaries and fields should be in valid markdown format where appropriate.
+    For markdown lists make sure there is a blank line before and after the list.
+    Only return the JSON object, nothing else.
+    Return your analysis as a JSON object with the following format:
     {{
       "short_summary": "Brief markdown summary here",
       "long_summary": "Detailed markdown summary here",
