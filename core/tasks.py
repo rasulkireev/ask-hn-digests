@@ -100,6 +100,7 @@ def summarize_hn_discussion(discussion_id):
 
     HNDiscussionSummary.objects.create(
         discussion_id=discussion_id,
+        discussion_title=title,
         comment_ids=comment_ids,
         short_summary=summary_data.get("short_summary", ""),
         long_summary=summary_data.get("long_summary", ""),
@@ -110,3 +111,73 @@ def summarize_hn_discussion(discussion_id):
     )
 
     return "Success"
+
+
+def send_buttondown_newsletter(ids: list[int]):
+    """
+    Sends a Buttondown newsletter with summaries of the given HNDiscussionSummary ids.
+
+    Args:
+        ids (list[int]): List of HNDiscussionSummary ids to include in the newsletter
+        subject (str, optional): The subject line for the email. If None, generates a subject like 'Ask HN Digest - 2025 Week 5'.
+    Returns:
+        dict: API response from Buttondown
+    """
+    from core.models import HNDiscussionSummary
+    from datetime import datetime
+
+    # Generate subject if not provided
+    now = datetime.now()
+    year, week_num, _ = now.isocalendar()
+    subject = f"Ask HN Digest - {year} Week {week_num}"
+
+    summaries = HNDiscussionSummary.objects.filter(discussion_id__in=ids)
+    if not summaries.exists():
+        logger.error(f"No HNDiscussionSummary objects found for ids: {ids}")
+        raise
+
+    # Compose the body
+    body_lines = ["Here is this week's digest:\n"]
+    for summary in summaries:
+        body_lines.append(f"**{summary.discussion_title}**\n")
+        body_lines.append(f"{summary.short_summary}\n")
+        full_url = f"https://askhndigests.com{summary.get_absolute_url()}"
+        body_lines.append(f"[Read more]({full_url})\n")
+    body = "\n".join(body_lines)
+
+    url = "https://api.buttondown.com/v1/emails"
+    headers = {
+        "Authorization": f"Token {settings.BUTTONDOWN_API_KEY}"
+    }
+    data = {
+        "subject": subject,
+        "body": body
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+    logger.info(f"Buttondown API response: {response.status_code} {response.text}")
+    return response.json()
+
+
+def send_buttondown_draft(email_id: str):
+    """
+    Sends a draft email via Buttondown to specified subscribers and recipients.
+
+    Args:
+        email_id (str): The ID of the Buttondown email draft to send.
+        subscribers (list[str]): List of subscriber UUIDs to send the draft to.
+        recipients (list[str]): List of email addresses to send the draft to.
+    Returns:
+        dict: API response from Buttondown
+    """
+    url = f"https://api.buttondown.com/v1/emails/{email_id}/send-draft"
+    headers = {
+        "Authorization": f"Token {settings.BUTTONDOWN_API_KEY}"
+    }
+    data = {
+        "recipients": ["kireevr1996@gmail.com"]
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+    logger.info(f"Buttondown send-draft API response: {response.status_code} {response.text}")
+    return response.json()

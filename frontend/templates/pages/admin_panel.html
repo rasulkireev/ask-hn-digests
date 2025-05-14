@@ -28,5 +28,24 @@
         </button>
       </form>
     </div>
+
+    <div class="mt-8">
+      <h2 class="mb-2 text-xl font-semibold">Send Newsletter</h2>
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        {{ send_newsletter_form.non_field_errors }}
+        <div>
+          <label for="id_summary_ids" class="block text-sm font-medium text-gray-700">Summary IDs</label>
+          {{ send_newsletter_form.summary_ids.errors }}
+          {{ send_newsletter_form.summary_ids|add_class:'block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm' }}
+          {% if send_newsletter_form.summary_ids.help_text %}
+            <p class="mt-1 text-xs text-gray-500">{{ send_newsletter_form.summary_ids.help_text }}</p>
+          {% endif %}
+        </div>
+        <button type="submit" name="send_newsletter" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md border border-transparent shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          Send Newsletter
+        </button>
+      </form>
+    </div>
   </div>
 {% endblock content %}

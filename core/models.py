@@ -130,6 +130,7 @@ class Feedback(BaseModel):
 
 class HNDiscussionSummary(BaseModel):
     discussion_id = models.BigIntegerField(unique=True, help_text="Hacker News discussion ID")
+    discussion_title = models.CharField(max_length=500, help_text="Title of the discussion")
     comment_ids = models.JSONField(help_text="List of all comment IDs for this discussion")
     date_analyzed = models.DateTimeField(auto_now_add=True, help_text="Date and time when the discussion was analyzed")
 
@@ -148,3 +149,7 @@ class HNDiscussionSummary(BaseModel):
 
     def get_absolute_url(self):
         return reverse("blog_post", kwargs={"slug": self.slug})
+
+    @staticmethod
+    def get_latest_summaries_ids(count: int = 7):
+        return list(HNDiscussionSummary.objects.order_by("-date_analyzed")[:count].values_list("discussion_id", flat=True))

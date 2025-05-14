@@ -6,7 +6,7 @@ on:
         - main
 
 env:
-  PROJECT_NAME: ask_hn_digest
+  PROJECT_NAME: askhn-digests
 
 jobs:
   build-and-deploy:

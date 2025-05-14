@@ -15,7 +15,7 @@ from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives
 from django_q.tasks import async_task
 
-from core.forms import ProfileUpdateForm, SummarizeHNDiscussionForm
+from core.forms import ProfileUpdateForm, SummarizeHNDiscussionForm, SendNewsletterForm
 from core.models import Profile, BlogPost, HNDiscussionSummary
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
@@ -28,8 +28,7 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["latest_posts"] = BlogPost.objects.filter(status="published").order_by("-created_at")[:5]
-        context["latest_summaries"] = HNDiscussionSummary.objects.order_by("-date_analyzed")[:5]
+        context["latest_summaries"] = HNDiscussionSummary.objects.order_by("-date_analyzed")[:3]
         return context
 
 
@@ -105,18 +104,39 @@ class AdminPanelView(UserPassesTestMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["summarize_form"] = kwargs.get("summarize_form") or SummarizeHNDiscussionForm()
+        if "send_newsletter_form" in kwargs:
+            context["send_newsletter_form"] = kwargs["send_newsletter_form"]
+        else:
+            latest_ids = HNDiscussionSummary.get_latest_summaries_ids()
+            initial = {"summary_ids": ",".join(str(i) for i in latest_ids)}
+            context["send_newsletter_form"] = SendNewsletterForm(initial=initial)
         return context
 
     def post(self, request, *args, **kwargs):
-        form = SummarizeHNDiscussionForm(request.POST)
-        if form.is_valid():
-            discussion_ids_str = form.cleaned_data["discussion_ids"]
-            discussion_ids = [int(d.strip()) for d in discussion_ids_str.split(',') if d.strip()]
-
-            for discussion_id in discussion_ids:
-                async_task('core.tasks.summarize_hn_discussion', discussion_id, group="Analyze Discussion")
-
-            messages.success(request, f"Summarization tasks for discussions {discussion_ids_str} started!")
-            return redirect("admin_panel")
+        if "send_newsletter" in request.POST:
+            form = SendNewsletterForm(request.POST)
+            if form.is_valid():
+                summary_ids_str = form.cleaned_data["summary_ids"]
+                summary_ids = [int(sid.strip()) for sid in summary_ids_str.split(',') if sid.strip()]
+                from core.tasks import send_buttondown_newsletter
+                response = send_buttondown_newsletter(summary_ids)
+                if response.get("id") or response.get("success"):
+                    messages.success(request, f"Newsletter sent for summaries: {summary_ids_str}")
+                else:
+                    messages.error(request, f"Failed to send newsletter: {response}")
+                return redirect("admin_panel")
+            else:
+                return self.render_to_response(self.get_context_data(send_newsletter_form=form))
         else:
-            return self.render_to_response(self.get_context_data(summarize_form=form))
+            form = SummarizeHNDiscussionForm(request.POST)
+            if form.is_valid():
+                discussion_ids_str = form.cleaned_data["discussion_ids"]
+                discussion_ids = [int(d.strip()) for d in discussion_ids_str.split(',') if d.strip()]
+
+                for discussion_id in discussion_ids:
+                    async_task('core.tasks.summarize_hn_discussion', discussion_id, group="Analyze Discussion")
+
+                messages.success(request, f"Summarization tasks for discussions {discussion_ids_str} started!")
+                return redirect("admin_panel")
+            else:
+                return self.render_to_response(self.get_context_data(summarize_form=form))
