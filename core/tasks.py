@@ -3,6 +3,7 @@ import requests
 from google import genai
 import json
 from django.utils.text import slugify
+from datetime import datetime, timedelta, timezone
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
 from core.models import HNDiscussionSummary
@@ -134,12 +135,20 @@ def send_buttondown_newsletter(ids: list[int]):
         dict: API response from Buttondown
     """
     from core.models import HNDiscussionSummary
-    from datetime import datetime
+    from datetime import datetime, timedelta, timezone
 
     # Generate subject if not provided
-    now = datetime.now()
+    now = datetime.now(timezone.utc)
     year, week_num, _ = now.isocalendar()
     subject = f"Ask HN Digest - {year} Week {week_num}"
+
+    # Calculate next 9am UTC
+    nine_am_today = now.replace(hour=9, minute=0, second=0, microsecond=0)
+    if now < nine_am_today:
+        publish_date = nine_am_today
+    else:
+        publish_date = nine_am_today + timedelta(days=1)
+    publish_date_str = publish_date.isoformat()
 
     summaries = HNDiscussionSummary.objects.filter(discussion_id__in=ids)
     if not summaries.exists():
@@ -164,7 +173,8 @@ def send_buttondown_newsletter(ids: list[int]):
     }
     data = {
         "subject": subject,
-        "body": body
+        "body": body,
+        "publish_date": publish_date_str
     }
 
     response = requests.post(url, headers=headers, json=data)
