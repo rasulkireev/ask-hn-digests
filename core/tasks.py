@@ -93,8 +93,12 @@ def summarize_hn_discussion(discussion_id):
             try:
                 summary_data = json.loads(match.group(0))
             except Exception as e2:
-                logger.error(f"Gemini response not valid JSON after extraction: {str(e2)} | Raw: {summary_response}")
-                return {"error": f"Gemini response not valid JSON: {str(e2)}"}
+                logger.error(
+                    "Gemini response not valid JSON after extraction",
+                    error=str(e2),
+                    raw=summary_response
+                )
+                raise
         else:
             raise
 
@@ -133,7 +137,10 @@ def send_buttondown_newsletter(ids: list[int]):
 
     summaries = HNDiscussionSummary.objects.filter(discussion_id__in=ids)
     if not summaries.exists():
-        logger.error(f"No HNDiscussionSummary objects found for ids: {ids}")
+        logger.error(
+            "No HNDiscussionSummary objects found for ids",
+            ids=ids
+        )
         raise
 
     # Compose the body
@@ -155,5 +162,13 @@ def send_buttondown_newsletter(ids: list[int]):
     }
 
     response = requests.post(url, headers=headers, json=data)
-    logger.info(f"Buttondown API response: {response.status_code} {response.text}")
+    logger.info(
+        "Sent Buttondown Newsletter",
+        status_code=response.status_code,
+        text=response.text,
+        response=response.json(),
+        subject=subject,
+        body=body,
+        ids=ids
+    )
     return response.json()
