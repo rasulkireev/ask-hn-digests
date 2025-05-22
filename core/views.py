@@ -66,6 +66,7 @@ class BlogView(ListView):
     model = HNDiscussionSummary
     template_name = "blog/blog_posts.html"
     context_object_name = "blog_posts"
+    ordering = ["-date_analyzed"]
 
 
 class BlogPostView(DetailView):
