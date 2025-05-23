@@ -4,6 +4,7 @@ from google import genai
 import json
 from django.utils.text import slugify
 from datetime import datetime, timedelta, timezone
+from django_q.tasks import async_task
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
 from core.models import HNDiscussionSummary
@@ -109,7 +110,7 @@ def summarize_hn_discussion(discussion_id):
         else:
             raise
 
-    HNDiscussionSummary.objects.create(
+    summary = HNDiscussionSummary.objects.create(
         discussion_id=discussion_id,
         discussion_title=title,
         comment_ids=comment_ids,
@@ -120,6 +121,8 @@ def summarize_hn_discussion(discussion_id):
         description=summary_data.get("description", summary_data.get("long_summary", "")[:200]),
         tags=summary_data.get("tags", "")
     )
+
+    async_task('core.tasks.generate_twitter_thread', summary)
 
     return "Success"
 
@@ -188,3 +191,42 @@ def send_buttondown_newsletter(ids: list[int]):
         ids=ids
     )
     return response.json()
+
+
+def generate_twitter_thread(summary: HNDiscussionSummary):
+    """
+    Generates a Twitter thread for the given HNDiscussionSummary.
+    """
+    prompt = f"""
+    Generate a Twitter thread for the following blog post:
+    Title: {summary.title}
+    Description: {summary.description}
+    Long Summary: {summary.long_summary}
+
+    Don't use hashtags.
+    Do use emojis.
+    Don't use bold or italic text.
+    Don't use markdown, just plain text.
+    Don't use links.
+    Don't use images.
+    Don't use videos.
+
+    Only return the thread, nothing else.
+    Separate each tweet with `---`.
+    """
+    response = gemini_client.models.generate_content(
+        model="gemini-2.5-pro-preview-05-06",
+        contents=prompt
+    )
+    thread = getattr(response, 'text', None)
+
+    if thread:
+        summary.twitter_thread = thread
+        summary.save(update_fields=["twitter_thread"])
+        return "Success"
+    else:
+        logger.error(
+            "Failed to generate Twitter thread",
+            summary=summary
+        )
+        return "Failed"
