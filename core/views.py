@@ -133,11 +133,11 @@ class AdminPanelView(UserPassesTestMixin, TemplateView):
             if form.is_valid():
                 discussion_ids_str = form.cleaned_data["discussion_ids"]
                 discussion_ids = [int(d.strip()) for d in discussion_ids_str.split(',') if d.strip()]
-
-                for discussion_id in discussion_ids:
+                discussion_ids_to_analyze = [d for d in discussion_ids if not HNDiscussionSummary.objects.filter(discussion_id=d).exists()]
+                for discussion_id in discussion_ids_to_analyze:
                     async_task('core.tasks.summarize_hn_discussion', discussion_id, group="Analyze Discussion")
 
-                messages.success(request, f"Summarization tasks for discussions {discussion_ids_str} started!")
+                messages.success(request, f"Scheduled {len(discussion_ids_to_analyze)} discussions for analysis!")
                 return redirect("admin_panel")
             else:
                 return self.render_to_response(self.get_context_data(summarize_form=form))

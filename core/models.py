@@ -144,6 +144,9 @@ class HNDiscussionSummary(BaseModel):
     tags = models.TextField(blank=True, help_text="Tags for the blog post")
     long_summary = models.TextField(help_text="Long summary of the discussion")
 
+    # for social media
+    twitter_thread = models.TextField(blank=True)
+
     def __str__(self):
         return f"HN Discussion {self.discussion_id} analyzed on {self.date_analyzed}"
 
