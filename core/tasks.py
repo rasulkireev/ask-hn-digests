@@ -4,6 +4,7 @@ from google import genai
 import json
 from django.utils.text import slugify
 from datetime import datetime, timedelta, timezone
+from core.utils import generate_buttondown_newsletter_subject
 from django_q.tasks import async_task
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
@@ -143,7 +144,6 @@ def send_buttondown_newsletter(ids: list[int]):
     # Generate subject if not provided
     now = datetime.now(timezone.utc)
     year, week_num, _ = now.isocalendar()
-    subject = f"Ask HN Digest - {year} Week {week_num}"
 
     # Calculate next 9am UTC
     nine_am_today = now.replace(hour=9, minute=0, second=0, microsecond=0)
@@ -169,6 +169,8 @@ def send_buttondown_newsletter(ids: list[int]):
         full_url = f"https://askhndigests.com{summary.get_absolute_url()}"
         body_lines.append(f"[Read more]({full_url})\n")
     body = "\n".join(body_lines)
+
+    subject = generate_buttondown_newsletter_subject(body)
 
     url = "https://api.buttondown.com/v1/emails"
     headers = {
