@@ -123,7 +123,8 @@ def summarize_hn_discussion(discussion_id):
         tags=summary_data.get("tags", "")
     )
 
-    async_task('core.tasks.generate_twitter_thread', summary)
+    async_task('core.tasks.generate_twitter_thread', summary, group="Generate Twitter Thread")
+    async_task('core.tasks.generate_summary_tags', summary, group="Generate Summary Tags")
 
     return "Success"
 
@@ -232,3 +233,64 @@ def generate_twitter_thread(summary: HNDiscussionSummary):
             summary=summary
         )
         return "Failed"
+
+
+def generate_summary_tags(summary: HNDiscussionSummary):
+    """
+    Generates 10 tags for the given HNDiscussionSummary object using Gemini.
+    """
+    prompt = f"""
+    Please analyze the following content from a Hacker News discussion summary and generate exactly 10 relevant tags.
+    These tags should help categorize the core topics and themes of the discussion.
+
+    Title:
+    {summary.title}
+
+    Short Summary:
+    {summary.short_summary}
+
+    Long Summary (excerpt):
+    {summary.long_summary} # Use an excerpt to stay within reasonable token limits
+
+    Based on this information, provide a comma-separated string of 10 tags.
+    Example output:
+    tag1,tag2,tag3,tag4,tag5,tag6,tag7,tag8,tag9,tag10
+
+    Only return the comma-separated string of tags. Do not include any other text, headers, or explanations.
+    """
+
+    try:
+        response = gemini_client.models.generate_content(
+            model="gemini-2.5-pro-preview-05-06", # Using the same model as generate_twitter_thread
+            contents=prompt
+        )
+        generated_tags = getattr(response, 'text', None)
+
+        if generated_tags:
+            # Basic cleaning: remove potential extra quotes or newlines
+            generated_tags = generated_tags.strip().strip('"').strip("'")
+            summary.summary_tags = generated_tags
+            summary.save(update_fields=["summary_tags"])
+            logger.info(
+                "Successfully generated and saved summary tags",
+                summary_id=summary.id,
+                discussion_id=summary.discussion_id,
+                generated_tags=generated_tags
+            )
+            return "Success"
+        else:
+            logger.error(
+                "Failed to generate summary tags: No text in Gemini response",
+                summary_id=summary.id,
+                discussion_id=summary.discussion_id
+            )
+            return "Failed: No text in response"
+    except Exception as e:
+        logger.error(
+            "Failed to generate summary tags due to an exception",
+            summary_id=summary.id,
+            discussion_id=summary.discussion_id,
+            error=str(e),
+            exc_info=True
+        )
+        return f"Failed: {str(e)}"

@@ -1,0 +1,27 @@
+{
+  "entrypoints": {
+    "index": {
+      "assets": {
+        "js": [
+          "http://localhost:9091/js/runtime.js",
+          "http://localhost:9091/js/vendors-node_modules_hotwired_stimulus-webpack-helpers_dist_stimulus-webpack-helpers_js-node_-9ebed4.js",
+          "http://localhost:9091/js/index.js"
+        ],
+        "css": [
+          "http://localhost:9091/css/index.css"
+        ]
+      }
+    }
+  },
+  "index.css": "http://localhost:9091/css/index.css",
+  "index.js": "http://localhost:9091/js/index.js",
+  "js/vendors-node_modules_hotwired_stimulus-webpack-helpers_dist_stimulus-webpack-helpers_js-node_-9ebed4.js": "http://localhost:9091/js/vendors-node_modules_hotwired_stimulus-webpack-helpers_dist_stimulus-webpack-helpers_js-node_-9ebed4.js",
+  "runtime.js": "http://localhost:9091/js/runtime.js",
+  "vendors/.gitkeep": "http://localhost:9091/vendors/.gitkeep",
+  "vendors/images/.gitkeep": "http://localhost:9091/vendors/images/.gitkeep",
+  "vendors/images/logo.png": "http://localhost:9091/vendors/images/logo.png",
+  "vendors/images/logo.svg": "http://localhost:9091/vendors/images/logo.svg",
+  "vendors/images/sample.jpg": "http://localhost:9091/vendors/images/sample.jpg",
+  "vendors/images/unknown-man.png": "http://localhost:9091/vendors/images/unknown-man.png",
+  "vendors/images/webpack.png": "http://localhost:9091/vendors/images/webpack.png"
+}

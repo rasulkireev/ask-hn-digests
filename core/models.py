@@ -131,6 +131,7 @@ class Feedback(BaseModel):
 class HNDiscussionSummary(BaseModel):
     discussion_id = models.BigIntegerField(unique=True, help_text="Hacker News discussion ID")
     discussion_title = models.CharField(max_length=500, help_text="Title of the discussion")
+    summary_tags = models.TextField(blank=True, null=True, help_text="Tags for categorizing the discussion summary")
     comment_ids = models.JSONField(help_text="List of all comment IDs for this discussion")
     date_analyzed = models.DateTimeField(auto_now_add=True, help_text="Date and time when the discussion was analyzed")
 
