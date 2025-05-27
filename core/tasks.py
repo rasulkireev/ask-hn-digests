@@ -15,6 +15,63 @@ logger = get_ask_hn_digest_logger(__name__)
 gemini_client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
 
+def _fetch_all_comments_recursive(current_level_ids: list[int], accumulated_texts: list[str], accumulated_ids: list[int]):
+    """
+    Recursively fetches all comments and their nested replies, accumulating their text and IDs.
+
+    Args:
+        current_level_ids (list[int]): A list of comment IDs to fetch for the current recursion level.
+        accumulated_texts (list[str]): A list to accumulate the text of all valid comments.
+        accumulated_ids (list[int]): A list to accumulate the IDs of all processed comments.
+    """
+    if settings.DEBUG and len(accumulated_texts) > 200:
+        logger.info("Reached comment text limit in debug mode during recursive fetch.")
+        return
+
+    for comment_id in current_level_ids:
+        try:
+            comment_resp = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{comment_id}.json")
+            comment_resp.raise_for_status()
+            comment_data = comment_resp.json()
+
+            if comment_data:
+                is_deleted = comment_data.get("deleted", False)
+                is_dead = comment_data.get("dead", False)
+
+                if not is_deleted and not is_dead:
+                    accumulated_ids.append(comment_id)
+
+                    comment_text = comment_data.get("text")
+                    if comment_text:
+                        accumulated_texts.append(comment_text)
+
+                    nested_comment_ids = comment_data.get("kids", [])
+                    if nested_comment_ids:
+                        _fetch_all_comments_recursive(nested_comment_ids, accumulated_texts, accumulated_ids)
+                else:
+                    logger.info(
+                        "Skipping deleted or dead comment",
+                        comment_id=comment_id,
+                        deleted=is_deleted,
+                        dead=is_dead
+                    )
+            else:
+                logger.warning("Received empty data for comment_id", comment_id=comment_id)
+
+        except requests.RequestException as e:
+            logger.error(
+                "Failed to fetch comment during recursive fetch",
+                comment_id=comment_id,
+                error=str(e)
+            )
+        except json.JSONDecodeError as e:
+            logger.error(
+                "Failed to decode JSON for comment during recursive fetch",
+                comment_id=comment_id,
+                error=str(e)
+            )
+
+
 def summarize_hn_discussion(discussion_id):
     """
     Summarize a Hacker News discussion by retrieving all comments and using an LLM to generate summaries.
@@ -39,17 +96,12 @@ def summarize_hn_discussion(discussion_id):
 
     title = discussion_data.get("title", "Untitled Discussion")
     original_post_text = discussion_data.get("text", "")
-    comment_ids = discussion_data.get("kids", [])
-
-    if settings.DEBUG:
-        comment_ids = comment_ids[:50]
+    top_level_comment_ids = discussion_data.get("kids", [])
 
     comments_text = []
-    for comment_id in comment_ids:
-        comment_resp = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{comment_id}.json")
-        comment_data = comment_resp.json()
-        if comment_data and "text" in comment_data and not comment_data.get("deleted", False):
-            comments_text.append(comment_data["text"])
+    all_processed_comment_ids = []
+
+    _fetch_all_comments_recursive(top_level_comment_ids, comments_text, all_processed_comment_ids)
 
     all_comments = "\n\n".join(comments_text)
     prompt = f"""Analyze the following Hacker News discussion and its comments.
@@ -114,7 +166,7 @@ def summarize_hn_discussion(discussion_id):
     summary = HNDiscussionSummary.objects.create(
         discussion_id=discussion_id,
         discussion_title=title,
-        comment_ids=comment_ids,
+        comment_ids=all_processed_comment_ids,
         short_summary=summary_data.get("short_summary", ""),
         long_summary=summary_data.get("long_summary", ""),
         title=summary_data.get("title", title),
