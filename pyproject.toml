@@ -36,12 +36,14 @@ logfire = "^3.6.4"
 pydantic = {extras = ["email"], version = "^2.11.4"}
 google-genai = "^1.14.0"
 
-
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.1"
 ty = "^0.0.1a7"
 ruff = "^0.11.11"
 djlint = "^1.36.4"
+
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
 
 [tool.ruff]
 line-length = 100
