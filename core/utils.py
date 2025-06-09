@@ -1,13 +1,15 @@
 from django.forms.utils import ErrorList
+import requests
+from datetime import datetime
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
 from google import genai
 from django.conf import settings
 
+
 logger = get_ask_hn_digest_logger(__name__)
 
-gemini_client = genai.Client(api_key=settings.GEMINI_API_KEY)
-
+HN_API_BASE_URL = "https://hacker-news.firebaseio.com/v0"
 
 class DivErrorList(ErrorList):
     def __str__(self):
@@ -33,6 +35,8 @@ class DivErrorList(ErrorList):
          """
 
 def generate_buttondown_newsletter_subject(body: str):
+    gemini_client = genai.Client(api_key=settings.GEMINI_API_KEY)
+
     """
     Generates a newsletter subject line using the Gemini API based on the email body.
     """
@@ -88,3 +92,103 @@ def generate_buttondown_newsletter_subject(body: str):
     subject = getattr(response, 'text', None)
 
     return subject.strip()
+
+def get_item_data(item_id):
+    """Fetches data for a given item ID from the Hacker News API."""
+    try:
+        response = requests.get(f"{HN_API_BASE_URL}/item/{item_id}.json")
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching item {item_id}: {e}")
+        return None
+    except ValueError as e: # Handles JSON decoding errors
+        print(f"Error decoding JSON for item {item_id}: {e}")
+        return None
+
+def fetch_comments_recursive(comment_id, depth, all_ids_list, comment_texts_list):
+    """
+    Recursively fetches a comment and its children, including author and date.
+    Appends comment IDs to all_ids_list and formatted text to comment_texts_list.
+    """
+    comment_data = get_item_data(comment_id)
+    indentation = '    ' * depth
+
+    if not comment_data:
+        comment_texts_list.append(f"{indentation}[Error fetching comment {comment_id}]")
+        return
+
+    item_id_val = comment_data.get("id")
+    if item_id_val is not None:
+        all_ids_list.append(item_id_val)
+    else:
+        # This case should be rare for valid comment items from the API
+        print(f"Warning: Fetched item (intended ID: {comment_id}) did not contain an 'id' field.")
+
+    if comment_data.get("deleted"):
+        comment_texts_list.append(f"{indentation}[comment deleted]")
+        return
+    if comment_data.get("dead"):
+        comment_texts_list.append(f"{indentation}[comment dead]")
+        return
+
+    author = comment_data.get("by", "[unknown author]")
+    unix_time = comment_data.get("time")
+    readable_date = "[unknown date]"
+    if unix_time:
+        try:
+            readable_date = datetime.fromtimestamp(unix_time).strftime('%Y-%m-%d %H:%M:%S')
+        except TypeError:
+            readable_date = "[invalid date format]"
+
+
+    text = comment_data.get("text", "[No text for this comment]")
+    # HTML entities will be preserved as they are from the API
+
+    comment_texts_list.append(f"{indentation}{author} ({readable_date}): {text}")
+
+    # Process child comments
+    if "kids" in comment_data:
+        for kid_id in comment_data["kids"]:
+            fetch_comments_recursive(kid_id, depth + 1, all_ids_list, comment_texts_list)
+
+def get_post_comments(post_id):
+    """
+    Retrieves all comment IDs and a formatted string of all comments (with author and date)
+    for a given Hacker News post ID.
+
+    Args:
+        post_id (int): The ID of the Hacker News post.
+
+    Returns:
+        tuple: (list_of_comment_ids, formatted_comments_string)
+               Returns ([], "Error or no comments message") on failure or no comments.
+    """
+    all_comment_ids = []
+    formatted_comment_lines = []
+
+    post_data = get_item_data(post_id)
+
+    if not post_data:
+        return [], f"Error: Could not fetch post {post_id} or post data is invalid."
+
+    item_type = post_data.get("type")
+
+    # A post (story, poll) has comments listed in its 'kids' attribute.
+    if "kids" in post_data:
+        for top_level_comment_id in post_data["kids"]:
+            fetch_comments_recursive(top_level_comment_id, 0, all_comment_ids, formatted_comment_lines)
+    elif item_type in ("story", "poll"): # These types should have 'descendants'
+        descendants = post_data.get("descendants", 0)
+        if descendants == 0:
+             return [], "Post has no comments."
+        else:
+            # This case suggests an API inconsistency or an old item format
+            # if 'descendants' > 0 but 'kids' is missing.
+            return [], f"Post {post_id} (type: {item_type}) has {descendants} descendants but no 'kids' attribute in the top-level item data. Comments cannot be directly traversed."
+    else:
+        # For other item types (e.g., 'job', or a 'comment' ID passed as post_id without kids)
+        return [], f"Post {post_id} (type: {item_type}) does not have comments listed under a 'kids' attribute or is not a type that typically has threaded comments in this manner."
+
+
+    return all_comment_ids, "\n".join(formatted_comment_lines)
