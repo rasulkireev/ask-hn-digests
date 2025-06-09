@@ -10,21 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import logging
 import os
 from pathlib import Path
-from ask_hn_digest.sentry_utils import CustomLoggingIntegration
-import environ
-import structlog
-import logging
-import sentry_sdk
-from sentry_sdk.integrations.logging import LoggingIntegration
 
+import environ
+import logfire
+import sentry_sdk
 import structlog
+from sentry_sdk.integrations.logging import LoggingIntegration
 from structlog_sentry import SentryProcessor
 
-import logfire
-
-
+from ask_hn_digest.sentry_utils import CustomLoggingIntegration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,7 +44,7 @@ if ENVIRONMENT == "prod":
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
@@ -64,15 +61,12 @@ INSTALLED_APPS = [
     "webpack_boilerplate",
     "widget_tweaks",
     "anymail",
-
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-
     "django_q",
     "django_extensions",
     "mjml",
-
     "django_structlog",
     "core.apps.CoreConfig",
 ]
@@ -166,14 +160,14 @@ STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3.S3Storage",
         "OPTIONS": {
-          "bucket_name": bucket_name,
-          "default_acl": "public-read",
-          "region_name": "eu-east-1",
-          "endpoint_url": env("AWS_S3_ENDPOINT_URL"),
-          "access_key": env("AWS_ACCESS_KEY_ID"),
-          "secret_key": env("AWS_SECRET_ACCESS_KEY"),
-          "querystring_auth": False,
-          "file_overwrite": False,
+            "bucket_name": bucket_name,
+            "default_acl": "public-read",
+            "region_name": "eu-east-1",
+            "endpoint_url": env("AWS_S3_ENDPOINT_URL"),
+            "access_key": env("AWS_ACCESS_KEY_ID"),
+            "secret_key": env("AWS_SECRET_ACCESS_KEY"),
+            "querystring_auth": False,
+            "file_overwrite": False,
         },
     },
     "staticfiles": {
@@ -217,9 +211,7 @@ ACCOUNT_FORMS = {
 if ENVIRONMENT == "prod":
     ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
-SOCIALACCOUNT_PROVIDERS = {
-
-}
+SOCIALACCOUNT_PROVIDERS = {}
 
 ANYMAIL = {
     "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
@@ -261,7 +253,9 @@ LOGGING = {
         },
         "key_value": {
             "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.processors.KeyValueRenderer(key_order=["timestamp", "level", "event", "logger"]),
+            "processor": structlog.processors.KeyValueRenderer(
+                key_order=["timestamp", "level", "event", "logger"]
+            ),
         },
     },
     "handlers": {
@@ -283,6 +277,11 @@ LOGGING = {
             "propagate": False,
         },
         "ask_hn_digest": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "django-q": {
             "level": "DEBUG",
             "handlers": ["console"],
             "propagate": False,
@@ -309,33 +308,33 @@ structlog.configure(
     cache_logger_on_first_use=True,
 )
 
+log_level = env("DJANGO_LOG_LEVEL", default="INFO")
 if ENVIRONMENT == "prod":
-    LOGGING["loggers"]["ask_hn_digest"]["level"] = env("DJANGO_LOG_LEVEL", default="INFO")
+    LOGGING["loggers"]["ask_hn_digest"]["level"] = log_level
     LOGGING["loggers"]["ask_hn_digest"]["handlers"] = ["json_console"]
     LOGGING["loggers"]["django_structlog"]["handlers"] = ["json_console"]
+    LOGGING["loggers"]["django-q"]["handlers"] = ["json_console"]
+    LOGGING["loggers"]["django-q"]["level"] = log_level
 
 SENTRY_DSN = env("SENTRY_DSN")
 if ENVIRONMENT == "prod" and SENTRY_DSN:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         integrations=[
-            LoggingIntegration(
-                level=None,
-                event_level=None
-            ),
-            CustomLoggingIntegration(event_level=logging.ERROR)
+            LoggingIntegration(level=None, event_level=None),
+            CustomLoggingIntegration(event_level=logging.ERROR),
         ],
     )
 
 POSTHOG_API_KEY = env("POSTHOG_API_KEY")
 
-BUTTONDOWN_API_KEY=env("BUTTONDOWN_API_KEY")
-GEMINI_API_KEY=env("GEMINI_API_KEY")
+BUTTONDOWN_API_KEY = env("BUTTONDOWN_API_KEY")
+GEMINI_API_KEY = env("GEMINI_API_KEY")
 
 MJML_BACKEND_MODE = "httpserver"
 MJML_HTTPSERVERS = [
     {
         "URL": "https://api.mjml.io/v1/render",
-        "HTTP_AUTH": (env('MJML_APPLICATION_ID'), env("MJML_SECRET")),
+        "HTTP_AUTH": (env("MJML_APPLICATION_ID"), env("MJML_SECRET")),
     }
 ]

@@ -4,7 +4,7 @@ from google import genai
 import json
 from django.utils.text import slugify
 from datetime import datetime, timedelta, timezone
-from core.utils import generate_buttondown_newsletter_subject
+from core.utils import generate_buttondown_newsletter_subject, get_post_comments
 from django_q.tasks import async_task
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
@@ -39,19 +39,8 @@ def summarize_hn_discussion(discussion_id):
 
     title = discussion_data.get("title", "Untitled Discussion")
     original_post_text = discussion_data.get("text", "")
-    comment_ids = discussion_data.get("kids", [])
 
-    if settings.DEBUG:
-        comment_ids = comment_ids[:50]
-
-    comments_text = []
-    for comment_id in comment_ids:
-        comment_resp = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{comment_id}.json")
-        comment_data = comment_resp.json()
-        if comment_data and "text" in comment_data and not comment_data.get("deleted", False):
-            comments_text.append(comment_data["text"])
-
-    all_comments = "\n\n".join(comments_text)
+    comment_ids, comments_string = get_post_comments(discussion_id)
     prompt = f"""Analyze the following Hacker News discussion and its comments.
 
     ---
@@ -62,7 +51,7 @@ def summarize_hn_discussion(discussion_id):
     {original_post_text}
 
     Discussion comments:
-    {all_comments[:50000]}  # Limit text length to avoid token limits
+    {comments_string}  # Limit text length to avoid token limits
     ---
 
     Provide your analysis as a JSON object with the following keys:
