@@ -145,7 +145,7 @@ class HNDiscussionSummary(BaseModel):
     twitter_thread = models.TextField(blank=True)
 
     def __str__(self):
-        return f"HN Discussion {self.discussion_id} analyzed on {self.date_analyzed}"
+        return f"ID: {self.discussion_id} - Title: {self.discussion_title}"
 
     def get_absolute_url(self):
         return reverse("blog_post", kwargs={"slug": self.slug})
