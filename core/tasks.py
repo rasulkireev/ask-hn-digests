@@ -49,17 +49,53 @@ def summarize_hn_discussion(discussion_id):
     ---
 
     Provide your analysis as a JSON object with the following keys:
-    - "short_summary" (This summary will be featured in an email newsletter that includes a total of 7 summaries. It needs to be concise enough to fit well within this format, yet detailed enough to offer a meaningful understanding of the discussion. Highlight any useful tips, tricks, or productive arguments shared. The primary goal is to provide immediate value to the newsletter reader.)
-    - "long_summary" (This summary will be published as a blog post on a website. It should be a more comprehensive version of the short_summary. Elaborate on the key themes, useful tips and tricks, insightful points, and any productive arguments from the discussion. The aim is to deliver significant value to someone reading it as a standalone piece. Don't start with a header/subheader. Do a text intro first, then add headers/subheader as you see fit.)
-    - "title" (A concise, SEO-friendly blog post title for this discussion. Do not use generic titles. Make it specific and engaging. Do not use HN or Hacker News in the title.)
-    - "slug" (A URL-friendly version of the title, lowercase, words separated by hyphens, no special characters, on the shorter side.)
-    - "description" (A 1-2 sentence summary of the discussion, suitable for meta description tags. Should entice a reader to click and read the post.)
-    - "tags" (A comma-separated list of tags for the blog post. Use the tags from the discussion and the comments.)
+    - "short_summary"
+      - This summary will be featured in an email newsletter that includes a total of 7 summaries.
+      - It needs to be concise enough to fit well within this format, yet detailed enough to offer a meaningful understanding of the discussion.
+      - Highlight any useful tips, tricks, or productive arguments shared.
+      - The primary goal is to provide immediate value to the newsletter reader.
+      - Do not talk abour HN or Hacker News in the summary.
 
-    All summaries and fields should be in valid markdown format where appropriate.
-    For markdown lists make sure there is a blank line before and after the list.
-    Only return the JSON object, nothing else.
-    Return your analysis as a JSON object with the following format:
+    - "long_summary"
+      - This summary will be published as a blog post on a website.
+      - It should be a more comprehensive version of the short_summary.
+      - Elaborate on the key themes, useful tips and tricks, insightful points, and any productive arguments from the discussion.
+      - The aim is to deliver significant value to someone reading it as a standalone piece.
+      - Don't start with a header/subheader. Do a text intro first, then add headers/subheader as you see fit.
+      - Do not talk abour HN or Hacker News in the summary.
+
+    - "title"
+      - A concise, SEO-friendly blog post title for this discussion.
+      - Do not use generic titles.
+      - Make it specific and engaging.
+      - Do not use HN or Hacker News in the title.
+
+    - "slug"
+      - A URL-friendly version of the title
+      - Lowercase
+      - Words separated by hyphens
+      - No special characters
+      - On the shorter side
+
+    - "description"
+      - A 1-2 sentence summary of the discussion
+      - Suitable for meta description tags
+      - Should entice a reader to click and read the post
+
+    - "tags"
+      - A comma-separated list of tags for the blog post
+      - Use the tags from the discussion and the comments
+      - Do not include HN or Hacker News in the tags
+
+    ---
+
+    - All summaries and fields should be in valid markdown format where appropriate.
+    - For markdown lists make sure there is a blank line before and after the list.
+    - IMPORTANT: Only return the JSON object, nothing else.
+
+    ---
+
+    IMPORTANT: Return your analysis as a JSON object with the following format:
     {{
       "short_summary": "Brief markdown summary here",
       "long_summary": "Detailed markdown summary here",
@@ -177,6 +213,7 @@ def generate_twitter_thread(summary: HNDiscussionSummary):
     Don't use links.
     Don't use images.
     Don't use videos.
+    Don't mention Hacker News or HN in the thread.
 
     Only return the thread, nothing else.
     Separate each tweet with `---`.
@@ -196,22 +233,29 @@ def generate_twitter_thread(summary: HNDiscussionSummary):
 
 
 def generate_summary_tags(summary: HNDiscussionSummary):
-    """
-    Generates 10 tags for the given HNDiscussionSummary object using Gemini.
-    """
     prompt = f"""
     Please analyze the following content from a Hacker News discussion summary and generate exactly 10 relevant tags.
     These tags should help categorize the core topics and themes of the discussion.
+
+    ---
     Title:
     {summary.title}
+
     Short Summary:
     {summary.short_summary}
+
     Long Summary (excerpt):
-    {summary.long_summary} # Use an excerpt to stay within reasonable token limits
+    {summary.long_summary}
+    ---
+
     Based on this information, provide a comma-separated string of 10 tags.
+
     Example output:
     tag1,tag2,tag3,tag4,tag5,tag6,tag7,tag8,tag9,tag10
-    Only return the comma-separated string of tags. Do not include any other text, headers, or explanations.
+
+    Only return the comma-separated string of tags.
+    Do not include any other text, headers, or explanations.
+    Do not include HN or Hacker News in the tags.
     """  # noqa: E501
 
     try:
