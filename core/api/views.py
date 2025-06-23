@@ -1,22 +1,22 @@
 from django.http import HttpRequest
 from ninja import NinjaAPI
 
+from ask_hn_digest.utils import get_ask_hn_digest_logger
 from core.api.auth import MultipleAuthSchema
-from core.models import BlogPost, Feedback, NewsletterSubscriber
 from core.api.schemas import (
+    BlogPostIn,
+    BlogPostOut,
     NewsletterSubscribeIn,
     NewsletterSubscribeOut,
     SubmitFeedbackIn,
     SubmitFeedbackOut,
-    BlogPostIn,
-    BlogPostOut,
 )
-
-from ask_hn_digest.utils import get_ask_hn_digest_logger
+from core.models import BlogPost, Feedback, NewsletterSubscriber
 
 logger = get_ask_hn_digest_logger(__name__)
 
 api = NinjaAPI(auth=MultipleAuthSchema(), csrf=True)
+
 
 @api.post("/submit-feedback", response=SubmitFeedbackOut)
 def submit_feedback(request: HttpRequest, data: SubmitFeedbackIn):
@@ -52,19 +52,18 @@ def newsletter_subscribe(request: HttpRequest, data: NewsletterSubscribeIn):
 
     if not created:
         return NewsletterSubscribeOut(
-            status="failure",
-            message="You are already subscribed to the newsletter."
+            status="failure", message="You are already subscribed to the newsletter."
         )
 
     added_to_buttondown = subscriber.add_newsletter_subscriber_to_buttondown()
     if not added_to_buttondown:
         return NewsletterSubscribeOut(
             status="failure",
-            message="Failed to subscribe to the newsletter. Please try again later."
+            message="Failed to subscribe to the newsletter. Please try again later.",
         )
 
     return NewsletterSubscribeOut(
         status="success",
         message="Subscribed successfully! Please check your email to confirm \
-          your subscription and start receiving your weekly digest."
+          your subscription and start receiving your weekly digest.",
     )

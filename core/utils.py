@@ -1,15 +1,16 @@
-from django.forms.utils import ErrorList
-import requests
 from datetime import datetime
 
-from ask_hn_digest.utils import get_ask_hn_digest_logger
-from google import genai
+import requests
 from django.conf import settings
+from django.forms.utils import ErrorList
+from google import genai
 
+from ask_hn_digest.utils import get_ask_hn_digest_logger
 
 logger = get_ask_hn_digest_logger(__name__)
 
 HN_API_BASE_URL = "https://hacker-news.firebaseio.com/v0"
+
 
 class DivErrorList(ErrorList):
     def __str__(self):
@@ -28,11 +29,12 @@ class DivErrorList(ErrorList):
                   </svg>
                 </div>
                 <div class="ml-3 text-sm text-red-700">
-                      {''.join([f'<p>{e}</p>' for e in self])}
+                      {"".join([f"<p>{e}</p>" for e in self])}
                 </div>
               </div>
             </div>
-         """
+         """  # noqa: E501
+
 
 def generate_buttondown_newsletter_subject(body: str):
     gemini_client = genai.Client(api_key=settings.GEMINI_API_KEY)
@@ -83,15 +85,16 @@ def generate_buttondown_newsletter_subject(body: str):
 
     Generate a single, compelling subject line based on the content and guidelines above.
     Only return the subject line, nothing else.
-    """
+    """  # noqa: E501
 
     response = gemini_client.models.generate_content(
         model="gemini-2.5-pro-preview-05-06",  # Using model from user's example
-        contents=prompt
+        contents=prompt,
     )
-    subject = getattr(response, 'text', None)
+    subject = getattr(response, "text", None)
 
     return subject.strip()
+
 
 def get_item_data(item_id):
     """Fetches data for a given item ID from the Hacker News API."""
@@ -102,9 +105,10 @@ def get_item_data(item_id):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching item {item_id}: {e}")
         return None
-    except ValueError as e: # Handles JSON decoding errors
+    except ValueError as e:  # Handles JSON decoding errors
         print(f"Error decoding JSON for item {item_id}: {e}")
         return None
+
 
 def fetch_comments_recursive(comment_id, depth, all_ids_list, comment_texts_list):
     """
@@ -112,7 +116,7 @@ def fetch_comments_recursive(comment_id, depth, all_ids_list, comment_texts_list
     Appends comment IDs to all_ids_list and formatted text to comment_texts_list.
     """
     comment_data = get_item_data(comment_id)
-    indentation = '    ' * depth
+    indentation = "    " * depth
 
     if not comment_data:
         comment_texts_list.append(f"{indentation}[Error fetching comment {comment_id}]")
@@ -137,10 +141,9 @@ def fetch_comments_recursive(comment_id, depth, all_ids_list, comment_texts_list
     readable_date = "[unknown date]"
     if unix_time:
         try:
-            readable_date = datetime.fromtimestamp(unix_time).strftime('%Y-%m-%d %H:%M:%S')
+            readable_date = datetime.fromtimestamp(unix_time).strftime("%Y-%m-%d %H:%M:%S")
         except TypeError:
             readable_date = "[invalid date format]"
-
 
     text = comment_data.get("text", "[No text for this comment]")
     # HTML entities will be preserved as they are from the API
@@ -151,6 +154,7 @@ def fetch_comments_recursive(comment_id, depth, all_ids_list, comment_texts_list
     if "kids" in comment_data:
         for kid_id in comment_data["kids"]:
             fetch_comments_recursive(kid_id, depth + 1, all_ids_list, comment_texts_list)
+
 
 def get_post_comments(post_id):
     """
@@ -177,18 +181,35 @@ def get_post_comments(post_id):
     # A post (story, poll) has comments listed in its 'kids' attribute.
     if "kids" in post_data:
         for top_level_comment_id in post_data["kids"]:
-            fetch_comments_recursive(top_level_comment_id, 0, all_comment_ids, formatted_comment_lines)
-    elif item_type in ("story", "poll"): # These types should have 'descendants'
+            fetch_comments_recursive(
+                top_level_comment_id, 0, all_comment_ids, formatted_comment_lines
+            )
+    elif item_type in ("story", "poll"):  # These types should have 'descendants'
         descendants = post_data.get("descendants", 0)
         if descendants == 0:
-             return [], "Post has no comments."
+            return [], "Post has no comments."
         else:
             # This case suggests an API inconsistency or an old item format
             # if 'descendants' > 0 but 'kids' is missing.
-            return [], f"Post {post_id} (type: {item_type}) has {descendants} descendants but no 'kids' attribute in the top-level item data. Comments cannot be directly traversed."
+            return (
+                [],
+                f"""
+                Post {post_id} (type: {item_type})
+                has {descendants} descendants but no 'kids' attribute in the top-level item data.
+                Comments cannot be directly traversed.
+                This is a bug in the Hacker News API.
+                """,
+            )
     else:
         # For other item types (e.g., 'job', or a 'comment' ID passed as post_id without kids)
-        return [], f"Post {post_id} (type: {item_type}) does not have comments listed under a 'kids' attribute or is not a type that typically has threaded comments in this manner."
-
+        return (
+            [],
+            f"""
+            Post {post_id} (type: {item_type})
+            does not have comments listed under a 'kids' attribute
+            or is not a type that typically has threaded comments in this manner.
+            This is a bug in the Hacker News API.
+            """,
+        )
 
     return all_comment_ids, "\n".join(formatted_comment_lines)

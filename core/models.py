@@ -1,15 +1,14 @@
 import requests
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 
+from ask_hn_digest.utils import get_ask_hn_digest_logger
 from core.base_models import BaseModel
+from core.choices import BlogPostStatus
 from core.model_utils import generate_random_key
 
-from core.choices import BlogPostStatus
-from ask_hn_digest.utils import get_ask_hn_digest_logger
 logger = get_ask_hn_digest_logger(__name__)
 
 
@@ -26,20 +25,16 @@ class NewsletterSubscriber(BaseModel):
         return self.email
 
     def add_newsletter_subscriber_to_buttondown(
-        self,
-        tags: list[str] = [],
-        ip_address: str = None
+        self, tags: list[str] = None, ip_address: str = None
     ):
         url = "https://api.buttondown.com/v1/subscribers"
-        headers = {
-          "Authorization": f"Token {settings.BUTTONDOWN_API_KEY}"
-        }
+        headers = {"Authorization": f"Token {settings.BUTTONDOWN_API_KEY}"}
         data = {
-          "email_address": self.email,
-          "type": "unactivated",
+            "email_address": self.email,
+            "type": "unactivated",
         }
 
-        if len(tags) > 0:
+        if tags:
             data["tags"] = tags
 
         if ip_address:
@@ -118,7 +113,7 @@ class Feedback(BaseModel):
             subject = "New Feedback Submitted"
             message = f"""
                 New feedback was submitted:\n\n
-                User: {self.profile.user.email if self.profile else 'Anonymous'}
+                User: {self.profile.user.email if self.profile else "Anonymous"}
                 Feedback: {self.feedback}
                 Page: {self.page}
             """
@@ -132,7 +127,9 @@ class HNDiscussionSummary(BaseModel):
     discussion_id = models.BigIntegerField(unique=True, help_text="Hacker News discussion ID")
     discussion_title = models.CharField(max_length=500, help_text="Title of the discussion")
     comment_ids = models.JSONField(help_text="List of all comment IDs for this discussion")
-    date_analyzed = models.DateTimeField(auto_now_add=True, help_text="Date and time when the discussion was analyzed")
+    date_analyzed = models.DateTimeField(
+        auto_now_add=True, help_text="Date and time when the discussion was analyzed"
+    )
 
     # for email
     short_summary = models.TextField(help_text="Short summary of the discussion")
@@ -155,4 +152,8 @@ class HNDiscussionSummary(BaseModel):
 
     @staticmethod
     def get_latest_summaries_ids(count: int = 7):
-        return list(HNDiscussionSummary.objects.order_by("-date_analyzed")[:count].values_list("discussion_id", flat=True))
+        return list(
+            HNDiscussionSummary.objects.order_by("-date_analyzed")[:count].values_list(
+                "discussion_id", flat=True
+            )
+        )
