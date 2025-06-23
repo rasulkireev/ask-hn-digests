@@ -17,6 +17,8 @@ gemini_client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
 
 def summarize_hn_discussion(discussion_id):
+    # TODO: Split AI request into separate parts
+
     # Get the main discussion data
     discussion_resp = requests.get(
         f"https://hacker-news.firebaseio.com/v0/item/{discussion_id}.json"
