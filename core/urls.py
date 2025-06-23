@@ -11,7 +11,6 @@ urlpatterns = [
     # blog
     path("blog/", views.BlogView.as_view(), name="blog_posts"),
     path("blog/<slug:slug>", views.BlogPostView.as_view(), name="blog_post"),
-
     # app
     path("api/", api.urls),
     # utils

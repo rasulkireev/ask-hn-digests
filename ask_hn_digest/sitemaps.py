@@ -1,8 +1,9 @@
 from django.contrib import sitemaps
-from django.urls import reverse
 from django.contrib.sitemaps import GenericSitemap
+from django.urls import reverse
 
 from core.models import HNDiscussionSummary
+
 
 class StaticViewSitemap(sitemaps.Sitemap):
     """Generate Sitemap for the site"""
@@ -32,6 +33,7 @@ class StaticViewSitemap(sitemaps.Sitemap):
             str: Url for the sitemap item
         """
         return reverse(item)
+
 
 sitemaps = {
     "static": StaticViewSitemap,

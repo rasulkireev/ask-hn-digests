@@ -1,15 +1,13 @@
 from ninja import Schema
-from typing import Optional
 from pydantic import EmailStr
 
-
 from core.choices import BlogPostStatus
-
 
 
 class SubmitFeedbackIn(Schema):
     feedback: str
     page: str
+
 
 class SubmitFeedbackOut(Schema):
     success: bool
@@ -22,8 +20,8 @@ class BlogPostIn(Schema):
     slug: str
     tags: str = ""
     content: str
-    icon: Optional[str] = None  # URL or base64 string
-    image: Optional[str] = None  # URL or base64 string
+    icon: str | None = None  # URL or base64 string
+    image: str | None = None  # URL or base64 string
     status: BlogPostStatus = BlogPostStatus.DRAFT
 
 
@@ -34,6 +32,7 @@ class BlogPostOut(Schema):
 
 class NewsletterSubscribeIn(Schema):
     email: EmailStr
+
 
 class NewsletterSubscribeOut(Schema):
     status: str

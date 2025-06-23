@@ -1,5 +1,3 @@
-from typing import Optional
-
 from django.http import HttpRequest
 from ninja.security import HttpBearer
 
@@ -7,7 +5,7 @@ from core.models import Profile
 
 
 class MultipleAuthSchema(HttpBearer):
-    def authenticate(self, request: HttpRequest, token: Optional[str] = None) -> Optional[Profile]:
+    def authenticate(self, request: HttpRequest, token: str | None = None) -> Profile | None:
         # For session-based authentication (when using the web interface)
         if hasattr(request, "user") and request.user.is_authenticated:
             try:

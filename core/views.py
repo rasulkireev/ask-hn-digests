@@ -1,27 +1,25 @@
-from django.http import HttpResponse
-
 from allauth.account.models import EmailAddress
 from allauth.account.utils import send_email_confirmation
+from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import redirect
-from django.conf import settings
-from django.contrib import messages
-from django.urls import reverse, reverse_lazy
-from django.views.generic import TemplateView, UpdateView, ListView, DetailView
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.template.loader import render_to_string
+from django.urls import reverse, reverse_lazy
+from django.utils.html import strip_tags
+from django.views.generic import DetailView, ListView, TemplateView, UpdateView
 from django_q.tasks import async_task
 
-from core.forms import ProfileUpdateForm, SummarizeHNDiscussionForm, SendNewsletterForm
-from core.models import Profile, BlogPost, HNDiscussionSummary
-
 from ask_hn_digest.utils import get_ask_hn_digest_logger
-
+from core.forms import ProfileUpdateForm, SendNewsletterForm, SummarizeHNDiscussionForm
+from core.models import HNDiscussionSummary, Profile
 
 logger = get_ask_hn_digest_logger(__name__)
+
 
 class HomeView(TemplateView):
     template_name = "pages/home.html"
@@ -118,8 +116,11 @@ class AdminPanelView(UserPassesTestMixin, TemplateView):
             form = SendNewsletterForm(request.POST)
             if form.is_valid():
                 summary_ids_str = form.cleaned_data["summary_ids"]
-                summary_ids = [int(sid.strip()) for sid in summary_ids_str.split(',') if sid.strip()]
+                summary_ids = [
+                    int(sid.strip()) for sid in summary_ids_str.split(",") if sid.strip()
+                ]
                 from core.tasks import send_buttondown_newsletter
+
                 response = send_buttondown_newsletter(summary_ids)
                 if response.get("id") or response.get("success"):
                     messages.success(request, f"Newsletter sent for summaries: {summary_ids_str}")
@@ -132,12 +133,24 @@ class AdminPanelView(UserPassesTestMixin, TemplateView):
             form = SummarizeHNDiscussionForm(request.POST)
             if form.is_valid():
                 discussion_ids_str = form.cleaned_data["discussion_ids"]
-                discussion_ids = [int(d.strip()) for d in discussion_ids_str.split(',') if d.strip()]
-                discussion_ids_to_analyze = [d for d in discussion_ids if not HNDiscussionSummary.objects.filter(discussion_id=d).exists()]
+                discussion_ids = [
+                    int(d.strip()) for d in discussion_ids_str.split(",") if d.strip()
+                ]
+                discussion_ids_to_analyze = [
+                    d
+                    for d in discussion_ids
+                    if not HNDiscussionSummary.objects.filter(discussion_id=d).exists()
+                ]
                 for discussion_id in discussion_ids_to_analyze:
-                    async_task('core.tasks.summarize_hn_discussion', discussion_id, group="Analyze Discussion")
+                    async_task(
+                        "core.tasks.summarize_hn_discussion",
+                        discussion_id,
+                        group="Analyze Discussion",
+                    )
 
-                messages.success(request, f"Scheduled {len(discussion_ids_to_analyze)} discussions for analysis!")
+                messages.success(
+                    request, f"Scheduled {len(discussion_ids_to_analyze)} discussions for analysis!"
+                )
                 return redirect("admin_panel")
             else:
                 return self.render_to_response(self.get_context_data(summarize_form=form))
