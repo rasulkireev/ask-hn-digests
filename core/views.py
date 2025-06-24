@@ -146,6 +146,7 @@ class AdminPanelView(UserPassesTestMixin, TemplateView):
                         "core.tasks.summarize_hn_discussion",
                         discussion_id,
                         group="Analyze Discussion",
+                        timeout=159,
                     )
 
                 messages.success(
