@@ -205,22 +205,27 @@ def generate_twitter_thread(summary: HNDiscussionSummary):
     """
     prompt = f"""
     Generate a Twitter thread for the following blog post:
+
+    ---
     Title: {summary.title}
     Description: {summary.description}
     Long Summary: {summary.long_summary}
+    ---
 
-    Don't use hashtags.
-    Do use emojis.
-    Don't use bold or italic text.
-    Don't use markdown, just plain text.
-    Don't use links.
-    Don't use images.
-    Don't use videos.
-    Don't mention Hacker News or HN in the thread.
+    Formatting rules:
+    - Don't use hashtags.
+    - Do use emojis.
+    - Don't use bold or italic text.
+    - Don't use markdown, just plain text.
+    - Don't use links.
+    - Don't use images.
+    - Don't use videos.
+    - Don't mention Hacker News or HN in the thread.
+    - Don't mention the discussion in the thread. Write as if you are coming up with a thread. Use discussion as a reference.
+    - Separate each tweet with `---`.
 
-    Only return the thread, nothing else.
-    Separate each tweet with `---`.
-    """
+    IMPORTANT: Only return the thread, nothing else.
+    """  # noqa: E501
     response = gemini_client.models.generate_content(
         model="gemini-2.5-pro-preview-05-06", contents=prompt
     )
