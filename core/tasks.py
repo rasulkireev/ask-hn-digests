@@ -65,6 +65,7 @@ def summarize_hn_discussion(discussion_id):
       - The aim is to deliver significant value to someone reading it as a standalone piece.
       - Don't start with a header/subheader. Do a text intro first, then add headers/subheader as you see fit.
       - Do not talk abour HN or Hacker News in the summary.
+      - Do not talk about the discussion in the summary. Write it as if you are writing a blog post with the discussion as a reference.
 
     - "title"
       - A concise, SEO-friendly blog post title for this discussion.
