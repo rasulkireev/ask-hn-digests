@@ -214,7 +214,7 @@ def generate_twitter_thread(summary: HNDiscussionSummary):
 
     Formatting rules:
     - Don't use hashtags.
-    - Do use emojis.
+    - Don't use emojis.
     - Don't use bold or italic text.
     - Don't use markdown, just plain text.
     - Don't use links.
