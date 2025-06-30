@@ -223,9 +223,31 @@ def generate_twitter_thread(summary: HNDiscussionSummary):
     - Don't mention Hacker News or HN in the thread.
     - Don't mention the discussion in the thread. Write as if you are coming up with a thread. Use discussion as a reference.
     - Separate each tweet with `---`.
+    - Split each tweet such that each paragraph represents an idea. Here is an example:
+    instead of this:
+    ```
+    So, what's the right way? There isn't one! Your strategy depends on your goal. Are you practicing good habits, trying to hack the model for better output, or optimizing for pure efficiency? What's your approach? 🤔
+    ```
+
+    do this:
+    ```
+    ---
+    So, what's the right way?
+
+    There isn't one!
+
+    Your strategy depends on your goal.
+
+    Are you practicing good habits, trying to hack the model for better output, or optimizing for pure efficiency?
+
+    What's your approach? 🤔
+    ---
+    ```
+    This doesn't mean that each sentence should be a paragraph., but each idea should be a paragraph.
 
     IMPORTANT: Only return the thread, nothing else.
     """  # noqa: E501
+
     response = gemini_client.models.generate_content(
         model="gemini-2.5-pro-preview-05-06", contents=prompt
     )
