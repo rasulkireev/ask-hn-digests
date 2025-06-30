@@ -213,3 +213,20 @@ def get_post_comments(post_id):
         )
 
     return all_comment_ids, "\n".join(formatted_comment_lines)
+
+
+def send_to_typefully(content: str) -> dict:
+    cleaned_content = content.replace("\n---\n", "\n\n\n\n")
+
+    url = "https://api.typefully.com/v1/drafts/"
+    headers = {
+        "X-API-KEY": f"Bearer {settings.TYPEFULLY_API_KEY}",
+        "Content-Type": "application/json",
+    }
+    payload = {"content": cleaned_content, "threadify": True}
+
+    response = requests.post(url, headers=headers, json=payload)
+    response.raise_for_status()
+    result = response.json()
+    logger.info("Successfully sent to Typefully", response=result)
+    return result
