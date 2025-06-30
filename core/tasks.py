@@ -9,7 +9,7 @@ from google import genai
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
 from core.models import HNDiscussionSummary
-from core.utils import generate_buttondown_newsletter_subject, get_post_comments
+from core.utils import generate_buttondown_newsletter_subject, get_post_comments, send_to_typefully
 
 logger = get_ask_hn_digest_logger(__name__)
 
@@ -234,6 +234,9 @@ def generate_twitter_thread(summary: HNDiscussionSummary):
     if thread:
         summary.twitter_thread = thread
         summary.save(update_fields=["twitter_thread"])
+
+        send_to_typefully(thread)
+
         return "Success"
     else:
         logger.error("Failed to generate Twitter thread", summary=summary)
