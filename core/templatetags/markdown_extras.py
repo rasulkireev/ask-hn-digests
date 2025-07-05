@@ -20,3 +20,12 @@ def markdown(value):
 @stringfilter
 def replace_quotes(value):
     return value.replace('"', "'")
+
+
+@register.filter
+@stringfilter
+def split(value, delimiter=","):
+    """Split a string by the given delimiter and return a list"""
+    if not value:
+        return []
+    return [item.strip() for item in value.split(delimiter) if item.strip()]

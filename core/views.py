@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.mail import EmailMultiAlternatives
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
@@ -27,6 +28,29 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["latest_summaries"] = HNDiscussionSummary.objects.order_by("-date_analyzed")[:3]
+        return context
+
+
+class SearchView(ListView):
+    model = HNDiscussionSummary
+    template_name = "pages/search_results.html"
+    context_object_name = "search_results"
+    paginate_by = 10
+    
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        if query:
+            return HNDiscussionSummary.objects.filter(
+                Q(title__icontains=query) |
+                Q(short_summary__icontains=query) |
+                Q(long_summary__icontains=query) |
+                Q(description__icontains=query)
+            ).order_by('-date_analyzed')
+        return HNDiscussionSummary.objects.none()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q', '')
         return context
 
 
