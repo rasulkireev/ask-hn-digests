@@ -28,3 +28,13 @@ else:
             f"Title: {discussion['discussion_title']}"
         )
     print("-" * 30)
+
+# SQL version
+# SELECT
+#     discussion_id,
+#     discussion_title,
+#     jsonb_array_length(comment_ids) as comment_count
+# FROM core_hndiscussionsummary
+# WHERE comment_ids IS NOT NULL
+# ORDER BY jsonb_array_length(comment_ids) DESC
+# LIMIT 20;

@@ -1,0 +1,5 @@
+---
+alwaysApply: true
+---
+
+No need to generate tests. Not for backend, not for frontend. No tests.
