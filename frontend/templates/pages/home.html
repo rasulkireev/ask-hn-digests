@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load markdown_extras %}
 
 {% block content %}
 
@@ -43,14 +44,25 @@
               <a href="/blog/{{ summary.slug }}" class="text-lg font-semibold text-orange-700 hover:underline">{{ summary.title }}</a>
               <div class="mt-1 text-xs text-gray-500">{{ summary.date_analyzed|date:"M j, Y" }}</div>
               <p class="mt-2 text-sm text-gray-700">{{ summary.description }}</p>
+              {% if summary.tags %}
+                <div class="mt-2 flex flex-wrap gap-1">
+                  {% for tag in summary.tags|split:"," %}
+                    {% if tag.strip %}
+                      {% include 'components/tag.html' with tag=tag.strip %}
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              {% endif %}
             </li>
           {% endfor %}
         </ul>
       {% else %}
         <p class="text-center text-gray-400">No HN summaries yet. Check back soon!</p>
       {% endif %}
-      <div class="flex flex-row justify-center mt-6">
+      <div class="flex flex-row justify-center mt-6 space-x-4">
         <a href="{% url 'blog_posts' %}" class="text-sm text-center text-blue-400 hover:text-blue-500 hover:underline">See all</a>
+        <span class="text-gray-400">|</span>
+        <a href="{% url 'tag_list' %}" class="text-sm text-center text-blue-400 hover:text-blue-500 hover:underline">Browse tags</a>
       </div>
     </div>
   </div>

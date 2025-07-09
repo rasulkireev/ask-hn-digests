@@ -7,11 +7,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.mail import EmailMultiAlternatives
 from django.db.models import Q
-from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils.html import strip_tags
+from django.utils.text import slugify
 from django.views.generic import DetailView, ListView, TemplateView, UpdateView
 from django_q.tasks import async_task
 
@@ -180,3 +181,49 @@ class AdminPanelView(UserPassesTestMixin, TemplateView):
                 return redirect("admin_panel")
             else:
                 return self.render_to_response(self.get_context_data(summarize_form=form))
+
+
+class TagListView(ListView):
+    template_name = "pages/tag_list.html"
+    context_object_name = "tags"
+    paginate_by = 50
+
+    def get_queryset(self):
+        return HNDiscussionSummary.get_all_tags_with_counts()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["total_tags"] = len(context["tags"])
+        return context
+
+
+class TagDetailView(ListView):
+    model = HNDiscussionSummary
+    template_name = "pages/tag_detail.html"
+    context_object_name = "summaries"
+    paginate_by = 10
+
+    def get_queryset(self):
+        self.tag = self.kwargs.get("tag_slug")
+        if not self.tag:
+            raise Http404("Tag not found")
+        
+        # Find the actual tag name from the slug
+        all_tags = HNDiscussionSummary.get_all_tags_with_counts()
+        actual_tag = None
+        for tag_name, count in all_tags:
+            if slugify(tag_name) == self.tag:
+                actual_tag = tag_name
+                break
+        
+        if not actual_tag:
+            raise Http404("Tag not found")
+        
+        self.actual_tag = actual_tag
+        return HNDiscussionSummary.get_summaries_by_tag(actual_tag)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tag"] = self.actual_tag
+        context["tag_slug"] = self.tag
+        return context
