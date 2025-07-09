@@ -212,7 +212,7 @@ class TagDetailView(ListView):
         all_tags = HNDiscussionSummary.get_all_tags_with_counts()
         actual_tag = None
         for tag_name, count in all_tags:
-            if slugify(tag_name) == self.tag:
+            if slugify(tag_name).lower() == self.tag.lower():
                 actual_tag = tag_name
                 break
         
