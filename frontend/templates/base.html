@@ -43,6 +43,22 @@
 </head>
 
 <body class="min-h-screen bg-gradient-to-br from-orange-50 to-white">
+  <nav class="sticky top-0 z-50 shadow-md backdrop-blur-sm bg-white/90">
+    <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center">
+          <a href="{% url 'home' %}">
+            <img class="h-8" src="{% static 'vendors/images/logo.svg' %}" alt="Ask HN Digest" />
+          </a>
+        </div>
+        <div class="flex items-center space-x-1 sm:space-x-4">
+          <a href="{% url 'home' %}" class="px-2 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-orange-600 sm:px-3">Home</a>
+          <a href="{% url 'blog_posts' %}" class="px-2 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-orange-600 sm:px-3">Posts</a>
+          <a href="{% url 'tag_list' %}" class="px-2 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-orange-600 sm:px-3">Tags</a>
+        </div>
+      </div>
+    </div>
+  </nav>
   {% block default_messages %}
     {% include 'components/messages.html' with messages=messages %}
   {% endblock default_messages %}
