@@ -63,8 +63,8 @@
         <div class="flex justify-center mt-8">
           <nav class="flex space-x-2">
             {% if page_obj.has_previous %}
-              <a href="?q={{ query }}&page=1" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">First</a>
-              <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Previous</a>
+              <a href="?q={{ query|urlencode }}&page=1" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">First</a>
+              <a href="?q={{ query|urlencode }}&page={{ page_obj.previous_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Previous</a>
             {% endif %}
             
             {% for num in page_obj.paginator.page_range %}
