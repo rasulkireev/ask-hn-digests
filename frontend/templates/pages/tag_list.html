@@ -5,7 +5,7 @@
 <title>All Tags - Ask HN Digest</title>
 <meta name="description" content="Browse all tags used in Ask HN Digest discussion summaries." />
 <meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://{{ request.get_host }}{% url 'tag_list' %}" />
+<link rel="canonical" href="{{ request.build_absolute_uri }}{% url 'tag_list' %}" />
 {% endblock meta %}
 
 {% block content %}
