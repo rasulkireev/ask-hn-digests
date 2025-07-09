@@ -2,7 +2,9 @@ import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Count
 from django.urls import reverse
+from django.utils.text import slugify
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
 from core.base_models import BaseModel
@@ -149,6 +151,26 @@ class HNDiscussionSummary(BaseModel):
 
     def get_absolute_url(self):
         return reverse("blog_post", kwargs={"slug": self.slug})
+
+    def get_tags_list(self):
+        """Return a list of tags for this summary"""
+        if not self.tags:
+            return []
+        return [tag.strip() for tag in self.tags.split(",") if tag.strip()]
+
+    @classmethod
+    def get_all_tags_with_counts(cls):
+        """Get all tags with their counts"""
+        tag_counts = {}
+        for summary in cls.objects.all():
+            for tag in summary.get_tags_list():
+                tag_counts[tag] = tag_counts.get(tag, 0) + 1
+        return sorted(tag_counts.items(), key=lambda x: x[1], reverse=True)
+
+    @classmethod
+    def get_summaries_by_tag(cls, tag):
+        """Get all summaries that have the specified tag"""
+        return cls.objects.filter(tags__icontains=tag).order_by("-date_analyzed")
 
     @staticmethod
     def get_latest_summaries_ids(count: int = 7):

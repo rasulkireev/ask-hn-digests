@@ -31,8 +31,25 @@
 
 <article class="container px-4 py-8 mx-auto md:relative">
   <div class="mx-auto max-w-3xl">
-    <h1 class="mb-6 text-3xl font-bold">{{ blog_post.title }}</h1>
-    <div class="mb-4">
+    <h1 class="mb-4 text-3xl font-bold">{{ blog_post.title }}</h1>
+    
+    <!-- Date information -->
+    <div class="mb-4 text-sm text-gray-500">
+      Published on {{ blog_post.created_at|date:"F j, Y" }}
+    </div>
+    
+    <!-- Tags -->
+    {% if blog_post.tags %}
+      <div class="mb-6 flex flex-wrap gap-2">
+        {% for tag in blog_post.tags|split:"," %}
+          {% if tag.strip %}
+            {% include 'components/tag.html' with tag=tag.strip %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    <div class="mb-6">
       <a href="https://news.ycombinator.com/item?id={{ blog_post.discussion_id }}" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-500 underline hover:text-orange-600">
         View original discussion on Hacker News
       </a>

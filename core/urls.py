@@ -12,6 +12,9 @@ urlpatterns = [
     # blog
     path("blog/", views.BlogView.as_view(), name="blog_posts"),
     path("blog/<slug:slug>", views.BlogPostView.as_view(), name="blog_post"),
+    # tags
+    path("tags/", views.TagListView.as_view(), name="tag_list"),
+    path("tag/<slug:tag_slug>/", views.TagDetailView.as_view(), name="tag_detail"),
     # app
     path("api/", api.urls),
     # utils
