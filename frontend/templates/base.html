@@ -43,9 +43,9 @@
 </head>
 
 <body class="min-h-screen bg-gradient-to-br from-orange-50 to-white">
-  <nav class="sticky top-0 z-50 shadow-md backdrop-blur-sm bg-white/90">
-    <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
+  <nav class="bg-white/90 backdrop-blur-sm shadow-md fixed top-0 w-full z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
         <div class="flex items-center">
           <a href="{% url 'home' %}">
             <img class="h-8" src="{% static 'vendors/images/logo.svg' %}" alt="Ask HN Digest" />
@@ -59,6 +59,7 @@
       </div>
     </div>
   </nav>
+  <div class="h-16"></div>
   {% block default_messages %}
     {% include 'components/messages.html' with messages=messages %}
   {% endblock default_messages %}
