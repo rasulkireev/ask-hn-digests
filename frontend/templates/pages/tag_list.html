@@ -9,25 +9,25 @@
 {% endblock meta %}
 
 {% block content %}
-<div class="bg-gradient-to-br from-orange-50 to-white min-h-screen">
+<div class="min-h-screen bg-gradient-to-br from-orange-50 to-white">
   <div class="container px-4 py-8 mx-auto max-w-4xl">
     <div class="mb-8">
-      <h1 class="text-4xl font-bold text-center text-gray-900 mb-4">All Tags</h1>
-      <p class="text-center text-gray-600 mb-6">Browse discussions by topic</p>
-      <div class="text-center text-sm text-gray-500">
+      <h1 class="mb-4 text-4xl font-bold text-center text-gray-900">All Tags</h1>
+      <p class="mb-6 text-center text-gray-600">Browse discussions by topic</p>
+      <div class="text-sm text-center text-gray-500">
         {{ total_tags }} tag{{ total_tags|pluralize }} found
       </div>
     </div>
 
     {% if tags %}
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="p-6 bg-white rounded-lg shadow-md">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {% for tag, count in tags %}
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg transition-colors hover:bg-gray-100">
               <div>
                 {% include 'components/tag.html' with tag=tag %}
               </div>
-              <div class="text-sm text-gray-500 font-medium">
+              <div class="text-sm font-medium text-gray-500">
                 {{ count }} post{{ count|pluralize }}
               </div>
             </div>
@@ -35,43 +35,20 @@
         </div>
       </div>
 
-      {% if page_obj.paginator.num_pages > 1 %}
-        <div class="flex justify-center mt-8">
-          <nav class="flex space-x-2">
-            {% if page_obj.has_previous %}
-              <a href="?page=1" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">First</a>
-              <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Previous</a>
-            {% endif %}
-            
-            {% for num in page_obj.paginator.page_range %}
-              {% if page_obj.number == num %}
-                <span class="px-3 py-2 text-sm font-medium text-white bg-orange-600 border border-orange-600 rounded-md">{{ num }}</span>
-              {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                <a href="?page={{ num }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">{{ num }}</a>
-              {% endif %}
-            {% endfor %}
-            
-            {% if page_obj.has_next %}
-              <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Next</a>
-              <a href="?page={{ page_obj.paginator.num_pages }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Last</a>
-            {% endif %}
-          </nav>
-        </div>
-      {% endif %}
     {% else %}
-      <div class="text-center py-12">
-        <div class="text-gray-600 mb-4">
-          <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="py-12 text-center">
+        <div class="mb-4 text-gray-600">
+          <svg class="mx-auto mb-4 w-16 h-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
           </svg>
           <p class="text-lg font-medium">No tags found</p>
           <p class="text-sm">Check back later for tagged discussions.</p>
         </div>
-        
+
         <div class="mt-8">
-          <a href="{% url 'home' %}" class="text-blue-600 hover:text-blue-700 font-medium">← Back to Home</a>
+          <a href="{% url 'home' %}" class="font-medium text-blue-600 hover:text-blue-700">← Back to Home</a>
           <span class="mx-2 text-gray-400">|</span>
-          <a href="{% url 'blog_posts' %}" class="text-blue-600 hover:text-blue-700 font-medium">Browse All Discussions</a>
+          <a href="{% url 'blog_posts' %}" class="font-medium text-blue-600 hover:text-blue-700">Browse All Discussions</a>
         </div>
       </div>
     {% endif %}

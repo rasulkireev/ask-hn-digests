@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load markdown_extras %}
+{% load core_extras %}
 
 {% block content %}
 
@@ -56,7 +57,7 @@
                 <div class="flex flex-wrap gap-2">
                   {% for tag in summary.tags|split:"," %}
                     {% if tag.strip %}
-                      <span class="px-2 py-1 text-xs text-orange-800 bg-orange-100 rounded-full">{{ tag.strip }}</span>
+                      {% include "components/tag.html" with tag=tag.strip %}
                     {% endif %}
                   {% endfor %}
                 </div>

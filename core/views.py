@@ -8,7 +8,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.mail import EmailMultiAlternatives
 from django.db.models import Q
 from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils.html import strip_tags
@@ -37,21 +37,21 @@ class SearchView(ListView):
     template_name = "pages/search_results.html"
     context_object_name = "search_results"
     paginate_by = 10
-    
+
     def get_queryset(self):
-        query = self.request.GET.get('q')
+        query = self.request.GET.get("q")
         if query:
             return HNDiscussionSummary.objects.filter(
-                Q(title__icontains=query) |
-                Q(short_summary__icontains=query) |
-                Q(long_summary__icontains=query) |
-                Q(description__icontains=query)
-            ).order_by('-date_analyzed')
+                Q(title__icontains=query)
+                | Q(short_summary__icontains=query)
+                | Q(long_summary__icontains=query)
+                | Q(description__icontains=query)
+            ).order_by("-date_analyzed")
         return HNDiscussionSummary.objects.none()
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['query'] = self.request.GET.get('q', '')
+        context["query"] = self.request.GET.get("q", "")
         return context
 
 
@@ -186,7 +186,6 @@ class AdminPanelView(UserPassesTestMixin, TemplateView):
 class TagListView(ListView):
     template_name = "pages/tag_list.html"
     context_object_name = "tags"
-    paginate_by = 50
 
     def get_queryset(self):
         return HNDiscussionSummary.get_all_tags_with_counts()
@@ -207,18 +206,18 @@ class TagDetailView(ListView):
         self.tag = self.kwargs.get("tag_slug")
         if not self.tag:
             raise Http404("Tag not found")
-        
+
         # Find the actual tag name from the slug
         all_tags = HNDiscussionSummary.get_all_tags_with_counts()
         actual_tag = None
-        for tag_name, count in all_tags:
+        for tag_name, _count in all_tags:
             if slugify(tag_name).lower() == self.tag.lower():
                 actual_tag = tag_name
                 break
-        
+
         if not actual_tag:
             raise Http404("Tag not found")
-        
+
         self.actual_tag = actual_tag
         return HNDiscussionSummary.get_summaries_by_tag(actual_tag)
 
