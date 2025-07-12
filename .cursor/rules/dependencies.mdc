@@ -1,0 +1,6 @@
+---
+alwaysApply: true
+---
+
+Do not add dependencies directly to requirements.txt file.
+Always add dependency with poetry via `poetry add ...` command. Then regenerate requirements.txt file via `poetry export -f requirements.txt --output requirements.txt --without-hashes`.
