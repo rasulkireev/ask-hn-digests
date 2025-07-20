@@ -47,5 +47,16 @@
         </button>
       </form>
     </div>
+
+    <div class="mt-8">
+      <h2 class="mb-2 text-xl font-semibold">Sync HN Data</h2>
+      <p class="mb-4 text-sm text-gray-600">Sync all Hacker News data. This process can take several hours to complete and runs in the background.</p>
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <button type="submit" name="sync_hn_data" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md border border-transparent shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+          Start HN Data Sync
+        </button>
+      </form>
+    </div>
   </div>
 {% endblock content %}

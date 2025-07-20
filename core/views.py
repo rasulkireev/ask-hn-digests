@@ -155,6 +155,23 @@ class AdminPanelView(UserPassesTestMixin, TemplateView):
                 return redirect("admin_panel")
             else:
                 return self.render_to_response(self.get_context_data(send_newsletter_form=form))
+        elif "sync_hn_data" in request.POST:
+            logger.info(
+                "HN data sync triggered from admin panel",
+                user_id=request.user.id,
+                email=request.user.email,
+            )
+
+            async_task(
+                "core.tasks.sync_hn_data_async",
+                group="HN Data Sync",
+                timeout=24 * 60 * 60,  # 24 hours timeout
+            )
+
+            messages.success(
+                request, "HN data sync has been scheduled and is running in the background!"
+            )
+            return redirect("admin_panel")
         else:
             form = SummarizeHNDiscussionForm(request.POST)
             if form.is_valid():

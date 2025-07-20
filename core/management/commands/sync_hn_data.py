@@ -16,7 +16,7 @@ class Command(BaseCommand):
         task_id = async_task(
             "core.tasks.sync_hn_data_async",
             group="HN Data Sync",
-            timeout=7200,  # 2 hours timeout
+            timeout=24 * 60 * 60,  # 24 hours timeout
         )
 
         self.stdout.write(self.style.SUCCESS(f"✅ HN data sync task queued with ID: {task_id}"))
