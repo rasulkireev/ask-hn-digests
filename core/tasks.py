@@ -8,6 +8,7 @@ from django_q.tasks import async_task
 from google import genai
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
+from core.hn_utils import HAS_ASYNCPG, AsyncHackerNewsFetcher
 from core.models import HNDiscussionSummary
 from core.utils import generate_buttondown_newsletter_subject, get_post_comments, send_to_typefully
 
@@ -325,4 +326,52 @@ def generate_summary_tags(summary: HNDiscussionSummary):
             error=str(e),
             exc_info=True,
         )
+        return f"Failed: {str(e)}"
+
+
+def sync_hn_data_async():
+    """
+    Task to sync Hacker News data using the hn_utils AsyncHackerNewsFetcher.
+    This replaces the old sync logic with the modern async approach.
+    """
+    import asyncio
+
+    async def _run_sync():
+        logger.info("Starting HN data sync task")
+
+        try:
+            # Configure fetcher based on available libraries
+            concurrent_requests = 500 if HAS_ASYNCPG else 20
+            batch_size = 4000 if HAS_ASYNCPG else 500
+
+            logger.info(
+                "HN sync configuration",
+                concurrent_requests=concurrent_requests,
+                batch_size=batch_size,
+                database_backend="AsyncPG" if HAS_ASYNCPG else "psycopg2",
+            )
+
+            # Create fetcher instance
+            fetcher = AsyncHackerNewsFetcher(
+                concurrent_requests=concurrent_requests, batch_size=batch_size
+            )
+
+            try:
+                # Run the async fetch with defaults (auto-resume, auto-detect max)
+                await fetcher.fetch_all_items()
+                logger.info("HN data sync completed successfully")
+                return "Success"
+            finally:
+                # Always clean up resources
+                await fetcher.close()
+
+        except Exception as e:
+            logger.error("HN data sync failed", error=str(e), exc_info=True)
+            return f"Failed: {str(e)}"
+
+    # Run the async function
+    try:
+        return asyncio.run(_run_sync())
+    except Exception as e:
+        logger.error("Failed to run HN data sync", error=str(e), exc_info=True)
         return f"Failed: {str(e)}"
