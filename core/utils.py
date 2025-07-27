@@ -230,3 +230,14 @@ def send_to_typefully(content: str) -> dict:
     result = response.json()
     logger.info("Successfully sent to Typefully", response=result)
     return result
+
+
+def ping_healthchecks(ping_id, suffix: str = ""):
+    url = f"https://healthchecks.cr.lvtd.dev/ping/{ping_id}"
+    if suffix:
+        url += f"/{suffix}"
+
+    try:
+        requests.get(url, timeout=10)
+    except requests.RequestException:
+        logger.error("Ping failed", exc_info=True)
