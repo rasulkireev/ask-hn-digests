@@ -6,6 +6,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 import aiohttp
+import psycopg2
 from django.conf import settings
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
@@ -582,3 +583,53 @@ class AsyncHackerNewsFetcher:
         """Clean up resources"""
         await self.client.close()
         await self.db.close()
+
+
+def get_ask_hn_story_ids(limit: int = 40) -> list[int]:
+    """
+    Get IDs of Ask HN stories from 7-14 days ago with good engagement (>5 comments)
+
+    Args:
+        limit: Maximum number of story IDs to return
+
+    Returns:
+        List of story IDs
+    """
+    try:
+        parsed_url = urlparse(settings.HN_DB_URL)
+        conn = psycopg2.connect(
+            host=parsed_url.hostname,
+            port=parsed_url.port or 5432,
+            database=parsed_url.path[1:],
+            user=parsed_url.username,
+            password=parsed_url.password,
+        )
+
+        try:
+            with conn.cursor() as cursor:
+                query = """
+                    SELECT id
+                    FROM hn_items
+                    WHERE
+                        type = 'story'
+                        AND title ILIKE 'Ask HN:%%'
+                        AND descendants > 5
+                        AND by_user NOT IN ('whoishiring', 'david927')
+                        AND time_created >= CURRENT_DATE - INTERVAL '14 days'
+                        AND time_created < CURRENT_DATE - INTERVAL '7 days'
+                    ORDER BY descendants DESC
+                    LIMIT %s;
+                """
+
+                cursor.execute(query, (limit,))
+                rows = cursor.fetchall()
+                story_ids = [row[0] for row in rows]
+
+                return story_ids
+
+        finally:
+            conn.close()
+
+    except Exception as e:
+        logger.error("Error fetching Ask HN story IDs", error=str(e), limit=limit, exc_info=True)
+        return []

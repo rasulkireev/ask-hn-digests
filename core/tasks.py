@@ -8,9 +8,14 @@ from django_q.tasks import async_task
 from google import genai
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
-from core.hn_utils import HAS_ASYNCPG, AsyncHackerNewsFetcher
+from core.hn_utils import HAS_ASYNCPG, AsyncHackerNewsFetcher, get_ask_hn_story_ids
 from core.models import HNDiscussionSummary
-from core.utils import generate_buttondown_newsletter_subject, get_post_comments, send_to_typefully
+from core.utils import (
+    generate_buttondown_newsletter_subject,
+    get_post_comments,
+    ping_healthchecks,
+    send_to_typefully,
+)
 
 logger = get_ask_hn_digest_logger(__name__)
 
@@ -152,8 +157,10 @@ def summarize_hn_discussion(discussion_id):
     return "Success"
 
 
-def send_buttondown_newsletter(ids: list[int]):
+def send_buttondown_newsletter(ids: list[int] | None = None):
     from core.models import HNDiscussionSummary
+
+    ping_healthchecks("f68afc04-5bb7-446f-adf5-0b6c91b56a43", suffix="start")
 
     # Generate subject if not provided
     now = datetime.now(UTC)
@@ -166,6 +173,9 @@ def send_buttondown_newsletter(ids: list[int]):
     else:
         publish_date = nine_am_today + timedelta(days=1)
     publish_date_str = publish_date.isoformat()
+
+    if not ids:
+        ids = get_ask_hn_story_ids(limit=5)
 
     summaries = HNDiscussionSummary.objects.filter(discussion_id__in=ids)
     if not summaries.exists():
@@ -197,7 +207,10 @@ def send_buttondown_newsletter(ids: list[int]):
         body=body,
         ids=ids,
     )
-    return response.json()
+
+    ping_healthchecks("f68afc04-5bb7-446f-adf5-0b6c91b56a43")
+
+    return "Success"
 
 
 def generate_twitter_thread(summary: HNDiscussionSummary):
@@ -336,6 +349,8 @@ def sync_hn_data_async():
     """
     import asyncio
 
+    ping_healthchecks("4b2a8a85-5511-4258-83e4-3bee1a3e3032", suffix="start")
+
     async def _run_sync():
         logger.info("Starting HN data sync task")
 
@@ -369,9 +384,28 @@ def sync_hn_data_async():
             logger.error("HN data sync failed", error=str(e), exc_info=True)
             return f"Failed: {str(e)}"
 
-    # Run the async function
     try:
-        return asyncio.run(_run_sync())
+        asyncio.run(_run_sync())
+        ping_healthchecks("4b2a8a85-5511-4258-83e4-3bee1a3e3032")
+        return "Success"
     except Exception as e:
         logger.error("Failed to run HN data sync", error=str(e), exc_info=True)
         return f"Failed: {str(e)}"
+
+
+def schedule_ask_hn_summaries():
+    ping_healthchecks("d8da731d-a94e-4527-a8c7-15219c248e32", suffix="start")
+
+    story_ids = get_ask_hn_story_ids()
+
+    for story_id in story_ids:
+        async_task(
+            "core.tasks.summarize_hn_discussion",
+            story_id,
+            group="Analyze Discussion (Automated)",
+            timeout=159,
+        )
+
+    ping_healthchecks("d8da731d-a94e-4527-a8c7-15219c248e32")
+
+    return "Success"
