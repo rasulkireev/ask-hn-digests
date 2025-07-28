@@ -254,7 +254,7 @@ def generate_twitter_thread(summary: HNDiscussionSummary):
 
     Are you practicing good habits, trying to hack the model for better output, or optimizing for pure efficiency?
 
-    What's your approach? 🤔
+    What's your approach?
     ---
     ```
     This doesn't mean that each sentence should be a paragraph., but each idea should be a paragraph.
@@ -398,7 +398,11 @@ def schedule_ask_hn_summaries():
 
     story_ids = get_ask_hn_story_ids()
 
-    for story_id in story_ids:
+    story_ids_to_analyze = [
+        s for s in story_ids if not HNDiscussionSummary.objects.filter(discussion_id=s).exists()
+    ]
+
+    for story_id in story_ids_to_analyze:
         async_task(
             "core.tasks.summarize_hn_discussion",
             story_id,
@@ -408,4 +412,4 @@ def schedule_ask_hn_summaries():
 
     ping_healthchecks("d8da731d-a94e-4527-a8c7-15219c248e32")
 
-    return "Success"
+    return f"Scheduled {len(story_ids_to_analyze)} summaries"
