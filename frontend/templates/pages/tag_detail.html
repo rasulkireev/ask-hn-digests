@@ -27,28 +27,7 @@
 
       <div class="space-y-6">
         {% for summary in summaries %}
-          <div class="p-6 bg-white rounded-lg border border-orange-100 shadow-md">
-            <div class="mb-2">
-              <a href="{% url 'blog_post' slug=summary.slug %}" class="text-xl font-bold text-orange-700 hover:text-orange-800 hover:underline">
-                {{ summary.title }}
-              </a>
-            </div>
-            <div class="mb-3 text-xs text-gray-500">
-              {{ summary.created_at|date:"F j, Y" }}
-            </div>
-            <p class="mb-4 text-gray-700">
-              {{ summary.description }}
-            </p>
-            {% if summary.tags %}
-              <div class="flex flex-wrap gap-2">
-                {% for tag_item in summary.tags|split:"," %}
-                  {% if tag_item.strip %}
-                    {% include 'components/tag.html' with tag=tag_item.strip %}
-                  {% endif %}
-                {% endfor %}
-              </div>
-            {% endif %}
-          </div>
+          {% include "components/article_card.html" with article=summary %}
         {% endfor %}
       </div>
 

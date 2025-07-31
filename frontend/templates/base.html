@@ -55,6 +55,8 @@
           <a href="{% url 'home' %}" class="px-2 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-orange-600 sm:px-3">Home</a>
           <a href="{% url 'blog_posts' %}" class="px-2 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-orange-600 sm:px-3">Posts</a>
           <a href="{% url 'tag_list' %}" class="px-2 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-orange-600 sm:px-3">Tags</a>
+          <a href="{% url 'liked_articles' %}" class="px-2 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-red-600 sm:px-3" title="Liked Articles">❤️</a>
+          <a href="{% url 'bookmarked_articles' %}" class="px-2 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-blue-600 sm:px-3" title="Bookmarked Articles">🔖</a>
           <div class="flex flex-1 justify-center px-2 sm:px-0">
             <form method="get" action="{% url 'search' %}" class="w-full max-w-xs">
               <div class="relative">
