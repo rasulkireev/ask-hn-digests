@@ -13,6 +13,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.2] - 2025-07-31
+- You can now like and bookmark posts to read later.
+- I now also generate a one tweet version of the summary
+
+
 ## [0.0.1] - 2025-07-27
 
 - Use the new HN DB to get ids, instead of local duckdb
