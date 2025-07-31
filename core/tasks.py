@@ -327,6 +327,7 @@ def generate_single_tweet(summary: HNDiscussionSummary):
             discussion_id=summary.discussion_id,
             tweet_length=len(tweet),
         )
+        send_to_typefully(tweet, threadify=False)
         return "Success"
     else:
         logger.error("Failed to generate single tweet", summary=summary)
