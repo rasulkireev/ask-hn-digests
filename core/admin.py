@@ -27,7 +27,21 @@ def schedule_twitter_thread_generation(modeladmin, request, queryset):
             group="Generate Twitter Thread",
         )
     modeladmin.message_user(
-        request, f"Scheduled Twitter thread generation for {queryset.count()} summaries."
+        request,
+        f"Scheduled Twitter thread generation for {queryset.count()} summaries.",
+    )
+
+
+@admin.action(description="Generate single tweet for selected summaries")
+def schedule_single_tweet_generation(modeladmin, request, queryset):
+    for summary in queryset:
+        async_task(
+            "core.tasks.generate_single_tweet",
+            summary,
+            group="Generate Single Tweet",
+        )
+    modeladmin.message_user(
+        request, f"Scheduled single tweet generation for {queryset.count()} summaries."
     )
 
 
@@ -35,6 +49,7 @@ class HNDiscussionSummaryAdmin(admin.ModelAdmin):
     actions = [
         send_to_typefully_action,
         schedule_twitter_thread_generation,
+        schedule_single_tweet_generation,
     ]
 
 

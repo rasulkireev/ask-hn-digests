@@ -152,6 +152,7 @@ def summarize_hn_discussion(discussion_id):
     )
 
     async_task("core.tasks.generate_twitter_thread", summary, group="Generate Twitter Thread")
+    async_task("core.tasks.generate_single_tweet", summary, group="Generate Single Tweet")
     async_task("core.tasks.generate_summary_tags", summary, group="Generate Summary Tags")
 
     return "Success"
@@ -276,6 +277,59 @@ def generate_twitter_thread(summary: HNDiscussionSummary):
         return "Success"
     else:
         logger.error("Failed to generate Twitter thread", summary=summary)
+        return "Failed"
+
+
+def generate_single_tweet(summary: HNDiscussionSummary):
+    """
+    Generates a single tweet for the given HNDiscussionSummary.
+    """
+    prompt = f"""
+    Generate a single tweet for the following blog post:
+
+    ---
+    Title: {summary.title}
+    Description: {summary.description}
+    Long Summary: {summary.long_summary}
+    ---
+
+    Formatting rules:
+    - Don't use hashtags.
+    - Don't use emojis.
+    - Don't use bold or italic text.
+    - Don't use markdown, just plain text.
+    - Don't use links.
+    - Don't use images.
+    - Don't use videos.
+    - Don't mention Hacker News or HN in the tweet.
+    - Don't mention the discussion in the tweet. Write as if you are coming up with a tweet. Use discussion as a reference.
+    - Keep it under 280 characters.
+    - Make it engaging and informative.
+    - Focus on the most interesting or valuable insight from the content.
+
+    IMPORTANT: Only return the tweet text, nothing else.
+    """  # noqa: E501
+
+    response = gemini_client.models.generate_content(
+        model="gemini-2.5-pro-preview-05-06", contents=prompt
+    )
+    tweet = getattr(response, "text", None)
+
+    if tweet:
+        # Clean up any potential extra whitespace or quotes
+        tweet = tweet.strip().strip('"').strip("'")
+        summary.single_tweet = tweet
+        summary.save(update_fields=["single_tweet"])
+
+        logger.info(
+            "Successfully generated and saved single tweet",
+            summary_id=summary.id,
+            discussion_id=summary.discussion_id,
+            tweet_length=len(tweet),
+        )
+        return "Success"
+    else:
+        logger.error("Failed to generate single tweet", summary=summary)
         return "Failed"
 
 
