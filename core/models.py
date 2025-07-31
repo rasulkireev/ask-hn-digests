@@ -2,9 +2,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Count
 from django.urls import reverse
-from django.utils.text import slugify
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
 from core.base_models import BaseModel
@@ -145,6 +143,7 @@ class HNDiscussionSummary(BaseModel):
 
     # for social media
     twitter_thread = models.TextField(blank=True)
+    single_tweet = models.TextField(blank=True)
 
     def __str__(self):
         return f"ID: {self.discussion_id} - Title: {self.discussion_title}"
