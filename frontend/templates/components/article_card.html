@@ -1,0 +1,53 @@
+<div class="p-6 bg-white rounded-lg border border-orange-100 shadow-md relative" 
+     data-controller="likes" 
+     data-likes-article-id-value="{{ article.id }}"
+     data-likes-article-slug-value="{{ article.slug }}"
+     data-likes-article-title-value="{{ article.title }}">
+  
+  <!-- Like and Bookmark buttons in top right -->
+  <div class="absolute top-4 right-4 flex space-x-2">
+    <!-- Like button -->
+    <button data-action="click->likes#like" 
+            data-likes-target="likeButton"
+            class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-red-500"
+            title="Like this article">
+      <svg data-likes-target="likeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+      </svg>
+    </button>
+    
+    <!-- Bookmark button -->
+    <button data-action="click->likes#bookmark" 
+            data-likes-target="bookmarkButton"
+            class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-blue-500"
+            title="Bookmark this article">
+      <svg data-likes-target="bookmarkIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Article content -->
+  <div class="pr-20"> <!-- Add right padding to make room for buttons -->
+    <div class="mb-2">
+      <a href="{{ article.get_absolute_url }}" class="text-xl font-bold text-orange-700 hover:text-orange-800 hover:underline">
+        {{ article.title }}
+      </a>
+    </div>
+    <div class="mb-3 text-xs text-gray-500">
+      {{ article.created_at|date:"F j, Y" }}
+    </div>
+    <p class="mb-4 text-gray-700">
+      {{ article.description }}
+    </p>
+    {% if article.tags %}
+      <div class="flex flex-wrap gap-2">
+        {% for tag in article.tags|split:"," %}
+          {% if tag.strip %}
+            {% include "components/tag.html" with tag=tag.strip %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</div>

@@ -243,3 +243,25 @@ class TagDetailView(ListView):
         context["tag"] = self.actual_tag
         context["tag_slug"] = self.tag
         return context
+
+
+class LikedArticlesView(TemplateView):
+    """View for displaying user's liked articles"""
+    template_name = "pages/liked_articles.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["page_title"] = "Liked Articles"
+        context["page_description"] = "Articles you've liked"
+        return context
+
+
+class BookmarkedArticlesView(TemplateView):
+    """View for displaying user's bookmarked articles"""
+    template_name = "pages/bookmarked_articles.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["page_title"] = "Bookmarked Articles"
+        context["page_description"] = "Articles you've bookmarked"
+        return context

@@ -35,28 +35,7 @@
     {% if blog_posts %}
       <div class="space-y-6">
         {% for post in blog_posts %}
-          <div class="p-6 bg-white rounded-lg border border-orange-100 shadow-md">
-            <div class="mb-2">
-              <a href="{{ post.get_absolute_url }}" class="text-xl font-bold text-orange-700 hover:text-orange-800 hover:underline">
-                {{ post.title }}
-              </a>
-            </div>
-            <div class="mb-3 text-xs text-gray-500">
-              {{ post.created_at|date:"F j, Y" }}
-            </div>
-            <p class="mb-4 text-gray-700">
-              {{ post.description }}
-            </p>
-            {% if post.tags %}
-              <div class="flex flex-wrap gap-2">
-                {% for tag in post.tags|split:"," %}
-                  {% if tag.strip %}
-                    {% include "components/tag.html" with tag=tag.strip %}
-                  {% endif %}
-                {% endfor %}
-              </div>
-            {% endif %}
-          </div>
+          {% include "components/article_card.html" with article=post %}
         {% endfor %}
       </div>
 

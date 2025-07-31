@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock title %}
+
+{% block meta %}
+<meta name="description" content="{{ page_description }}" />
+<meta property="og:title" content="{{ page_title }}" />
+<meta property="og:description" content="{{ page_description }}" />
+<meta name="twitter:title" content="{{ page_title }}" />
+<meta name="twitter:description" content="{{ page_description }}" />
+{% endblock meta %}
+
+{% block content %}
+<div class="container px-4 py-8 mx-auto md:relative">
+  <div class="mx-auto max-w-3xl">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-3xl font-bold text-center">{{ page_title }}</h1>
+      <div class="flex space-x-4">
+        <a href="{% url 'liked_articles' %}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-red-100 hover:text-red-700">
+          ❤️ Liked
+        </a>
+        <a href="{% url 'bookmarked_articles' %}" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-md font-medium">
+          🔖 Bookmarked
+        </a>
+      </div>
+    </div>
+    
+    <div class="mb-8 text-center text-gray-600">
+      Articles you've bookmarked will appear here
+    </div>
+
+    <!-- Container for bookmarked articles -->
+    <div data-controller="saved-articles" 
+         data-saved-articles-type-value="bookmarked"
+         class="space-y-6">
+      
+      <!-- Articles will be loaded here by JavaScript -->
+      <div data-saved-articles-target="container"></div>
+      
+      <!-- Empty state message -->
+      <div data-saved-articles-target="emptyMessage" class="text-center py-12">
+        <div class="mb-4">
+          <svg class="w-16 h-16 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No bookmarked articles yet</h3>
+        <p class="text-gray-500 mb-6">Start bookmarking articles to save them for later!</p>
+        <a href="{% url 'blog_posts' %}" class="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors">
+          Browse Articles
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
