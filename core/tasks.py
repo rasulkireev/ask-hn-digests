@@ -272,7 +272,7 @@ def generate_twitter_thread(summary: HNDiscussionSummary):
         summary.twitter_thread = thread
         summary.save(update_fields=["twitter_thread"])
 
-        send_to_typefully(thread)
+        # send_to_typefully(thread)
 
         return "Success"
     else:

@@ -6,7 +6,7 @@ from core.utils import send_to_typefully
 
 
 @admin.action(description="Send selected summary threads to Typefully")
-def send_to_typefully_action(modeladmin, request, queryset):
+def send_thread_to_typefully_action(modeladmin, request, queryset):
     successful_sends = 0
     for summary in queryset:
         if summary.twitter_thread:
@@ -47,7 +47,7 @@ def schedule_single_tweet_generation(modeladmin, request, queryset):
 
 class HNDiscussionSummaryAdmin(admin.ModelAdmin):
     actions = [
-        send_to_typefully_action,
+        send_thread_to_typefully_action,
         schedule_twitter_thread_generation,
         schedule_single_tweet_generation,
     ]
