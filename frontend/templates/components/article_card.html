@@ -30,15 +30,20 @@
   </div>
 
   <!-- Article content -->
-  <div class="pr-20"> <!-- Add right padding to make room for buttons -->
-    <div class="mb-2">
-      <a href="{{ article.get_absolute_url }}" class="text-xl font-bold text-orange-700 hover:text-orange-800 hover:underline">
-        {{ article.title }}
-      </a>
+  <div>
+    <!-- Title and date area - needs right padding for buttons -->
+    <div class="pr-20 mb-3">
+      <div class="mb-2">
+        <a href="{{ article.get_absolute_url }}" class="text-xl font-bold text-orange-700 hover:text-orange-800 hover:underline">
+          {{ article.title }}
+        </a>
+      </div>
+      <div class="text-xs text-gray-500">
+        {{ article.created_at|date:"F j, Y" }}
+      </div>
     </div>
-    <div class="mb-3 text-xs text-gray-500">
-      {{ article.created_at|date:"F j, Y" }}
-    </div>
+
+    <!-- Description and tags - can use full width -->
     <p class="mb-4 text-gray-700">
       {{ article.description }}
     </p>
