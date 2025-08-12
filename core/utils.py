@@ -6,6 +6,7 @@ from django.forms.utils import ErrorList
 from google import genai
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
+from core.models import HNDiscussionSummary
 
 logger = get_ask_hn_digest_logger(__name__)
 
@@ -230,6 +231,66 @@ def send_to_typefully(content: str, threadify: bool = True) -> dict:
     result = response.json()
     logger.info("Successfully sent to Typefully", response=result)
     return result
+
+
+def generate_subreddit_recommendations(summary: HNDiscussionSummary) -> str:
+    gemini_client = genai.Client(api_key=settings.GEMINI_API_KEY)
+
+    prompt = f"""
+    Analyze the following blog post content and recommend the best subreddits for sharing this content:
+
+    ---
+    Title: {summary.title}
+    Description: {summary.description}
+    Long Summary: {summary.long_summary}
+    Tags: {summary.tags}
+    ---
+
+    Requirements:
+    - Suggest 5-10 relevant subreddits where this content would be valuable and appropriate
+    - Consider the topic, audience, and content type when making recommendations
+    - Focus on active subreddits that would genuinely appreciate this type of content
+    - Include a mix of general and niche subreddits when appropriate
+    - Avoid subreddits that don't allow promotional content or external links
+    - Consider subreddits for: technology, programming, business, productivity, career advice, etc.
+    - Don't include r/ prefix in the subreddit names
+
+    Provide your recommendations as a comma-separated list of subreddit names, ordered by relevance (most relevant first).
+
+    Example format: programming, technology, webdev, startups, entrepreneur
+
+    IMPORTANT: Only return the comma-separated list of subreddit names, nothing else.
+    """  # noqa: E501
+
+    try:
+        response = gemini_client.models.generate_content(
+            model="gemini-2.5-pro-preview-05-06", contents=prompt
+        )
+        subreddit_recommendations = getattr(response, "text", None)
+
+        if subreddit_recommendations:
+            # Clean up any potential extra whitespace or quotes
+            subreddit_recommendations = subreddit_recommendations.strip().strip('"').strip("'")
+
+            logger.info(
+                "Successfully generated subreddit recommendations",
+                title=summary.title,
+                subreddits=subreddit_recommendations,
+                subreddit_count=len(subreddit_recommendations.split(",")),
+            )
+            summary.subreddits = subreddit_recommendations
+            summary.save(update_fields=["subreddits"])
+            return subreddit_recommendations
+        else:
+            logger.error("Failed to generate subreddit recommendations: No text in response")
+            return ""
+    except Exception as e:
+        logger.error(
+            "Failed to generate subreddit recommendations due to an exception",
+            error=str(e),
+            exc_info=True,
+        )
+        return ""
 
 
 def ping_healthchecks(ping_id, suffix: str = ""):

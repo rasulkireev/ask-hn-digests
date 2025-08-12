@@ -12,6 +12,7 @@ from core.hn_utils import HAS_ASYNCPG, AsyncHackerNewsFetcher, get_ask_hn_story_
 from core.models import HNDiscussionSummary
 from core.utils import (
     generate_buttondown_newsletter_subject,
+    generate_subreddit_recommendations,
     get_post_comments,
     ping_healthchecks,
     send_to_typefully,
@@ -151,8 +152,6 @@ def summarize_hn_discussion(discussion_id):
         tags=summary_data.get("tags", ""),
     )
 
-    async_task("core.tasks.generate_twitter_thread", summary, group="Generate Twitter Thread")
-    async_task("core.tasks.generate_single_tweet", summary, group="Generate Single Tweet")
     async_task("core.tasks.generate_summary_tags", summary, group="Generate Summary Tags")
 
     return "Success"
@@ -293,6 +292,13 @@ def generate_single_tweet(summary: HNDiscussionSummary):
     Long Summary: {summary.long_summary}
     ---
 
+    Style of the tweet should be personal. Feel free to:
+    - use first person
+    - use casual language
+    - use a conversational and friendly tone
+    - use a tone that is engaging, helpful and informative
+    - should be formatted as an opinion or a today-i-learned
+
     Formatting rules:
     - Don't use hashtags.
     - Don't use emojis.
@@ -331,6 +337,87 @@ def generate_single_tweet(summary: HNDiscussionSummary):
         return "Success"
     else:
         logger.error("Failed to generate single tweet", summary=summary)
+        return "Failed"
+
+
+def generate_reddit_post(summary: HNDiscussionSummary):
+    subreddits = generate_subreddit_recommendations(summary)
+
+    prompt = f"""
+    **Your Role:** You are an expert content strategist and community manager, skilled at identifying
+    interesting discussions from platforms like Hacker News and adapting them for Reddit.
+    You excel at summarizing complex topics and sparking engaging, high-quality conversations within specific communities.
+
+    **Your Task:** Your task is to take the provided summary of a Hacker News (HN)
+    discussion and transform it into a high-engagement Reddit post.
+    You will first analyze a list of potential subreddits, choose the best fit, and then
+    craft tailored titles and a post body designed to generate comments and discussion.
+
+    ---
+    Title: {summary.title}
+    Description: {summary.description}
+    Long Summary: {summary.long_summary}
+    List of subreddits: {summary.subreddits}
+    ---
+
+    **Instructions for the AI:**
+
+    **Step 1: Analyze and Select the Best Subreddit**
+    From the `[List of Potential Target Subreddits]`, analyze each one for its rules, tone, typical content, and relevance to the discussion topic. In your response, first state which subreddit you believe is the **best fit** and briefly explain why. All subsequent content (titles and post body) must be tailored for this chosen subreddit.
+
+    **Step 2: Generate Engaging Reddit Titles (5)**
+    Based on the most interesting, surprising, or controversial aspects of the HN discussion, create 5 title options that are optimized for the chosen subreddit. Use patterns that spark curiosity and debate:
+    *   **Question-based:** "HN is debating whether [X] is dead. What does this sub think?"
+    *   **Controversial Statement:** "An interesting take from HN: '[Quote from discussion]'. Thoughts?"
+    *   **Key Insight:** "The most surprising takeaway from a HN thread on [Topic]..."
+    *   **Value Promise:** "A great discussion on [Topic] happened on HN. Here are the 3 main viewpoints."
+    *   **Direct & Simple:** "Discussion on [Topic] from Hacker News"
+
+    **Step 3: Generate the Post Body**
+    Write the full post body, structuring it for maximum readability and engagement. Follow this framework:
+
+    *   **Hook:** Start with a strong opening sentence that captures the core of the debate or the most interesting point.
+    *   **Context:** Briefly state that you saw an interesting discussion on Hacker News about `[Topic]` and wanted to share the key points to see what this community thinks.
+    *   **Summary of Key Points:**
+        *   Present the main arguments from the `[Hacker News Discussion Summary]` in a clear, digestible format.
+        *   Use bullet points (`-`) or a numbered list to break down different viewpoints, pros/cons, or key takeaways.
+        *   If provided, integrate the `[Key Points or Quotes to Highlight]`.
+    *   **Call to Discussion (The Closing):**
+        *   This is the most important part. End with one or two open-ended questions to spark a conversation.
+        *   Examples: `"What's this community's take on this?", "Are there any angles the HN discussion missed?", "How do you see this evolving in the next 5 years?", "Do you agree or disagree with this assessment?"`
+
+    ---
+
+    **Critical Rules & Constraints (MUST FOLLOW):**
+
+    *   ✅ **Credit the Source:** Always mention that the discussion originated on Hacker News. This provides context and transparency.
+    *   🤝 **Foster Discussion, Don't Preach:** Your tone should be that of a curious facilitator, not an expert with all the answers. The goal is to start a conversation, not to end one.
+    *   ⚖️ **Be Objective:** Summarize the key arguments from the HN discussion fairly, even if they are contradictory. Represent the different sides of the debate mentioned in the summary.
+    *   📜 **Follow Subreddit Rules:** Ensure the post format and content adhere to the specific rules of the chosen subreddit (e.g., rules against low-effort posts, requirements for summary posts, etc.).
+    *   ✍️ **Scannability is Key:** Use **bolding**, bullet points, and short paragraphs to make the post easy to read and digest quickly. Avoid walls of text.
+
+    IMPORTANT: Only return the Reddit post content, nothing else.
+    """  # noqa: E501
+
+    response = gemini_client.models.generate_content(
+        model="gemini-2.5-pro-preview-05-06", contents=prompt
+    )
+    reddit_response = getattr(response, "text", None)
+
+    if reddit_response:
+        summary.reddit_post = reddit_response
+        summary.save(update_fields=["reddit_post"])
+
+        logger.info(
+            "Successfully generated and saved Reddit post",
+            summary_id=summary.id,
+            discussion_id=summary.discussion_id,
+            post_length=len(reddit_response),
+            subreddits=subreddits,
+        )
+        return "Success"
+    else:
+        logger.error("Failed to generate Reddit post", summary=summary)
         return "Failed"
 
 

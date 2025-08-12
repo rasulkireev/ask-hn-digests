@@ -141,9 +141,13 @@ class HNDiscussionSummary(BaseModel):
     tags = models.TextField(blank=True, help_text="Tags for the blog post")
     long_summary = models.TextField(help_text="Long summary of the discussion")
 
-    # for social media
+    # for twitter
     twitter_thread = models.TextField(blank=True)
     single_tweet = models.TextField(blank=True)
+
+    # reddit
+    subreddits = models.TextField(blank=True, help_text="Subreddits to post to")
+    reddit_post = models.TextField(blank=True)
 
     def __str__(self):
         return f"ID: {self.discussion_id} - Title: {self.discussion_title}"

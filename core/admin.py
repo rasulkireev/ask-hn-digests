@@ -45,11 +45,25 @@ def schedule_single_tweet_generation(modeladmin, request, queryset):
     )
 
 
+@admin.action(description="Generate Reddit post for selected summaries")
+def schedule_reddit_post_generation(modeladmin, request, queryset):
+    for summary in queryset:
+        async_task(
+            "core.tasks.generate_reddit_post",
+            summary,
+            group="Generate Reddit Post",
+        )
+    modeladmin.message_user(
+        request, f"Scheduled Reddit post generation for {queryset.count()} summaries."
+    )
+
+
 class HNDiscussionSummaryAdmin(admin.ModelAdmin):
     actions = [
         send_thread_to_typefully_action,
         schedule_twitter_thread_generation,
         schedule_single_tweet_generation,
+        schedule_reddit_post_generation,
     ]
 
 
