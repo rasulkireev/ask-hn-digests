@@ -344,59 +344,54 @@ def generate_reddit_post(summary: HNDiscussionSummary):
     subreddits = generate_subreddit_recommendations(summary)
 
     prompt = f"""
-    **Your Role:** You are an expert content strategist and community manager, skilled at identifying
-    interesting discussions from platforms like Hacker News and adapting them for Reddit.
-    You excel at summarizing complex topics and sparking engaging, high-quality conversations within specific communities.
+        **Your Role:** You are an expert content strategist and Reddit community manager. Your skill is in taking a core idea or piece of content and reframing it into an authentic, original, and high-engagement Reddit post that feels like it was written by a real person for a specific community.
 
-    **Your Task:** Your task is to take the provided summary of a Hacker News (HN)
-    discussion and transform it into a high-engagement Reddit post.
-    You will first analyze a list of potential subreddits, choose the best fit, and then
-    craft tailored titles and a post body designed to generate comments and discussion.
+        **Your Task:** Take the provided content and transform it into a complete Reddit post. You will internally analyze the suggested subreddits to select the best one, then internally generate and select the most compelling title. Finally, you will rewrite the provided content into a post body that is tailored for the chosen community and presented as an original thought or observation.
 
-    ---
-    Title: {summary.title}
-    Description: {summary.description}
-    Long Summary: {summary.long_summary}
-    List of subreddits: {summary.subreddits}
-    ---
+        ---
+        **Input Content:**
+        Topic Title: {summary.title}
+        Core Idea: {summary.description}
+        Detailed Content: {summary.long_summary}
+        Target Subreddits: {summary.subreddits}
+        ---
 
-    **Instructions for the AI:**
+        **Instructions for the AI:**
 
-    **Step 1: Analyze and Select the Best Subreddit**
-    From the `[List of Potential Target Subreddits]`, analyze each one for its rules, tone, typical content, and relevance to the discussion topic. In your response, first state which subreddit you believe is the **best fit** and briefly explain why. All subsequent content (titles and post body) must be tailored for this chosen subreddit.
+        **Step 1: Internal Analysis and Selection of Subreddit**
+        Internally analyze the `[Target Subreddits]` list. Consider each subreddit's rules, tone, typical content, and relevance to the `[Topic Title]` and `[Detailed Content]`. Select the single best subreddit to post to. All subsequent steps must be tailored for this chosen subreddit.
 
-    **Step 2: Generate Engaging Reddit Titles (5)**
-    Based on the most interesting, surprising, or controversial aspects of the HN discussion, create 5 title options that are optimized for the chosen subreddit. Use patterns that spark curiosity and debate:
-    *   **Question-based:** "HN is debating whether [X] is dead. What does this sub think?"
-    *   **Controversial Statement:** "An interesting take from HN: '[Quote from discussion]'. Thoughts?"
-    *   **Key Insight:** "The most surprising takeaway from a HN thread on [Topic]..."
-    *   **Value Promise:** "A great discussion on [Topic] happened on HN. Here are the 3 main viewpoints."
-    *   **Direct & Simple:** "Discussion on [Topic] from Hacker News"
+        **Step 2: Internal Generation and Selection of Title**
+        Internally generate 5 engaging title options based on the `[Detailed Content]`. The titles should be designed to spark curiosity and discussion within the chosen subreddit. From those 5, select the single most compelling and appropriate title. This will be the final title for the post.
 
-    **Step 3: Generate the Post Body**
-    Write the full post body, structuring it for maximum readability and engagement. Follow this framework:
+        **Step 3: Rewrite Content into an Original Post Body**
+        Write the full post body by adapting the `[Detailed Content]`. Follow this framework:
 
-    *   **Hook:** Start with a strong opening sentence that captures the core of the debate or the most interesting point.
-    *   **Context:** Briefly state that you saw an interesting discussion on Hacker News about `[Topic]` and wanted to share the key points to see what this community thinks.
-    *   **Summary of Key Points:**
-        *   Present the main arguments from the `[Hacker News Discussion Summary]` in a clear, digestible format.
-        *   Use bullet points (`-`) or a numbered list to break down different viewpoints, pros/cons, or key takeaways.
-        *   If provided, integrate the `[Key Points or Quotes to Highlight]`.
-    *   **Call to Discussion (The Closing):**
-        *   This is the most important part. End with one or two open-ended questions to spark a conversation.
-        *   Examples: `"What's this community's take on this?", "Are there any angles the HN discussion missed?", "How do you see this evolving in the next 5 years?", "Do you agree or disagree with this assessment?"`
+        *   **Framing:** Present the content as your own original thoughts, observations, or story. **DO NOT** mention that the content comes from another source, summary, or discussion.
+        *   **Hook:** Start with a strong opening sentence that captures the core of the `[Core Idea]`.
+        *   **The Breakdown:** Present the main arguments from the `[Detailed Content]` in a clear, digestible format. Use bullet points (`-`) or a numbered list to break down different viewpoints, pros/cons, or key takeaways.
+        *   **Personal Touch (Optional but Recommended):** Add a brief personal reflection or opinion to make the post feel more authentic.
+        *   **Call to Discussion:** End with one or two open-ended questions to spark a conversation. Examples: `"What's your take on this?", "Am I missing something here?", "Curious to hear what this community thinks."`
 
-    ---
+        ---
 
-    **Critical Rules & Constraints (MUST FOLLOW):**
+        **Critical Rules & Constraints (MUST FOLLOW):**
 
-    *   ✅ **Credit the Source:** Always mention that the discussion originated on Hacker News. This provides context and transparency.
-    *   🤝 **Foster Discussion, Don't Preach:** Your tone should be that of a curious facilitator, not an expert with all the answers. The goal is to start a conversation, not to end one.
-    *   ⚖️ **Be Objective:** Summarize the key arguments from the HN discussion fairly, even if they are contradictory. Represent the different sides of the debate mentioned in the summary.
-    *   📜 **Follow Subreddit Rules:** Ensure the post format and content adhere to the specific rules of the chosen subreddit (e.g., rules against low-effort posts, requirements for summary posts, etc.).
-    *   ✍️ **Scannability is Key:** Use **bolding**, bullet points, and short paragraphs to make the post easy to read and digest quickly. Avoid walls of text.
+        *   🚫 **DO NOT MENTION THE SOURCE:** Under no circumstances should you mention 'Hacker News', 'HN', 'a discussion', 'a summary', or any other external source. The post must be presented as the user's original thoughts.
+        *   ✍️ **ADOPT A PERSONAL VOICE:** Write in a first-person, conversational tone. The goal is to sound like a genuine community member sharing an insight, not a bot summarizing text.
+        *   📜 **FOLLOW SUBREDDIT RULES:** Ensure the post format and content adhere to the specific rules of the chosen subreddit (e.g., rules against low-effort posts, requirements for post length, etc.).
+        *   ✨ **SCANNABILITY IS KEY:** Use **bolding**, bullet points, and short paragraphs to make the post easy to read and digest quickly. Avoid walls of text.
 
-    IMPORTANT: Only return the Reddit post content, nothing else.
+        ---
+
+        **Output Format:**
+        Your entire response must be a single string with no extra text, commentary, or formatting. It must strictly follow this structure, with each part separated by two newlines:
+
+        Post to: [Chosen Subreddit]
+
+        Title: [Chosen Title]
+
+        Content: [Post Body]
     """  # noqa: E501
 
     response = gemini_client.models.generate_content(
