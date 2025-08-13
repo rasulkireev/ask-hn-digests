@@ -1,5 +1,5 @@
 import json
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 
 import requests
 from django.conf import settings
@@ -163,17 +163,18 @@ def send_buttondown_newsletter(ids: list[int] | None = None):
     ping_healthchecks("f68afc04-5bb7-446f-adf5-0b6c91b56a43", suffix="start")
 
     # Generate subject if not provided
-    now = datetime.now(UTC)
-    year, week_num, _ = now.isocalendar()
+    from zoneinfo import ZoneInfo
 
-    # Calculate next 9am UTC
+    est = ZoneInfo("America/New_York")
+    now = datetime.now(est)
+
+    # Calculate next 9am EST
     nine_am_today = now.replace(hour=9, minute=0, second=0, microsecond=0)
     if now < nine_am_today:
         publish_date = nine_am_today
     else:
         publish_date = nine_am_today + timedelta(days=1)
     publish_date_str = publish_date.isoformat()
-
     if not ids:
         ids = get_ask_hn_story_ids(limit=5)
 
