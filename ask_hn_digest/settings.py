@@ -232,8 +232,8 @@ else:
 
 Q_CLUSTER = {
     "name": "ask_hn_digest-q",
-    "timeout": 120,
-    "retry": 160,
+    "timeout": 3600,  # 1 hour
+    "retry": 4800,  # 80 minutes
     "workers": 4,
     "max_attempts": 2,
     "redis": env("REDIS_URL"),
