@@ -89,7 +89,7 @@ def generate_buttondown_newsletter_subject(body: str):
     """  # noqa: E501
 
     response = gemini_client.models.generate_content(
-        model="gemini-2.5-pro-preview-05-06",  # Using model from user's example
+        model="gemini-2.5-flash",  # Using model from user's example
         contents=prompt,
     )
     subject = getattr(response, "text", None)
@@ -263,9 +263,7 @@ def generate_subreddit_recommendations(summary: HNDiscussionSummary) -> str:
     """  # noqa: E501
 
     try:
-        response = gemini_client.models.generate_content(
-            model="gemini-2.5-pro-preview-05-06", contents=prompt
-        )
+        response = gemini_client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
         subreddit_recommendations = getattr(response, "text", None)
 
         if subreddit_recommendations:

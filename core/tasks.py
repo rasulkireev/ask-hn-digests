@@ -115,9 +115,7 @@ def summarize_hn_discussion(discussion_id):
     }}
     """  # noqa: E501
 
-    response = gemini_client.models.generate_content(
-        model="gemini-2.5-pro-preview-05-06", contents=prompt
-    )
+    response = gemini_client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
     summary_response = getattr(response, "text", None)
 
     try:
@@ -263,9 +261,7 @@ def generate_twitter_thread(summary: HNDiscussionSummary):
     IMPORTANT: Only return the thread, nothing else.
     """  # noqa: E501
 
-    response = gemini_client.models.generate_content(
-        model="gemini-2.5-pro-preview-05-06", contents=prompt
-    )
+    response = gemini_client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
     thread = getattr(response, "text", None)
 
     if thread:
@@ -317,9 +313,7 @@ def generate_single_tweet(summary: HNDiscussionSummary):
     IMPORTANT: Only return the tweet text, nothing else.
     """  # noqa: E501
 
-    response = gemini_client.models.generate_content(
-        model="gemini-2.5-pro-preview-05-06", contents=prompt
-    )
+    response = gemini_client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
     tweet = getattr(response, "text", None)
 
     if tweet:
@@ -395,9 +389,7 @@ def generate_reddit_post(summary: HNDiscussionSummary):
         Content: [Post Body]
     """  # noqa: E501
 
-    response = gemini_client.models.generate_content(
-        model="gemini-2.5-pro-preview-05-06", contents=prompt
-    )
+    response = gemini_client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
     reddit_response = getattr(response, "text", None)
 
     if reddit_response:
@@ -445,7 +437,7 @@ def generate_summary_tags(summary: HNDiscussionSummary):
 
     try:
         response = gemini_client.models.generate_content(
-            model="gemini-2.5-pro-preview-05-06",  # Using the same model as generate_twitter_thread
+            model="gemini-2.5-flash",  # Using the same model as generate_twitter_thread
             contents=prompt,
         )
         generated_tags = getattr(response, "text", None)
