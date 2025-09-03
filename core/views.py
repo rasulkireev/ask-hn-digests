@@ -189,7 +189,6 @@ class AdminPanelView(UserPassesTestMixin, TemplateView):
                         "core.tasks.summarize_hn_discussion",
                         discussion_id,
                         group="Analyze Discussion",
-                        timeout=159,
                     )
 
                 messages.success(
@@ -247,6 +246,7 @@ class TagDetailView(ListView):
 
 class LikedArticlesView(TemplateView):
     """View for displaying user's liked articles"""
+
     template_name = "pages/liked_articles.html"
 
     def get_context_data(self, **kwargs):
@@ -258,6 +258,7 @@ class LikedArticlesView(TemplateView):
 
 class BookmarkedArticlesView(TemplateView):
     """View for displaying user's bookmarked articles"""
+
     template_name = "pages/bookmarked_articles.html"
 
     def get_context_data(self, **kwargs):

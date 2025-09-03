@@ -537,7 +537,6 @@ def schedule_ask_hn_summaries():
             "core.tasks.summarize_hn_discussion",
             story_id,
             group="Analyze Discussion (Automated)",
-            timeout=159,
         )
 
     ping_healthchecks("d8da731d-a94e-4527-a8c7-15219c248e32")
