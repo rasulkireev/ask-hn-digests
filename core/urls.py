@@ -2,7 +2,7 @@ from django.urls import path
 
 from core import views
 from core.api.views import api
-from core.views import AdminPanelView, LikedArticlesView, BookmarkedArticlesView
+from core.views import AdminPanelView, BookmarkedArticlesView, LikedArticlesView
 
 urlpatterns = [
     # pages
@@ -13,7 +13,7 @@ urlpatterns = [
     path("bookmarked/", BookmarkedArticlesView.as_view(), name="bookmarked_articles"),
     # blog
     path("blog/", views.BlogView.as_view(), name="blog_posts"),
-    path("blog/<slug:slug>", views.BlogPostView.as_view(), name="blog_post"),
+    path("blog/<str:slug>", views.BlogPostView.as_view(), name="blog_post"),
     # tags
     path("tags/", views.TagListView.as_view(), name="tag_list"),
     path("tag/<slug:tag_slug>/", views.TagDetailView.as_view(), name="tag_detail"),
