@@ -365,8 +365,8 @@ structlog.configure(
 if ENVIRONMENT == "prod":
     LOGGING["loggers"]["django.server"]["level"] = "WARNING"
     LOGGING["loggers"]["django_structlog"]["handlers"].append("json_console")
-    LOGGING["loggers"]["ask_hn_digests"]["level"] = env("DJANGO_LOG_LEVEL", default="INFO")
-    LOGGING["loggers"]["ask_hn_digests"]["handlers"].append("json_console")
+    LOGGING["loggers"]["ask-hn-digests"]["level"] = env("DJANGO_LOG_LEVEL", default="INFO")
+    LOGGING["loggers"]["ask-hn-digests"]["handlers"].append("json_console")
 
 SENTRY_DSN = env("SENTRY_DSN")
 if ENVIRONMENT == "prod" and SENTRY_DSN:
