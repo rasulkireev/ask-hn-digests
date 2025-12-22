@@ -15,7 +15,7 @@ from core.models import BlogPost, Feedback, NewsletterSubscriber
 
 logger = get_ask_hn_digest_logger(__name__)
 
-api = NinjaAPI(auth=MultipleAuthSchema(), csrf=True, version="0.0.1")
+api = NinjaAPI(auth=MultipleAuthSchema(), version="0.0.1")
 
 
 @api.post("/submit-feedback", response=SubmitFeedbackOut)

@@ -13,7 +13,7 @@
 <meta property="og:title" content="{{ blog_post.title }}" />
 <meta property="og:url" content="https://{{ request.get_host }}{{ blog_post.get_absolute_url }}" />
 <meta property="og:description" content="{{ blog_post.description }}" />
-<meta property="og:image" content="https://osig.app/g?site=x&style=base&font=markerfelt&title={{ blog_post.title }} | Ask HN Digest Blog&subtitle={{ blog_post.description }}&image_url={{ blog_post.image.url }}" />
+<meta property="og:image" content="https://osig.app/g?site=x&style=base&font=markerfelt&title={{ blog_post.title }} | Ask HN Digest Blog&subtitle={{ blog_post.description }}{% if blog_post.image %}&image_url={{ blog_post.image.url }}{% endif %}" />
 <meta property="og:locale" content="en_US" />
 
 <meta name="twitter:card" content="summary_large_image" />
@@ -21,7 +21,7 @@
 <meta name="twitter:site" content="@rasulkireev" />
 <meta name="twitter:title" content="{{ blog_post.title }}" />
 <meta name="twitter:description" content="{{ blog_post.description }}" />
-<meta name="twitter:image" content="https://osig.app/g?site=x&style=base&font=markerfelt&title={{ blog_post.title }} | Ask HN Digest Blog&subtitle={{ blog_post.description }}&image_url={{ blog_post.image.url }}" />
+<meta name="twitter:image" content="https://osig.app/g?site=x&style=base&font=markerfelt&title={{ blog_post.title }} | Ask HN Digest Blog&subtitle={{ blog_post.description }}{% if blog_post.image %}&image_url={{ blog_post.image.url }}{% endif %}" />
 {% endblock meta %}
 
 {% block content %}
@@ -29,30 +29,30 @@
   <a href="{% url 'home' %}" class="text-sm text-gray-500 underline hover:text-orange-600">← back home</a>
 </div>
 
-<article class="container px-4 py-8 mx-auto md:relative" 
-         data-controller="likes" 
+<article class="container px-4 py-8 mx-auto md:relative"
+         data-controller="likes"
          data-likes-article-id-value="{{ blog_post.id }}"
          data-likes-article-slug-value="{{ blog_post.slug }}"
          data-likes-article-title-value="{{ blog_post.title }}">
   <div class="mx-auto max-w-3xl">
     <!-- Like and Bookmark buttons -->
     <div class="flex justify-between items-start mb-6">
-      <h1 class="text-3xl font-bold flex-1 mr-4">{{ blog_post.title }}</h1>
-      <div class="flex space-x-2 flex-shrink-0">
+      <h1 class="flex-1 mr-4 text-3xl font-bold">{{ blog_post.title }}</h1>
+      <div class="flex flex-shrink-0 space-x-2">
         <!-- Like button -->
-        <button data-action="click->likes#like" 
+        <button data-action="click->likes#like"
                 data-likes-target="likeButton"
-                class="p-3 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-red-500"
+                class="p-3 text-gray-400 rounded-full transition-colors hover:bg-gray-100 hover:text-red-500"
                 title="Like this article">
           <svg data-likes-target="likeIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
           </svg>
         </button>
-        
+
         <!-- Bookmark button -->
-        <button data-action="click->likes#bookmark" 
+        <button data-action="click->likes#bookmark"
                 data-likes-target="bookmarkButton"
-                class="p-3 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-blue-500"
+                class="p-3 text-gray-400 rounded-full transition-colors hover:bg-gray-100 hover:text-blue-500"
                 title="Bookmark this article">
           <svg data-likes-target="bookmarkIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
@@ -77,14 +77,8 @@
       </div>
     {% endif %}
 
-    <div class="mb-6">
-      <a href="https://news.ycombinator.com/item?id={{ blog_post.discussion_id }}" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-500 underline hover:text-orange-600">
-        View original discussion on Hacker News
-      </a>
-    </div>
-
     <div class="max-w-none prose prose-lg">
-      {{ blog_post.long_summary|markdown|safe }}
+      {{ blog_post.content|markdown|safe }}
     </div>
   </div>
 </article>
@@ -111,7 +105,7 @@
     "@type": "BlogPosting",
     "headline": "{{ blog_post.title }}",
     "description": "{{ blog_post.description }}",
-    "image": "https://osig.app/g?site=x&style=base&font=markerfelt&title={{ blog_post.title }} | Ask HN Digest Blog&subtitle={{ blog_post.description }}&image_url={{ blog_post.image.url }}",
+    "image": "https://osig.app/g?site=x&style=base&font=markerfelt&title={{ blog_post.title }} | Ask HN Digest Blog&subtitle={{ blog_post.description }}{% if blog_post.image %}&image_url={{ blog_post.image.url }}{% endif %}",
     "url": "https://{{ request.get_host }}{{ blog_post.get_absolute_url }}",
     "datePublished": "{{ blog_post.created_at|date:'c' }}",
     "dateModified": "{{ blog_post.updated_at|date:'c' }}",
@@ -128,7 +122,7 @@
         "url": "https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}"
       }
     },
-    "articleBody": "{{ blog_post.long_summary|safe|replace_quotes }}",
+    "articleBody": "{{ blog_post.content|safe|replace_quotes }}",
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": "https://{{ request.get_host }}{{ blog_post.get_absolute_url }}"

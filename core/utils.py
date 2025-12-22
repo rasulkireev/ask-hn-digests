@@ -1,16 +1,20 @@
+import asyncio
 from datetime import datetime
 
 import requests
 from django.conf import settings
 from django.forms.utils import ErrorList
 from google import genai
+from gpt_researcher.actions.retriever import get_retrievers
+from gpt_researcher.config.config import Config
+from pydantic_ai import capture_run_messages
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
-from core.models import HNDiscussionSummary
 
 logger = get_ask_hn_digest_logger(__name__)
 
 HN_API_BASE_URL = "https://hacker-news.firebaseio.com/v0"
+cfg = Config()
 
 
 class DivErrorList(ErrorList):
@@ -233,7 +237,7 @@ def send_to_typefully(content: str, threadify: bool = True) -> dict:
     return result
 
 
-def generate_subreddit_recommendations(summary: HNDiscussionSummary) -> str:
+def generate_subreddit_recommendations(summary) -> str:
     gemini_client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
     prompt = f"""
@@ -300,3 +304,189 @@ def ping_healthchecks(ping_id, suffix: str = ""):
         requests.get(url, timeout=10)
     except requests.RequestException:
         logger.error("Ping failed", exc_info=True)
+
+
+def run_gptr_synchronously(agent, custom_prompt=None):
+    """
+    Run a GPTR agent synchronously.
+
+    Args:
+        agent: The GPTR agent to run
+        custom_prompt: Optional custom prompt to pass to the agent
+
+    Returns:
+        The result of the agent run
+
+    Raises:
+        RuntimeError: If the agent execution fails
+    """
+    config = Config()
+    retrievers = get_retrievers({}, config)
+
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+    try:
+        logger.info(
+            "[Run GPTR Synchronously] Running agent",
+            agent=agent,
+            custom_prompt=custom_prompt,
+            config=config,
+            retrievers=retrievers,
+            has_custom_prompt=custom_prompt is not None,
+        )
+
+        if custom_prompt is None:
+            result = loop.run_until_complete(agent.write_report())
+        else:
+            result = loop.run_until_complete(agent.write_report(custom_prompt=custom_prompt))
+
+        logger.info(
+            "[Run GPTR Synchronously] Agent run successfully",
+            custom_prompt=custom_prompt,
+            has_custom_prompt=custom_prompt is not None,
+            result_length=len(str(result)) if result else 0,
+        )
+        return result
+
+    except Exception as error:
+        logger.error(
+            "[Run GPTR Synchronously] Failed execution",
+            exc_info=True,
+            error=str(error),
+            custom_prompt=custom_prompt,
+            has_custom_prompt=custom_prompt is not None,
+        )
+        raise
+
+
+def run_agent_synchronously(agent, input_string, deps=None, function_name="", model_name=""):
+    """
+    Run a PydanticAI agent synchronously.
+
+    Args:
+        agent: The PydanticAI agent to run
+        input_string: The input string to pass to the agent
+        deps: Optional dependencies to pass to the agent
+
+    Returns:
+        The result of the agent run
+
+    Raises:
+        RuntimeError: If the agent execution fails
+    """
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+    with capture_run_messages() as messages:
+        try:
+            logger.info(
+                "[Run Agent Synchronously] Running agent",
+                messages=messages,
+                input_string=input_string,
+                deps=deps,
+                function_name=function_name,
+                model_name=model_name,
+            )
+            if deps is not None:
+                result = loop.run_until_complete(agent.run(input_string, deps=deps))
+            else:
+                result = loop.run_until_complete(agent.run(input_string))
+
+            logger.info(
+                "[Run Agent Synchronously] Agent run successfully",
+                messages=messages,
+                input_string=input_string,
+                deps=deps,
+                result=result.output,
+                result_usage=result.usage(),
+                function_name=function_name,
+                model_name=model_name,
+            )
+            return result
+        except Exception as e:
+            logger.error(
+                "[Run Agent Synchronously] Failed execution",
+                messages=messages,
+                exc_info=True,
+                error=str(e),
+                function_name=function_name,
+                model_name=model_name,
+            )
+            raise
+
+
+def process_generated_blog_content(blog_posts):
+    """
+    Process blog post content to extract title and clean up markdown.
+
+    Args:
+        blog_posts: A single BlogPost instance or a queryset of BlogPost instances
+
+    Returns:
+        Number of blog posts processed
+    """
+    from core.models import BlogPost
+
+    if isinstance(blog_posts, BlogPost):
+        blog_posts = [blog_posts]
+    elif hasattr(blog_posts, "__iter__"):
+        blog_posts = list(blog_posts)
+    else:
+        logger.error("Invalid blog_posts argument type", type=type(blog_posts))
+        return 0
+
+    processed_count = 0
+
+    for blog_post in blog_posts:
+        if not isinstance(blog_post, BlogPost):
+            logger.warning("Skipping non-BlogPost object", obj=blog_post)
+            continue
+
+        content_lines = blog_post.content.split("\n")
+        new_content_lines = []
+        title_line_index = None
+
+        for i, line in enumerate(content_lines):
+            if title_line_index is None and line.strip().startswith("# "):
+                extracted_title = line.strip()[2:].strip()
+                if extracted_title:
+                    blog_post.title = extracted_title
+                    title_line_index = i
+                    logger.info(
+                        "Extracted title from content",
+                        blog_post_id=blog_post.id,
+                        extracted_title=extracted_title,
+                    )
+                continue
+
+            if title_line_index is not None and i == title_line_index + 1:
+                if (
+                    line.strip().startswith("## ")
+                    and line.strip()[3:].strip().lower() == "abstract"
+                ):
+                    logger.info(
+                        "Skipping Abstract h2 line",
+                        blog_post_id=blog_post.id,
+                    )
+                    continue
+
+            new_content_lines.append(line)
+
+        blog_post.content = "\n".join(new_content_lines).strip()
+        blog_post.save(update_fields=["title", "content"])
+        processed_count += 1
+
+        logger.info(
+            "Processed blog post content",
+            blog_post_id=blog_post.id,
+            title=blog_post.title,
+        )
+
+    return processed_count

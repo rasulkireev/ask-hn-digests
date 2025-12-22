@@ -83,8 +83,10 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "allauth.account.middleware.AccountMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # "django_structlog.middlewares.RequestMiddleware",
 ]
+
+if DEBUG:
+    MIDDLEWARE.append("django_structlog.middlewares.RequestMiddleware")
 
 ROOT_URLCONF = "ask_hn_digest.urls"
 
@@ -328,7 +330,7 @@ LOGGING = {
             "level": "ERROR",  # so we don't chunder 404s, etc
             "propagate": False,
         },
-        "ask-hn-digests": {
+        "ask_hn_digest": {
             "level": "DEBUG",
             "handlers": ["console"],
             "propagate": False,
@@ -365,8 +367,8 @@ structlog.configure(
 if ENVIRONMENT == "prod":
     LOGGING["loggers"]["django.server"]["level"] = "WARNING"
     LOGGING["loggers"]["django_structlog"]["handlers"].append("json_console")
-    LOGGING["loggers"]["ask-hn-digests"]["level"] = env("DJANGO_LOG_LEVEL", default="INFO")
-    LOGGING["loggers"]["ask-hn-digests"]["handlers"].append("json_console")
+    LOGGING["loggers"]["ask_hn_digest"]["level"] = env("DJANGO_LOG_LEVEL", default="INFO")
+    LOGGING["loggers"]["ask_hn_digest"]["handlers"].append("json_console")
 
 SENTRY_DSN = env("SENTRY_DSN")
 if ENVIRONMENT == "prod" and SENTRY_DSN:
@@ -406,3 +408,8 @@ MJML_HTTPSERVERS = [
 TYPEFULLY_API_KEY = env("TYPEFULLY_API_KEY")
 
 HN_DB_URL = env("HN_DB_URL")
+
+SHELL_PLUS_IMPORTS = [
+    "from django_q.tasks import async_task",
+    "from core.tasks import *",
+]

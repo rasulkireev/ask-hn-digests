@@ -17,8 +17,9 @@ from django.views.generic import DetailView, ListView, TemplateView, UpdateView
 from django_q.tasks import async_task
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
+from core.choices import BlogPostStatus
 from core.forms import ProfileUpdateForm, SendNewsletterForm, SummarizeHNDiscussionForm
-from core.models import HNDiscussionSummary, Profile
+from core.models import BlogPost, HNDiscussionSummary, Profile
 
 logger = get_ask_hn_digest_logger(__name__)
 
@@ -28,12 +29,14 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["latest_summaries"] = HNDiscussionSummary.objects.order_by("-date_analyzed")[:3]
+        context["latest_summaries"] = BlogPost.objects.filter(
+            status=BlogPostStatus.PUBLISHED
+        ).order_by("-created_at")[:3]
         return context
 
 
 class SearchView(ListView):
-    model = HNDiscussionSummary
+    model = BlogPost
     template_name = "pages/search_results.html"
     context_object_name = "search_results"
     paginate_by = 10
@@ -41,13 +44,27 @@ class SearchView(ListView):
     def get_queryset(self):
         query = self.request.GET.get("q")
         if query:
-            return HNDiscussionSummary.objects.filter(
+            try:
+                discussion_id_query = int(query)
+            except (ValueError, TypeError):
+                discussion_id_query = None
+
+            q_objects = Q(
                 Q(title__icontains=query)
-                | Q(short_summary__icontains=query)
-                | Q(long_summary__icontains=query)
+                | Q(content__icontains=query)
                 | Q(description__icontains=query)
-            ).order_by("-date_analyzed")
-        return HNDiscussionSummary.objects.none()
+                | Q(tags__icontains=query)
+            )
+
+            if discussion_id_query is not None:
+                q_objects |= Q(hn_discussion_summary__discussion_id=discussion_id_query)
+
+            return (
+                BlogPost.objects.filter(status=BlogPostStatus.PUBLISHED)
+                .filter(q_objects)
+                .order_by("-created_at")
+            )
+        return BlogPost.objects.none()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -86,17 +103,25 @@ def resend_confirmation_email(request):
 
 
 class BlogView(ListView):
-    model = HNDiscussionSummary
+    model = BlogPost
     template_name = "blog/blog_posts.html"
     context_object_name = "blog_posts"
-    ordering = ["-date_analyzed"]
+    ordering = ["-created_at"]
     paginate_by = 10
+
+    def get_queryset(self):
+        return BlogPost.objects.filter(status=BlogPostStatus.PUBLISHED).order_by("-created_at")
 
 
 class BlogPostView(DetailView):
-    model = HNDiscussionSummary
+    model = BlogPost
     template_name = "blog/blog_post.html"
     context_object_name = "blog_post"
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
+
+    def get_queryset(self):
+        return BlogPost.objects.filter(status=BlogPostStatus.PUBLISHED)
 
 
 def test_mjml(request):

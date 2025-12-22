@@ -3,11 +3,14 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
+from django.utils.text import slugify
+from gpt_researcher import GPTResearcher
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
 from core.base_models import BaseModel
 from core.choices import BlogPostStatus
 from core.model_utils import generate_random_key
+from core.utils import run_gptr_synchronously
 
 logger = get_ask_hn_digest_logger(__name__)
 
@@ -73,6 +76,14 @@ class BlogPost(BaseModel):
         max_length=10,
         choices=BlogPostStatus.choices,
         default=BlogPostStatus.DRAFT,
+    )
+    hn_discussion_summary = models.ForeignKey(
+        "HNDiscussionSummary",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="blog_posts",
+        help_text="Related Hacker News discussion summary",
     )
 
     def __str__(self):
@@ -155,6 +166,11 @@ class HNDiscussionSummary(BaseModel):
     def get_absolute_url(self):
         return reverse("blog_post", kwargs={"slug": self.slug})
 
+    @property
+    def url(self):
+        """Return the Hacker News discussion URL"""
+        return f"https://news.ycombinator.com/item?id={self.discussion_id}"
+
     def get_tags_list(self):
         """Return a list of tags for this summary"""
         if not self.tags:
@@ -181,4 +197,31 @@ class HNDiscussionSummary(BaseModel):
             HNDiscussionSummary.objects.order_by("-date_analyzed")[:count].values_list(
                 "discussion_id", flat=True
             )
+        )
+
+    def generate_blog_post(self):
+        query = "Write a post from the following based on the following Hacker News discussion:\n"
+        query += f"Title: {self.discussion_title}\n"
+        query += f"Description: {self.description}\n"
+        query += f"Summary: {self.short_summary}\n"
+        query += f"Discussion URL: {self.url}\n"
+
+        agent = GPTResearcher(
+            query,
+            report_type="deep",
+            tone="Simple (written for young readers, using basic vocabulary and clear explanations)",  # noqa: E501
+            report_format="markdown",
+        )
+
+        result = run_gptr_synchronously(agent)
+
+        slug = slugify(self.title)
+
+        BlogPost.objects.create(
+            title=self.title,
+            description=self.description,
+            slug=slug,
+            tags=self.tags,
+            content=result,
+            status=BlogPostStatus.PUBLISHED,
         )
