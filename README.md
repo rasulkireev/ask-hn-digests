@@ -8,10 +8,9 @@ All the information on how to run, develop and update your new application can b
 1. Update the name of the `.env.example` to `.env` and update relevant variables.
 
 To start you'll need to run these commands:
-1. `poetry install`
-2. `poetry export -f requirements.txt --output requirements.txt --without-hashes`
-3. `poetry run python manage.py makemigrations`
-4. `make serve` : Make sure you have a Docker Engine running. I recommend OrbStack.
+1. `uv sync --dev`
+2. `uv run python manage.py makemigrations`
+3. `make serve` : Make sure you have a Docker Engine running. I recommend OrbStack.
 
 ## Next steps
 - When everything is running, go to http://localhost:8000/ to check if the backend is running.
