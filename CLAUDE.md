@@ -7,9 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Setup & Environment:**
 ```bash
 # Initial setup
-poetry install
-poetry export -f requirements.txt --output requirements.txt --without-hashes
-python manage.py makemigrations
+uv sync --dev
+uv run python manage.py makemigrations
 make serve  # Starts Docker containers
 
 # Environment setup
@@ -40,9 +39,9 @@ npm run watch          # Watch mode for development
 **Testing & Code Quality:**
 ```bash
 make test              # Run pytest
-poetry run ruff check  # Lint Python code
-poetry run ruff format # Format Python code
-poetry run djlint .    # Lint Django templates
+uv run ruff check      # Lint Python code
+uv run ruff format     # Format Python code
+uv run djlint .        # Lint Django templates
 ```
 
 **Workers & Background Tasks:**
@@ -112,8 +111,9 @@ This is a Django-based web application that analyzes and summarizes Hacker News 
 - Follow existing patterns in neighboring files
 
 **Dependencies:**
-- Always use `poetry add <package>` instead of editing requirements.txt directly
-- Regenerate requirements.txt with `poetry export -f requirements.txt --output requirements.txt --without-hashes`
+- Always use `uv add <package>` instead of editing dependency files directly
+- Use `uv add --dev <package>` for development dependencies
+- Regenerate the lockfile with `uv lock` when needed
 
 **Logging Best Practices:**
 - Use structured logging with consistent field names (user_id, email, profile_id)
