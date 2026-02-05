@@ -1,6 +1,6 @@
 [project]
 name = "ask_hn_digest"
-version = "0.1.0"
+version = "0.1.1"
 description = "Get Summaries of the most engaging discussions on Hacker News"
 authors = [{ name = "Rasul Kireev", email = "me@rasulkireev.com" }]
 requires-python = ">=3.11,<4.0"
@@ -50,7 +50,7 @@ dev = [
 ]
 
 [tool.ruff]
-line-length = 100
+line-length = 120
 target-version = "py311"
 
 [tool.ruff.lint]
