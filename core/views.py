@@ -1,5 +1,5 @@
+from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailAddress
-from allauth.account.utils import send_email_confirmation
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -80,7 +80,10 @@ class UserSettingsView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 @login_required
 def resend_confirmation_email(request):
     user = request.user
-    send_email_confirmation(request, user, EmailAddress.objects.get_for_user(user, user.email))
+    adapter = get_adapter(request)
+    emailaddress = EmailAddress.objects.get_for_user(user, user.email)
+
+    adapter.send_confirmation_mail(request, emailaddress, signup=False)
 
     return redirect("settings")
 
@@ -142,9 +145,7 @@ class AdminPanelView(UserPassesTestMixin, TemplateView):
             form = SendNewsletterForm(request.POST)
             if form.is_valid():
                 summary_ids_str = form.cleaned_data["summary_ids"]
-                summary_ids = [
-                    int(sid.strip()) for sid in summary_ids_str.split(",") if sid.strip()
-                ]
+                summary_ids = [int(sid.strip()) for sid in summary_ids_str.split(",") if sid.strip()]
                 from core.tasks import send_buttondown_newsletter
 
                 response = send_buttondown_newsletter(summary_ids)
@@ -168,21 +169,15 @@ class AdminPanelView(UserPassesTestMixin, TemplateView):
                 timeout=24 * 60 * 60,  # 24 hours timeout
             )
 
-            messages.success(
-                request, "HN data sync has been scheduled and is running in the background!"
-            )
+            messages.success(request, "HN data sync has been scheduled and is running in the background!")
             return redirect("admin_panel")
         else:
             form = SummarizeHNDiscussionForm(request.POST)
             if form.is_valid():
                 discussion_ids_str = form.cleaned_data["discussion_ids"]
-                discussion_ids = [
-                    int(d.strip()) for d in discussion_ids_str.split(",") if d.strip()
-                ]
+                discussion_ids = [int(d.strip()) for d in discussion_ids_str.split(",") if d.strip()]
                 discussion_ids_to_analyze = [
-                    d
-                    for d in discussion_ids
-                    if not HNDiscussionSummary.objects.filter(discussion_id=d).exists()
+                    d for d in discussion_ids if not HNDiscussionSummary.objects.filter(discussion_id=d).exists()
                 ]
                 for discussion_id in discussion_ids_to_analyze:
                     async_task(
@@ -191,9 +186,7 @@ class AdminPanelView(UserPassesTestMixin, TemplateView):
                         group="Analyze Discussion",
                     )
 
-                messages.success(
-                    request, f"Scheduled {len(discussion_ids_to_analyze)} discussions for analysis!"
-                )
+                messages.success(request, f"Scheduled {len(discussion_ids_to_analyze)} discussions for analysis!")
                 return redirect("admin_panel")
             else:
                 return self.render_to_response(self.get_context_data(summarize_form=form))

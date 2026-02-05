@@ -15,7 +15,7 @@ from core.models import BlogPost, Feedback, NewsletterSubscriber
 
 logger = get_ask_hn_digest_logger(__name__)
 
-api = NinjaAPI(auth=MultipleAuthSchema(), csrf=True, version="0.0.1")
+api = NinjaAPI(auth=MultipleAuthSchema(), version="0.0.1")
 
 
 @api.post("/submit-feedback", response=SubmitFeedbackOut)
@@ -51,9 +51,7 @@ def newsletter_subscribe(request: HttpRequest, data: NewsletterSubscribeIn):
     subscriber, created = NewsletterSubscriber.objects.get_or_create(email=data.email)
 
     if not created:
-        return NewsletterSubscribeOut(
-            status="failure", message="You are already subscribed to the newsletter."
-        )
+        return NewsletterSubscribeOut(status="failure", message="You are already subscribed to the newsletter.")
 
     added_to_buttondown = subscriber.add_newsletter_subscriber_to_buttondown()
     if not added_to_buttondown:

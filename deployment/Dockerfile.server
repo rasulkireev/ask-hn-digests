@@ -8,11 +8,12 @@ RUN npm install
 RUN npm run build
 
 # Production stage
-FROM python:3.11
+FROM python:3.14
 
 WORKDIR /app
 
-ENV VIRTUAL_ENV=/app/.venv
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv
+ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 COPY pyproject.toml uv.lock ./
