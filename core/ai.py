@@ -10,20 +10,49 @@ from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai.providers.openrouter import OpenRouterProvider
 
 
+def _content_model_settings(model_name: str | None = None) -> tuple[str, str, str, str]:
+    return (
+        model_name or settings.AI_CONTENT_MODEL,
+        settings.OPENROUTER_API_KEY,
+        settings.OPENROUTER_APP_URL,
+        settings.OPENROUTER_APP_TITLE,
+    )
+
+
 @lru_cache
-def _openrouter_provider() -> OpenRouterProvider:
+def _openrouter_provider(api_key: str, app_url: str, app_title: str) -> OpenRouterProvider:
     return OpenRouterProvider(
-        api_key=settings.OPENROUTER_API_KEY,
-        app_url=settings.OPENROUTER_APP_URL,
-        app_title=settings.OPENROUTER_APP_TITLE,
+        api_key=api_key,
+        app_url=app_url,
+        app_title=app_title,
+    )
+
+
+@lru_cache
+def _cached_content_model(
+    model_name: str,
+    api_key: str,
+    app_url: str,
+    app_title: str,
+) -> OpenRouterModel:
+    return OpenRouterModel(
+        model_name,
+        provider=_openrouter_provider(api_key, app_url, app_title),
     )
 
 
 def _content_model(model_name: str | None = None) -> OpenRouterModel:
-    return OpenRouterModel(
-        model_name or settings.AI_CONTENT_MODEL,
-        provider=_openrouter_provider(),
-    )
+    return _cached_content_model(*_content_model_settings(model_name))
+
+
+@lru_cache
+def _text_agent(
+    model_name: str,
+    api_key: str,
+    app_url: str,
+    app_title: str,
+) -> Agent:
+    return Agent(_cached_content_model(model_name, api_key, app_url, app_title))
 
 
 def generate_text(
@@ -32,7 +61,10 @@ def generate_text(
     system_prompt: str | Sequence[str] = (),
     model_name: str | None = None,
 ) -> str:
-    agent = Agent(_content_model(model_name), system_prompt=system_prompt)
+    if system_prompt:
+        agent = Agent(_content_model(model_name), system_prompt=system_prompt)
+    else:
+        agent = _text_agent(*_content_model_settings(model_name))
     result = agent.run_sync(prompt)
     return result.output.strip()
 
@@ -53,16 +85,28 @@ def generate_structured[OutputT](
     return result.output
 
 
+def _embedding_model_settings(model_name: str | None = None) -> tuple[str, str, str]:
+    return (
+        model_name or settings.AI_EMBEDDING_MODEL,
+        settings.OPENROUTER_BASE_URL,
+        settings.OPENROUTER_API_KEY,
+    )
+
+
 @lru_cache
-def _embedding_model(model_name: str | None = None) -> OpenAIEmbeddingModel:
+def _cached_embedding_model(model_name: str, base_url: str, api_key: str) -> OpenAIEmbeddingModel:
     provider = OpenAIProvider(
-        base_url=settings.OPENROUTER_BASE_URL,
-        api_key=settings.OPENROUTER_API_KEY,
+        base_url=base_url,
+        api_key=api_key,
     )
     return OpenAIEmbeddingModel(
-        model_name or settings.AI_EMBEDDING_MODEL,
+        model_name,
         provider=provider,
     )
+
+
+def _embedding_model(model_name: str | None = None) -> OpenAIEmbeddingModel:
+    return _cached_embedding_model(*_embedding_model_settings(model_name))
 
 
 def _embedder(model_name: str | None = None) -> Embedder:
