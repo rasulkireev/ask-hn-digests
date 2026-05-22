@@ -3,9 +3,9 @@ from datetime import datetime
 import requests
 from django.conf import settings
 from django.forms.utils import ErrorList
-from google import genai
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
+from core.ai import generate_text
 from core.models import HNDiscussionSummary
 
 logger = get_ask_hn_digest_logger(__name__)
@@ -38,10 +38,8 @@ class DivErrorList(ErrorList):
 
 
 def generate_buttondown_newsletter_subject(body: str):
-    gemini_client = genai.Client(api_key=settings.GEMINI_API_KEY)
-
     """
-    Generates a newsletter subject line using the Gemini API based on the email body.
+    Generates a newsletter subject line based on the email body.
     """
     prompt = f"""
     You are an expert copywriter specializing in email subject lines.
@@ -88,11 +86,7 @@ def generate_buttondown_newsletter_subject(body: str):
     Only return the subject line, nothing else.
     """  # noqa: E501
 
-    response = gemini_client.models.generate_content(
-        model="gemini-2.5-flash",  # Using model from user's example
-        contents=prompt,
-    )
-    subject = getattr(response, "text", None)
+    subject = generate_text(prompt)
 
     return subject.strip()
 
@@ -182,9 +176,7 @@ def get_post_comments(post_id):
     # A post (story, poll) has comments listed in its 'kids' attribute.
     if "kids" in post_data:
         for top_level_comment_id in post_data["kids"]:
-            fetch_comments_recursive(
-                top_level_comment_id, 0, all_comment_ids, formatted_comment_lines
-            )
+            fetch_comments_recursive(top_level_comment_id, 0, all_comment_ids, formatted_comment_lines)
     elif item_type in ("story", "poll"):  # These types should have 'descendants'
         descendants = post_data.get("descendants", 0)
         if descendants == 0:
@@ -234,8 +226,6 @@ def send_to_typefully(content: str, threadify: bool = True) -> dict:
 
 
 def generate_subreddit_recommendations(summary: HNDiscussionSummary) -> str:
-    gemini_client = genai.Client(api_key=settings.GEMINI_API_KEY)
-
     prompt = f"""
     Analyze the following blog post content and recommend the best subreddits for sharing this content:
 
@@ -263,8 +253,7 @@ def generate_subreddit_recommendations(summary: HNDiscussionSummary) -> str:
     """  # noqa: E501
 
     try:
-        response = gemini_client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
-        subreddit_recommendations = getattr(response, "text", None)
+        subreddit_recommendations = generate_text(prompt)
 
         if subreddit_recommendations:
             # Clean up any potential extra whitespace or quotes

@@ -257,9 +257,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "simple": {"format": "%(levelname)s %(message)s"},
-        "verbose": {
-            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"
-        },
+        "verbose": {"format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"},
         "json": {"format": "%(message)s"},
         "json_formatter": {
             "()": structlog.stdlib.ProcessorFormatter,
@@ -275,9 +273,7 @@ LOGGING = {
         },
         "key_value": {
             "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.processors.KeyValueRenderer(
-                key_order=["timestamp", "level", "event", "logger"]
-            ),
+            "processor": structlog.processors.KeyValueRenderer(key_order=["timestamp", "level", "event", "logger"]),
         },
     },
     "filters": {
@@ -393,7 +389,14 @@ if ENVIRONMENT == "prod" and SENTRY_DSN:
 POSTHOG_API_KEY = env("POSTHOG_API_KEY")
 
 BUTTONDOWN_API_KEY = env("BUTTONDOWN_API_KEY")
-GEMINI_API_KEY = env("GEMINI_API_KEY")
+
+OPENROUTER_API_KEY = env("OPENROUTER_API_KEY")
+OPENROUTER_BASE_URL = env("OPENROUTER_BASE_URL", default="https://openrouter.ai/api/v1")
+OPENROUTER_APP_URL = env("OPENROUTER_APP_URL", default="https://askhndigests.com")
+OPENROUTER_APP_TITLE = env("OPENROUTER_APP_TITLE", default="Ask HN Digest")
+
+AI_CONTENT_MODEL = env("AI_CONTENT_MODEL", default="google/gemini-2.5-flash")
+AI_EMBEDDING_MODEL = env("AI_EMBEDDING_MODEL", default="openai/text-embedding-3-small")
 
 MJML_BACKEND_MODE = "httpserver"
 MJML_HTTPSERVERS = [
