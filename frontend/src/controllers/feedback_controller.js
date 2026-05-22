@@ -90,11 +90,14 @@ export default class extends Controller {
       submitButton.textContent = 'Submitting...';
     }
 
+    const csrfTokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    const csrfToken = csrfTokenInput ? csrfTokenInput.value : '';
+
     fetch('/api/submit-feedback', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+        'X-CSRFToken': csrfToken
       },
       body: JSON.stringify({ feedback, page: window.location.pathname }),
     })

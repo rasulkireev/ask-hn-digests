@@ -66,7 +66,7 @@ export default class extends Controller {
 
     // Update like button
     if (this.hasLikeButtonTarget) {
-      this.toggleButtonClasses(this.likeButtonTarget, LIKE_ACTIVE_CLASSES, isLiked);
+      this.syncButtonClasses(this.likeButtonTarget, LIKE_ACTIVE_CLASSES, isLiked);
     }
 
     if (this.hasLikeIconTarget) {
@@ -75,7 +75,7 @@ export default class extends Controller {
 
     // Update bookmark button
     if (this.hasBookmarkButtonTarget) {
-      this.toggleButtonClasses(this.bookmarkButtonTarget, BOOKMARK_ACTIVE_CLASSES, isBookmarked);
+      this.syncButtonClasses(this.bookmarkButtonTarget, BOOKMARK_ACTIVE_CLASSES, isBookmarked);
     }
 
     if (this.hasBookmarkIconTarget) {
@@ -83,14 +83,15 @@ export default class extends Controller {
     }
   }
 
-  toggleButtonClasses(button, activeClasses, isActive) {
-    INACTIVE_BUTTON_CLASSES.forEach(className => {
-      button.classList.toggle(className, !isActive);
-    });
+  syncButtonClasses(button, activeClasses, isActive) {
+    if (isActive) {
+      button.classList.remove(...INACTIVE_BUTTON_CLASSES);
+      button.classList.add(...activeClasses);
+      return;
+    }
 
-    activeClasses.forEach(className => {
-      button.classList.toggle(className, isActive);
-    });
+    button.classList.remove(...activeClasses);
+    button.classList.add(...INACTIVE_BUTTON_CLASSES);
   }
 
   isLiked() {
