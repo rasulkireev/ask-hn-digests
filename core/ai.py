@@ -55,6 +55,20 @@ def _text_agent(
     return Agent(_cached_content_model(model_name, api_key, app_url, app_title))
 
 
+@lru_cache
+def _structured_agent[OutputT](
+    model_name: str,
+    api_key: str,
+    app_url: str,
+    app_title: str,
+    output_type: type[OutputT],
+) -> Agent:
+    return Agent(
+        _cached_content_model(model_name, api_key, app_url, app_title),
+        output_type=output_type,
+    )
+
+
 def generate_text(
     prompt: str,
     *,
@@ -76,11 +90,14 @@ def generate_structured[OutputT](
     system_prompt: str | Sequence[str] = (),
     model_name: str | None = None,
 ) -> OutputT:
-    agent = Agent(
-        _content_model(model_name),
-        output_type=output_type,
-        system_prompt=system_prompt,
-    )
+    if system_prompt:
+        agent = Agent(
+            _content_model(model_name),
+            output_type=output_type,
+            system_prompt=system_prompt,
+        )
+    else:
+        agent = _structured_agent(*_content_model_settings(model_name), output_type)
     result = agent.run_sync(prompt)
     return result.output
 
@@ -109,8 +126,13 @@ def _embedding_model(model_name: str | None = None) -> OpenAIEmbeddingModel:
     return _cached_embedding_model(*_embedding_model_settings(model_name))
 
 
+@lru_cache
+def _cached_embedder(model_name: str, base_url: str, api_key: str) -> Embedder:
+    return Embedder(_cached_embedding_model(model_name, base_url, api_key))
+
+
 def _embedder(model_name: str | None = None) -> Embedder:
-    return Embedder(_embedding_model(model_name))
+    return _cached_embedder(*_embedding_model_settings(model_name))
 
 
 async def embed_query_async(query: str | Sequence[str], *, model_name: str | None = None) -> list[list[float]]:
