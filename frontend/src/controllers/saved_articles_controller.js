@@ -42,26 +42,28 @@ export default class extends Controller {
     });
 
     return `
-      <div class="relative p-6 bg-white rounded-lg border border-orange-100 shadow-md">
-        <div class="pr-20">
-          <div class="mb-2">
-            <a href="/blog/${article.slug}" class="text-xl font-bold text-orange-700 hover:text-orange-800 hover:underline">
+      <article class="group grid gap-3 border-t border-line py-5 transition hover:bg-paper/70 sm:grid-cols-[7.5rem_minmax(0,1fr)_auto] sm:items-start">
+        <div class="text-[0.68rem] font-black uppercase leading-relaxed tracking-[0.16em] text-muted">
+          <span class="block text-ink">${actionText}</span>
+          <span class="block">${formattedDate}</span>
+        </div>
+        <div>
+          <h2 class="max-w-4xl break-words text-[1.12rem] font-black leading-tight sm:text-[1.34rem]">
+            <a href="/blog/${article.slug}" class="no-underline transition hover:text-accent-dark">
               ${this.escapeHtml(article.title)}
             </a>
-          </div>
-          <div class="mb-3 text-xs text-gray-500">
-            ${actionText} on ${formattedDate}
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-gray-500">Article ID: ${article.id}</span>
-            <button data-action="click->saved-articles#removeArticle"
-                    data-article-id="${article.id}"
-                    class="text-sm text-red-500 underline hover:text-red-700">
-              Remove from ${this.typeValue}
-            </button>
+          </h2>
+          <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.68rem] font-black uppercase tracking-[0.16em] text-muted">
+            <span>${actionText} on ${formattedDate}</span>
+            <span>Article ID: ${article.id}</span>
           </div>
         </div>
-      </div>
+        <button data-action="click->saved-articles#removeArticle"
+                data-article-id="${article.id}"
+                class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-line bg-paper px-4 text-[0.82rem] font-black uppercase tracking-[0.12em] leading-none text-ink-soft no-underline transition hover:border-line-strong hover:bg-paper-strong focus:outline-none focus:ring-2 focus:ring-accent/20">
+          Remove from ${this.typeValue}
+        </button>
+      </article>
     `;
   }
 

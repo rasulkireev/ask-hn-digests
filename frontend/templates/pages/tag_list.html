@@ -1,57 +1,54 @@
 {% extends "base.html" %}
 {% load static %}
-
 {% block meta %}
-<title>All Tags - Ask HN Digest</title>
-<meta name="description" content="Browse all tags used in Ask HN Digest discussion summaries." />
-<meta name="robots" content="index, follow" />
-<link rel="canonical" href="{{ request.build_absolute_uri }}{% url 'tag_list' %}" />
+    <title>All Tags - Ask HN Digest</title>
+    <meta name="description"
+          content="Browse all tags used in Ask HN Digest discussion summaries." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical"
+          href="https://{{ request.get_host }}{% url 'tag_list' %}" />
 {% endblock meta %}
-
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-orange-50 to-white">
-  <div class="container px-4 py-8 mx-auto max-w-4xl">
-    <div class="mb-8">
-      <h1 class="mb-4 text-4xl font-bold text-center text-gray-900">All Tags</h1>
-      <p class="mb-6 text-center text-gray-600">Browse discussions by topic</p>
-      <div class="text-sm text-center text-gray-500">
-        {{ total_tags }} tag{{ total_tags|pluralize }} found
-      </div>
-    </div>
-
-    {% if tags %}
-      <div class="p-6 bg-white rounded-lg shadow-md">
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {% for tag, count in tags %}
-            <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg transition-colors hover:bg-gray-100">
-              <div>
-                {% include 'components/tag.html' with tag=tag %}
-              </div>
-              <div class="text-sm font-medium text-gray-500">
-                {{ count }} post{{ count|pluralize }}
-              </div>
+    <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
+        <header class="mb-6 grid gap-3">
+            <p class="mb-1 inline-flex items-center gap-2 text-sm font-extrabold text-accent-dark before:h-2 before:w-2 before:rounded-[2px] before:bg-accent before:shadow-[0_0_0_3px_oklch(0.68_0.18_48_/_0.16)] before:content-['']">
+                Topic index
+            </p>
+            <h1 class="break-words text-[2.65rem] font-black leading-none tracking-normal sm:text-[3.55rem] lg:text-[4.35rem]">
+                Find the threads by subject.
+            </h1>
+            <p class="max-w-3xl text-[1.02rem] leading-relaxed text-ink-soft sm:text-[1.12rem]">
+                Tags group the archive into practical lanes: engineering, products, AI, startups, culture, and whatever the community keeps arguing about.
+            </p>
+        </header>
+        <div class="my-5 flex flex-wrap items-center justify-between gap-3">
+            <a href="{% url 'blog_posts' %}"
+               class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-line bg-paper px-4 text-[0.92rem] font-extrabold leading-none text-ink no-underline transition hover:border-line-strong hover:bg-paper-strong focus:outline-none focus:ring-4 focus:ring-accent/20">Browse all discussions</a>
+            <span class="inline-flex min-h-8 items-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold text-muted">{{ total_tags }} tag{{ total_tags|pluralize }}</span>
+        </div>
+        {% if tags %}
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {% for tag, count in tags %}
+                    <div class="flex items-center justify-between gap-3 rounded-[2px] border border-line bg-paper p-3 transition hover:border-line-strong">
+                        {% include 'components/tag.html' with tag=tag %}
+                        <span class="whitespace-nowrap text-sm font-extrabold text-muted">{{ count }} post{{ count|pluralize }}</span>
+                    </div>
+                {% endfor %}
             </div>
-          {% endfor %}
-        </div>
-      </div>
-
-    {% else %}
-      <div class="py-12 text-center">
-        <div class="mb-4 text-gray-600">
-          <svg class="mx-auto mb-4 w-16 h-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-          </svg>
-          <p class="text-lg font-medium">No tags found</p>
-          <p class="text-sm">Check back later for tagged discussions.</p>
-        </div>
-
-        <div class="mt-8">
-          <a href="{% url 'home' %}" class="font-medium text-blue-600 hover:text-blue-700">← Back to Home</a>
-          <span class="mx-2 text-gray-400">|</span>
-          <a href="{% url 'blog_posts' %}" class="font-medium text-blue-600 hover:text-blue-700">Browse All Discussions</a>
-        </div>
-      </div>
-    {% endif %}
-  </div>
-</div>
+        {% else %}
+            <div class="grid justify-items-center gap-3 rounded-[2px] border border-line bg-paper/95 p-8 text-center shadow-low sm:p-14">
+                <svg fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor"
+                     class="h-12 w-12 text-muted"
+                     aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 0 1 0 2.828l-7 7a2 2 0 0 1-2.828 0l-7-7A1.994 1.994 0 0 1 3 12V7a4 4 0 0 1 4-4z" />
+                </svg>
+                <h2 class="text-xl font-black">No tags found</h2>
+                <p class="max-w-xl leading-relaxed text-muted">Tagged discussions will appear here after summaries are analyzed.</p>
+                <a href="{% url 'home' %}"
+                   class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-line bg-paper px-4 text-[0.92rem] font-extrabold leading-none text-ink no-underline transition hover:border-line-strong hover:bg-paper-strong focus:outline-none focus:ring-4 focus:ring-accent/20">Back home</a>
+            </div>
+        {% endif %}
+    </section>
 {% endblock content %}

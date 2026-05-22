@@ -2,81 +2,102 @@
 {% load webpack_loader static %}
 {% load markdown_extras %}
 {% load core_extras %}
-
 {% block meta %}
-<title>Ask HN Digest Blog</title>
-<meta name="description" content="Get Summaries of the most engaging discussions on Hacker News" />
-<meta name="keywords" content="" />
-<meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://{{ request.get_host }}{% url 'blog_posts' %}" />
-
-<meta property="og:type" content="website" />
-<meta property="og:title" content="Ask HN Digest Blog" />
-<meta property="og:url" content="https://{{ request.get_host }}{% url 'blog_posts' %}" />
-<meta property="og:description" content="Get Summaries of the most engaging discussions on Hacker News" />
-<meta property="og:image" content="https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest Blog&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
-<meta property="og:locale" content="en_US" />
-
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:creator" content="@rasulkireev" />
-<meta name="twitter:site" content="@rasulkireev" />
-<meta name="twitter:title" content="Ask HN Digest Blog" />
-<meta name="twitter:description" content="Get Summaries of the most engaging discussions on Hacker News" />
-<meta name="twitter:image" content="https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest Blog&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
+    <title>Ask HN Digest Blog</title>
+    <meta name="description"
+          content="Get Summaries of the most engaging discussions on Hacker News" />
+    <meta name="keywords" content="" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical"
+          href="https://{{ request.get_host }}{% url 'blog_posts' %}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Ask HN Digest Blog" />
+    <meta property="og:url"
+          content="https://{{ request.get_host }}{% url 'blog_posts' %}" />
+    <meta property="og:description"
+          content="Get Summaries of the most engaging discussions on Hacker News" />
+    <meta property="og:image"
+          content="https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest Blog&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.svg' %}" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@rasulkireev" />
+    <meta name="twitter:site" content="@rasulkireev" />
+    <meta name="twitter:title" content="Ask HN Digest Blog" />
+    <meta name="twitter:description"
+          content="Get Summaries of the most engaging discussions on Hacker News" />
+    <meta name="twitter:image"
+          content="https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest Blog&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.svg' %}" />
 {% endblock meta %}
-
 {% block content %}
-<div class="container px-4 py-8 mx-auto md:relative">
-  <div class="mx-auto max-w-3xl">
-    <h1 class="mb-4 text-3xl font-bold text-center">Archive</h1>
-    <div class="mb-8 text-center">
-      <a href="{% url 'tag_list' %}" class="font-medium text-blue-600 hover:text-blue-700">Browse by tags</a>
-    </div>
-    {% if blog_posts %}
-      <div class="space-y-6">
-        {% for post in blog_posts %}
-          {% include "components/article_card.html" with article=post %}
-        {% endfor %}
-      </div>
-
-      {% if page_obj.paginator.num_pages > 1 %}
-        <div class="flex justify-center mt-8">
-          <nav class="flex space-x-2">
-            {% if page_obj.has_previous %}
-              <a href="?page=1" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white rounded-md border border-gray-300 hover:bg-gray-50">First</a>
-              <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white rounded-md border border-gray-300 hover:bg-gray-50">Previous</a>
+    <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
+        <header class="mb-6 grid gap-3">
+            <p class="mb-1 inline-flex items-center gap-2 text-sm font-extrabold text-accent-dark before:h-2 before:w-2 before:rounded-[2px] before:bg-accent before:shadow-[0_0_0_3px_oklch(0.68_0.18_48_/_0.16)] before:content-['']">
+                Archive
+            </p>
+            <h1 class="break-words text-[2.65rem] font-black leading-none tracking-normal sm:text-[3.55rem] lg:text-[4.35rem]">
+                Every brief, in order.
+            </h1>
+            <p class="max-w-3xl text-[1.02rem] leading-relaxed text-ink-soft sm:text-[1.12rem]">
+                Browse the full collection of Hacker News discussion summaries. Use tags when you want a topic lane, or search when you remember a phrase.
+            </p>
+        </header>
+        <div class="my-5 flex flex-wrap items-center justify-between gap-3">
+            <a href="{% url 'tag_list' %}"
+               class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-line bg-paper px-4 text-[0.92rem] font-extrabold leading-none text-ink no-underline transition hover:border-line-strong hover:bg-paper-strong focus:outline-none focus:ring-4 focus:ring-accent/20">Browse by tags</a>
+            {% if page_obj.paginator.count %}
+                <span class="inline-flex min-h-8 items-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold text-muted">{{ page_obj.paginator.count }} discussion{{ page_obj.paginator.count|pluralize }}</span>
             {% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-              {% if page_obj.number == num %}
-                <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md border border-blue-600">{{ num }}</span>
-              {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                <a href="?page={{ num }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white rounded-md border border-gray-300 hover:bg-gray-50">{{ num }}</a>
-              {% endif %}
-            {% endfor %}
-
-            {% if page_obj.has_next %}
-              <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white rounded-md border border-gray-300 hover:bg-gray-50">Next</a>
-              <a href="?page={{ page_obj.paginator.num_pages }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white rounded-md border border-gray-300 hover:bg-gray-50">Last</a>
-            {% endif %}
-          </nav>
         </div>
-      {% endif %}
-    {% else %}
-      <p class="text-center text-gray-600">No blog posts available at the moment.</p>
-    {% endif %}
-  </div>
-</div>
+        {% if blog_posts %}
+            <div class="grid gap-3">
+                {% for post in blog_posts %}
+                    {% include "components/article_card.html" with article=post %}
+                {% endfor %}
+            </div>
+            {% if page_obj.paginator.num_pages > 1 %}
+                <div class="mt-6 flex justify-center">
+                    <nav class="flex flex-wrap justify-center gap-1.5"
+                         aria-label="Archive pagination">
+                        {% if page_obj.has_previous %}
+                            <a href="?page=1"
+                               class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">First</a>
+                            <a href="?page={{ page_obj.previous_page_number }}"
+                               class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">Previous</a>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <span class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-ink bg-ink px-3 text-sm font-extrabold text-paper"
+                                      aria-current="page">{{ num }}</span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?page={{ num }}"
+                                   class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}"
+                               class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">Next</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}"
+                               class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">Last</a>
+                        {% endif %}
+                    </nav>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="grid justify-items-center gap-3 rounded-[2px] border border-line bg-paper/95 p-8 text-center shadow-low sm:p-14">
+                <h2 class="text-xl font-black">No discussions yet</h2>
+                <p class="max-w-xl leading-relaxed text-muted">Once summaries are generated, the archive will collect them here.</p>
+            </div>
+        {% endif %}
+    </section>
 {% endblock content %}
-
 {% block schema %}
-<script type="application/ld+json">
+    <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Ask HN Digest Blog",
     "description": "Get Summaries of the most engaging discussions on Hacker News",
-    "thumbnailUrl": "https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest Blog&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}",
+    "thumbnailUrl": "https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest Blog&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.svg' %}",
     "url": "https://{{ request.get_host }}{% url 'blog_posts' %}",
     "author": {
       "@type": "Person",
@@ -85,5 +106,5 @@
       "url": "https://rasulkireev.com/"
     }
   }
-  </script>
+    </script>
 {% endblock schema %}

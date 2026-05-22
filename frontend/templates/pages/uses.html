@@ -1,49 +1,114 @@
 {% extends "base.html" %}
 {% load webpack_loader static %}
-
 {% block meta %}
     <title>Technologies We Use | Ask HN Digest</title>
-    <meta name="description" content="Technologies and Tools Used by Ask HN Digest" />
-    <meta name="keywords" content="Ask HN Digest, Technology Stack, Web Development" />
+    <meta name="description"
+          content="Technologies and Tools Used by Ask HN Digest" />
+    <meta name="keywords"
+          content="Ask HN Digest, Technology Stack, Web Development" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://{{ request.get_host }}/uses" />
     <meta property="og:type" content="article" />
     <meta property="og:title" content="Technologies We Use | Ask HN Digest" />
     <meta property="og:url" content="https://{{ request.get_host }}/uses" />
-    <meta property="og:description" content="Technologies and Tools Used by Ask HN Digest" />
+    <meta property="og:description"
+          content="Technologies and Tools Used by Ask HN Digest" />
     <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@rasulkireev" />
     <meta name="twitter:site" content="@rasulkireev" />
     <meta name="twitter:title" content="Technologies We Use | Ask HN Digest" />
-    <meta name="twitter:description" content="Technologies and Tools Used by Ask HN Digest" />
-    <meta name="twitter:image" content="https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest&subtitle=Tech we use&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
+    <meta name="twitter:description"
+          content="Technologies and Tools Used by Ask HN Digest" />
+    <meta name="twitter:image"
+          content="https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest&subtitle=Tech we use&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.svg' %}" />
 {% endblock meta %}
-
 {% block content %}
-    <div class="container px-4 py-8 mx-auto prose">
-        <h1>Tech I Use</h1>
-        <p>
-          I run
-          <a href="https://www.rasulkireev.com/projects">multiple projects</a>
-          at the same time and using reliable and simple tech is the key to running everything smoothly. Here's what I use:
-        </p>
-        <ul>
-            <li><strong><a href="https://sentry.io/" target="_blank" rel="noopener noreferrer">Sentry</a>:</strong> For error tracking and performance monitoring, ensuring a smooth user experience.</li>
-            <li><strong><a href="https://hetzner.cloud/?ref=Ju1ttKSG0Fn7" target="_blank" rel="noopener noreferrer">Hetzner</a>:</strong> Our cloud infrastructure provider, hosting our servers and services.</li>
-            <li><strong><a href="https://buttondown.email/refer/rasulkireev" target="_blank" rel="noopener noreferrer">Buttondown</a>:</strong> for the newsletter.</li>
-            <li><strong><a href="https://www.djangoproject.com/" target="_blank" rel="noopener noreferrer">Django</a>:</strong> Our primary web framework, providing a robust foundation for our backend.</li>
-            <li><strong><a href="https://django-q2.readthedocs.io/" target="_blank" rel="noopener noreferrer">Django-Q2</a>:</strong> A task queue and scheduler for Django, helping us manage background tasks efficiently.</li>
-            <li><strong><a href="https://caprover.com/" target="_blank" rel="noopener noreferrer">CapRover</a>:</strong> Our deployment and server management tool, simplifying our DevOps processes.</li>
-            <li><strong><a href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub</a>:</strong> For version control and collaborative development of our codebase.</li>
-            <li><strong><a href="https://redis.io/" target="_blank" rel="noopener noreferrer">Redis</a>:</strong> An in-memory data structure store, used as a database, cache, and message broker.</li>
-            <li><strong><a href="https://www.postgresql.org/" target="_blank" rel="noopener noreferrer">PostgreSQL</a>:</strong> Our primary relational database management system.</li>
-            <li><strong><a href="https://www.anthropic.com/" target="_blank" rel="noopener noreferrer">Anthropic</a>:</strong> Leveraging AI capabilities to enhance our services.</li>
-            <li><strong><a href="https://replicate.com/" target="_blank" rel="noopener noreferrer">Replicate</a>:</strong> For AI model deployment and management.</li>
-            <li><strong><a href="https://stimulus.hotwired.dev/" target="_blank" rel="noopener noreferrer">StimulusJS</a>:</strong> A modest JavaScript framework for the "sprinkles of interactivity" in our frontend.</li>
-            <li><strong><a href="https://whitenoise.evans.io/" target="_blank" rel="noopener noreferrer">WhiteNoise</a>:</strong> For efficient serving of static files.</li>
-            <li><strong><a href="https://logfire.pydantic.dev/" target="_blank" rel="noopener noreferrer">Logfire</a>:</strong> For all my logging needs.</li>
-        </ul>
-        <p>If you have any questions about our technology choices or are interested in learning more, feel free to contact us at <a href="mailto:rasul@builtwithdjango.com">contact@builtwithdjango.com</a>.</p>
-    </div>
+    <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
+        <header class="mb-6 grid gap-3">
+            <p class="mb-1 inline-flex items-center gap-2 text-sm font-extrabold text-accent-dark before:h-2 before:w-2 before:rounded-[2px] before:bg-accent before:shadow-[0_0_0_3px_oklch(0.68_0.18_48_/_0.16)] before:content-['']">
+                Stack notes
+            </p>
+            <h1 class="break-words text-[2.65rem] font-black leading-none tracking-normal sm:text-[3.55rem] lg:text-[4.35rem]">
+                Tech I use
+            </h1>
+            <p class="max-w-3xl text-[1.02rem] leading-relaxed text-ink-soft sm:text-[1.12rem]">
+                I run <a href="https://www.rasulkireev.com/projects"
+    class="font-extrabold text-cobalt underline underline-offset-[0.18em] transition hover:text-accent-dark">multiple projects</a> at the same time. Simple, reliable tools matter more than novelty.
+            </p>
+        </header>
+        <div class="rounded-[2px] border border-line bg-paper/95 p-6 shadow-low">
+            <div class="prose prose-lg max-w-none text-ink prose-a:font-bold prose-a:text-cobalt prose-a:underline-offset-[0.18em] prose-blockquote:max-w-[68ch] prose-blockquote:rounded-r-lg prose-blockquote:border-l prose-blockquote:border-line-strong prose-blockquote:bg-paper-strong/70 prose-blockquote:text-ink-soft prose-code:rounded prose-code:border prose-code:border-line prose-code:bg-accent-soft prose-code:px-1 prose-code:font-bold prose-code:text-accent-dark prose-headings:font-black prose-headings:tracking-normal prose-headings:text-ink prose-ol:max-w-[68ch] prose-p:max-w-[68ch] prose-ul:max-w-[68ch] text-[1.06rem] leading-[1.82]">
+                <ul>
+                    <li>
+                        <strong><a href="https://sentry.io/" target="_blank" rel="noopener noreferrer">Sentry</a>:</strong> error tracking and performance monitoring.
+                    </li>
+                    <li>
+                        <strong><a href="https://hetzner.cloud/?ref=Ju1ttKSG0Fn7"
+   target="_blank"
+   rel="noopener noreferrer">Hetzner</a>:</strong> cloud infrastructure.
+                    </li>
+                    <li>
+                        <strong><a href="https://buttondown.email/refer/rasulkireev"
+   target="_blank"
+   rel="noopener noreferrer">Buttondown</a>:</strong> newsletter delivery.
+                    </li>
+                    <li>
+                        <strong><a href="https://www.djangoproject.com/"
+   target="_blank"
+   rel="noopener noreferrer">Django</a>:</strong> backend web framework.
+                    </li>
+                    <li>
+                        <strong><a href="https://django-q2.readthedocs.io/"
+   target="_blank"
+   rel="noopener noreferrer">Django-Q2</a>:</strong> task queue and scheduler.
+                    </li>
+                    <li>
+                        <strong><a href="https://caprover.com/"
+   target="_blank"
+   rel="noopener noreferrer">CapRover</a>:</strong> deployment and server management.
+                    </li>
+                    <li>
+                        <strong><a href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub</a>:</strong> source control and collaboration.
+                    </li>
+                    <li>
+                        <strong><a href="https://redis.io/" target="_blank" rel="noopener noreferrer">Redis</a>:</strong> cache and message broker.
+                    </li>
+                    <li>
+                        <strong><a href="https://www.postgresql.org/"
+   target="_blank"
+   rel="noopener noreferrer">PostgreSQL</a>:</strong> primary database.
+                    </li>
+                    <li>
+                        <strong><a href="https://www.anthropic.com/"
+   target="_blank"
+   rel="noopener noreferrer">Anthropic</a>:</strong> AI capabilities.
+                    </li>
+                    <li>
+                        <strong><a href="https://replicate.com/"
+   target="_blank"
+   rel="noopener noreferrer">Replicate</a>:</strong> model deployment.
+                    </li>
+                    <li>
+                        <strong><a href="https://stimulus.hotwired.dev/"
+   target="_blank"
+   rel="noopener noreferrer">StimulusJS</a>:</strong> focused frontend interactivity.
+                    </li>
+                    <li>
+                        <strong><a href="https://whitenoise.evans.io/"
+   target="_blank"
+   rel="noopener noreferrer">WhiteNoise</a>:</strong> static file serving.
+                    </li>
+                    <li>
+                        <strong><a href="https://logfire.pydantic.dev/"
+   target="_blank"
+   rel="noopener noreferrer">Logfire</a>:</strong> logging.
+                    </li>
+                </ul>
+                <p>
+                    Questions about the stack? Email <a href="mailto:rasul@builtwithdjango.com">contact@builtwithdjango.com</a>.
+                </p>
+            </div>
+        </div>
+    </section>
 {% endblock content %}
