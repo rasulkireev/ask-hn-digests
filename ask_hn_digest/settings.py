@@ -372,7 +372,8 @@ OPENROUTER_BASE_URL = env("OPENROUTER_BASE_URL", default="https://openrouter.ai/
 OPENROUTER_APP_URL = env("OPENROUTER_APP_URL", default="https://askhndigests.com")
 OPENROUTER_APP_TITLE = env("OPENROUTER_APP_TITLE", default="Ask HN Digest")
 
-AI_CONTENT_MODEL = env("AI_CONTENT_MODEL", default="google/gemini-2.5-flash")
+# Keep the default content model optimized for high-volume blog generation cost.
+AI_CONTENT_MODEL = env("AI_CONTENT_MODEL", default="google/gemini-3.1-flash-lite")
 AI_EMBEDDING_MODEL = env("AI_EMBEDDING_MODEL", default="openai/text-embedding-3-small")
 
 MJML_BACKEND_MODE = "httpserver"
