@@ -8,8 +8,8 @@ export function showMessage(message, type = 'error') {
       <div class="flex items-start">
         <div class="flex-shrink-0 mr-3">
           <svg class="w-5 h-5" viewBox="0 0 24 24">
-            <circle class="text-gray-200" stroke-width="2" stroke="currentColor" fill="transparent" r="10" cx="12" cy="12"/>
-            <circle class="${type === 'error' ? 'text-red-600' : 'text-green-600'}" stroke-width="2" stroke="currentColor" fill="transparent" r="10" cx="12" cy="12" data-timer-circle/>
+            <circle class="text-line" stroke-width="2" stroke="currentColor" fill="transparent" r="10" cx="12" cy="12"/>
+            <circle class="${type === 'error' ? 'text-danger' : 'text-success'}" stroke-width="2" stroke="currentColor" fill="transparent" r="10" cx="12" cy="12" data-timer-circle/>
           </svg>
         </div>
         <div class="flex-grow">
