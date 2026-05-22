@@ -19,13 +19,13 @@
                         {{ form.login.errors | safe }}
                         <label for="username"
                                class="mb-2 block text-sm font-extrabold text-ink-soft">Username</label>
-                        {% render_field form.login placeholder="Username" id="username" name="username" type="text" autocomplete="username" required=True class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-[inset_0_1px_0_oklch(0.995_0.004_100_/_0.42)] transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" %}
+                        {% render_field form.login placeholder="Username" id="username" name="username" type="text" autocomplete="username" required=True class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-input transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" %}
                     </div>
                     <div>
                         {{ form.password.errors | safe }}
                         <label for="password"
                                class="mb-2 block text-sm font-extrabold text-ink-soft">Password</label>
-                        {% render_field form.password id="password" name="password" type="password" autocomplete="current-password" required="True" class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-[inset_0_1px_0_oklch(0.995_0.004_100_/_0.42)] transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" placeholder="Password" %}
+                        {% render_field form.password id="password" name="password" type="password" autocomplete="current-password" required="True" class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-input transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" placeholder="Password" %}
                     </div>
                 </div>
                 {% if redirect_field_value %}

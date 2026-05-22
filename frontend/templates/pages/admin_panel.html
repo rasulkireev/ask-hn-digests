@@ -31,7 +31,7 @@
                             Hacker News discussion IDs
                         </label>
                         {{ summarize_form.discussion_ids.errors }}
-                        {{ summarize_form.discussion_ids|add_class:'w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-[inset_0_1px_0_oklch(0.995_0.004_100_/_0.42) ] transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15' }}
+                        {{ summarize_form.discussion_ids|add_class:'w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-input transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15' }}
                         {% if summarize_form.discussion_ids.help_text %}
                             <p class="mt-2 text-sm leading-snug text-muted">{{ summarize_form.discussion_ids.help_text }}</p>
                         {% endif %}
@@ -54,7 +54,7 @@
                         <label for="id_summary_ids"
                                class="mb-2 block text-sm font-extrabold text-ink-soft">Summary IDs</label>
                         {{ send_newsletter_form.summary_ids.errors }}
-                        {{ send_newsletter_form.summary_ids|add_class:'w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-[inset_0_1px_0_oklch(0.995_0.004_100_/_0.42) ] transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15' }}
+                        {{ send_newsletter_form.summary_ids|add_class:'w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-input transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15' }}
                         {% if send_newsletter_form.summary_ids.help_text %}
                             <p class="mt-2 text-sm leading-snug text-muted">{{ send_newsletter_form.summary_ids.help_text }}</p>
                         {% endif %}

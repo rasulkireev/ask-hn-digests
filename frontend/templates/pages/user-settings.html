@@ -29,19 +29,19 @@
                         {{ form.first_name.errors | safe }}
                         <label for="{{ form.first_name.id_for_label }}"
                                class="mb-2 block text-sm font-extrabold text-ink-soft">First name</label>
-                        {% render_field form.first_name id="first-name" name="first-name" type="text" autocomplete="given-name" class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-[inset_0_1px_0_oklch(0.995_0.004_100_/_0.42)] transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" %}
+                        {% render_field form.first_name id="first-name" name="first-name" type="text" autocomplete="given-name" class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-input transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" %}
                     </div>
                     <div>
                         {{ form.last_name.errors | safe }}
                         <label for="{{ form.last_name.id_for_label }}"
                                class="mb-2 block text-sm font-extrabold text-ink-soft">Last name</label>
-                        {% render_field form.last_name id="last-name" name="last-name" type="text" autocomplete="family-name" class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-[inset_0_1px_0_oklch(0.995_0.004_100_/_0.42)] transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" %}
+                        {% render_field form.last_name id="last-name" name="last-name" type="text" autocomplete="family-name" class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-input transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" %}
                     </div>
                     <div class="sm:col-span-2">
                         {{ form.email.errors | safe }}
                         <label for="{{ form.email.id_for_label }}"
                                class="mb-2 block text-sm font-extrabold text-ink-soft">Email address</label>
-                        {% render_field form.email id="email-address" name="email-address" type="email" autocomplete="email" class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-[inset_0_1px_0_oklch(0.995_0.004_100_/_0.42)] transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" %}
+                        {% render_field form.email id="email-address" name="email-address" type="email" autocomplete="email" class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-input transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" %}
                     </div>
                 </div>
                 <div class="mt-2 flex flex-wrap items-center gap-3">

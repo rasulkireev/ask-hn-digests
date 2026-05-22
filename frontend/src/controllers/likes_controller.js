@@ -1,5 +1,9 @@
 import { Controller } from "@hotwired/stimulus";
 
+const INACTIVE_BUTTON_CLASSES = ["border-line", "bg-paper", "text-muted"];
+const LIKE_ACTIVE_CLASSES = ["border-danger/25", "bg-danger-soft", "text-danger"];
+const BOOKMARK_ACTIVE_CLASSES = ["border-cobalt/25", "bg-cobalt-soft", "text-cobalt"];
+
 export default class extends Controller {
   static values = {
     articleId: String,
@@ -62,9 +66,7 @@ export default class extends Controller {
 
     // Update like button
     if (this.hasLikeButtonTarget) {
-      this.likeButtonTarget.classList.toggle('border-danger/25', isLiked);
-      this.likeButtonTarget.classList.toggle('bg-danger-soft', isLiked);
-      this.likeButtonTarget.classList.toggle('text-danger', isLiked);
+      this.toggleButtonClasses(this.likeButtonTarget, LIKE_ACTIVE_CLASSES, isLiked);
     }
 
     if (this.hasLikeIconTarget) {
@@ -73,14 +75,22 @@ export default class extends Controller {
 
     // Update bookmark button
     if (this.hasBookmarkButtonTarget) {
-      this.bookmarkButtonTarget.classList.toggle('border-cobalt/25', isBookmarked);
-      this.bookmarkButtonTarget.classList.toggle('bg-cobalt-soft', isBookmarked);
-      this.bookmarkButtonTarget.classList.toggle('text-cobalt', isBookmarked);
+      this.toggleButtonClasses(this.bookmarkButtonTarget, BOOKMARK_ACTIVE_CLASSES, isBookmarked);
     }
 
     if (this.hasBookmarkIconTarget) {
       this.bookmarkIconTarget.classList.toggle('fill-current', isBookmarked);
     }
+  }
+
+  toggleButtonClasses(button, activeClasses, isActive) {
+    INACTIVE_BUTTON_CLASSES.forEach(className => {
+      button.classList.toggle(className, !isActive);
+    });
+
+    activeClasses.forEach(className => {
+      button.classList.toggle(className, isActive);
+    });
   }
 
   isLiked() {

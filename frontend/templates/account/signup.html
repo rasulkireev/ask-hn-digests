@@ -22,24 +22,24 @@
                         {{ form.username.errors | safe }}
                         <label for="username"
                                class="mb-2 block text-sm font-extrabold text-ink-soft">Username</label>
-                        {% render_field form.username placeholder="Username" id="username" name="username" type="text" autocomplete="username" required=True class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-[inset_0_1px_0_oklch(0.995_0.004_100_/_0.42)] transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" %}
+                        {% render_field form.username placeholder="Username" id="username" name="username" type="text" autocomplete="username" required=True class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-input transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" %}
                     </div>
                     <div>
                         {{ form.email.errors | safe }}
                         <label for="email" class="mb-2 block text-sm font-extrabold text-ink-soft">Email</label>
-                        {% render_field form.email id="email" name="email" placeholder="Email" type="email" autocomplete="email" required="True" class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-[inset_0_1px_0_oklch(0.995_0.004_100_/_0.42)] transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" %}
+                        {% render_field form.email id="email" name="email" placeholder="Email" type="email" autocomplete="email" required="True" class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-input transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" %}
                     </div>
                     <div>
                         {{ form.password1.errors | safe }}
                         <label for="password1"
                                class="mb-2 block text-sm font-extrabold text-ink-soft">Password</label>
-                        {% render_field form.password1 id="password1" name="password1" placeholder="Password" type="password" autocomplete="new-password" required="True" class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-[inset_0_1px_0_oklch(0.995_0.004_100_/_0.42)] transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" %}
+                        {% render_field form.password1 id="password1" name="password1" placeholder="Password" type="password" autocomplete="new-password" required="True" class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-input transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" %}
                     </div>
                     <div>
                         {{ form.password2.errors | safe }}
                         <label for="password2"
                                class="mb-2 block text-sm font-extrabold text-ink-soft">Confirm password</label>
-                        {% render_field form.password2 id="password2" name="password2" type="password" autocomplete="new-password" required="True" class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-[inset_0_1px_0_oklch(0.995_0.004_100_/_0.42)] transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" placeholder="Confirm password" %}
+                        {% render_field form.password2 id="password2" name="password2" type="password" autocomplete="new-password" required="True" class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-input transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" placeholder="Confirm password" %}
                     </div>
                 </div>
                 {% if redirect_field_value %}

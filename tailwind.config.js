@@ -28,6 +28,7 @@ module.exports = {
         'warning-soft': 'oklch(0.95 0.055 85)',
       },
       boxShadow: {
+        input: 'inset 0 1px 0 oklch(0.995 0.004 100 / 0.42)',
         low: '0 1px 0 oklch(0.19 0.035 145 / 0.08)',
         mid: '0 1px 0 oklch(0.19 0.035 145 / 0.12), 0 8px 0 oklch(0.19 0.035 145 / 0.03)',
         emblem: 'inset 0 0 0 1px oklch(0.68 0.18 48 / 0.16)',
