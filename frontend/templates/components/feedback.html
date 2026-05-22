@@ -19,6 +19,7 @@
              class="w-full max-w-lg translate-y-2 scale-[0.98] rounded-[2px] border border-line bg-paper p-5 shadow-mid transition-transform duration-200">
             <h3 class="mb-4 text-xl font-black">Share your feedback</h3>
             <form data-action="submit->feedback#submitFeedback">
+                {% csrf_token %}
                 <div class="grid gap-3">
                     <label for="feedback-input" class="sr-only">Feedback</label>
                     <textarea id="feedback-input"
