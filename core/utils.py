@@ -231,7 +231,7 @@ def generate_subreddit_recommendations(summary: HNDiscussionSummary) -> str:
     Title: {summary.title}
     Description: {summary.description}
     Long Summary: {summary.long_summary}
-    Tags: {summary.tags}
+    Tags: {summary.tag_keywords}
     ---
 
     Requirements:

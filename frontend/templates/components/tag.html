@@ -1,3 +1,8 @@
 {% load core_extras %}
-<a href="{% url 'tag_detail' tag_slug=tag|slugify_tag %}"
-   class="inline-flex min-h-[1.55rem] items-center rounded-[2px] border border-line bg-paper px-2.5 text-[0.68rem] font-black uppercase tracking-[0.14em] text-cobalt no-underline transition hover:border-accent/40 hover:bg-accent-soft hover:text-accent-dark">{{ tag|title }}</a>
+{% if tag.slug %}
+    <a href="{% url 'tag_detail' tag_slug=tag.slug %}"
+       class="inline-flex min-h-[1.55rem] items-center rounded-[2px] border border-line bg-paper px-2.5 text-[0.68rem] font-black uppercase tracking-[0.14em] text-cobalt no-underline transition hover:border-accent/40 hover:bg-accent-soft hover:text-accent-dark">{{ tag.name }}</a>
+{% else %}
+    <a href="{% url 'tag_detail' tag_slug=tag|slugify_tag %}"
+       class="inline-flex min-h-[1.55rem] items-center rounded-[2px] border border-line bg-paper px-2.5 text-[0.68rem] font-black uppercase tracking-[0.14em] text-cobalt no-underline transition hover:border-accent/40 hover:bg-accent-soft hover:text-accent-dark">{{ tag|title }}</a>
+{% endif %}

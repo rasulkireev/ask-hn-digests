@@ -4,7 +4,7 @@
 {% block meta %}
     <title>{{ blog_post.title }} | Ask HN Digest Blog</title>
     <meta name="description" content="{{ blog_post.description }}" />
-    <meta name="keywords" content="{{ blog_post.tags }}" />
+    <meta name="keywords" content="{{ blog_post.tag_keywords }}" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical"
           href="https://{{ request.get_host }}{{ blog_post.get_absolute_url }}" />
@@ -70,15 +70,15 @@
                 </svg>
             </button>
         </div>
-        {% if blog_post.tags %}
-            <div class="mt-4 flex flex-wrap gap-2">
-                {% for tag in blog_post.tags|split:"," %}
-                    {% if tag.strip %}
-                        {% include 'components/tag.html' with tag=tag.strip %}
-                    {% endif %}
-                {% endfor %}
-            </div>
-        {% endif %}
+        {% with tags=blog_post.tags.all %}
+            {% if tags %}
+                <div class="mt-4 flex flex-wrap gap-2">
+                    {% for tag in tags %}
+                        {% include 'components/tag.html' with tag=tag %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
     </article>
     <div class="mx-auto max-w-3xl px-4 pb-10 sm:px-6 sm:pb-16">
         <div class="prose prose-lg max-w-none text-ink prose-a:font-bold prose-a:text-cobalt prose-a:underline-offset-[0.18em] prose-blockquote:max-w-[68ch] prose-blockquote:rounded-r-lg prose-blockquote:border-l prose-blockquote:border-line-strong prose-blockquote:bg-paper-strong/70 prose-blockquote:text-ink-soft prose-code:rounded prose-code:border prose-code:border-line prose-code:bg-accent-soft prose-code:px-1 prose-code:font-bold prose-code:text-accent-dark prose-headings:font-black prose-headings:tracking-normal prose-headings:text-ink prose-ol:max-w-[68ch] prose-p:max-w-[68ch] prose-ul:max-w-[68ch] text-[1.06rem] leading-[1.82]">

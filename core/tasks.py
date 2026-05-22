@@ -99,6 +99,7 @@ def summarize_hn_discussion(discussion_id):
 
     - tags
       - A comma-separated list of tags for the blog post
+      - Prefer canonical tags like AI, LLMs, Python, Developer Tools, Startups, Security, Databases, Career
       - Use the tags from the discussion and the comments
       - Do not include HN or Hacker News in the tags
 
@@ -110,17 +111,21 @@ def summarize_hn_discussion(discussion_id):
 
     summary_data = generate_structured(prompt, HNDiscussionAnalysis)
 
+    generated_tags = summary_data.tags or ""
+    summary_title = summary_data.title or title
+    long_summary = summary_data.long_summary or ""
     summary = HNDiscussionSummary.objects.create(
         discussion_id=discussion_id,
         discussion_title=title,
         comment_ids=comment_ids,
-        short_summary=summary_data.short_summary,
-        long_summary=summary_data.long_summary,
-        title=summary_data.title or title,
-        slug=summary_data.slug or slugify(summary_data.title or title),
-        description=summary_data.description or summary_data.long_summary[:200],
-        tags=summary_data.tags,
+        short_summary=summary_data.short_summary or "",
+        long_summary=long_summary,
+        title=summary_title,
+        slug=summary_data.slug or slugify(summary_title),
+        description=summary_data.description or long_summary[:200],
+        legacy_tags=generated_tags,
     )
+    summary.set_tags_from_text(generated_tags, save_legacy=False)
 
     async_task("core.tasks.generate_summary_tags", summary, group="Generate Summary Tags")
 
@@ -394,7 +399,9 @@ def generate_summary_tags(summary: HNDiscussionSummary):
     {summary.long_summary}
     ---
 
-    Based on this information, provide a comma-separated string of 10 tags.
+    Based on this information, provide a comma-separated string of 10 concise topic tags.
+    Prefer stable canonical tags over one-off phrases. Examples: AI, LLMs, Python,
+    Developer Tools, Startups, Security, Databases, Career, Product, Design.
 
     Example output:
     tag1,tag2,tag3,tag4,tag5,tag6,tag7,tag8,tag9,tag10
@@ -410,8 +417,7 @@ def generate_summary_tags(summary: HNDiscussionSummary):
         if generated_tags:
             # Basic cleaning: remove potential extra quotes or newlines
             generated_tags = generated_tags.strip().strip('"').strip("'")
-            summary.tags = generated_tags
-            summary.save(update_fields=["tags"])
+            summary.set_tags_from_text(generated_tags)
             logger.info(
                 "Successfully generated and saved summary tags",
                 summary_id=summary.id,

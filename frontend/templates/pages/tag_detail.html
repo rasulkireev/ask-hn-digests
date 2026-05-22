@@ -2,9 +2,9 @@
 {% load static %}
 {% load markdown_extras %}
 {% block meta %}
-    <title>{{ tag|title }} - Ask HN Digest</title>
+    <title>{{ tag.name }} - Ask HN Digest</title>
     <meta name="description"
-          content="Browse all discussion summaries tagged with {{ tag }}." />
+          content="Browse all discussion summaries tagged with {{ tag.name }}." />
     <meta name="robots" content="index, follow" />
     <link rel="canonical"
           href="https://{{ request.get_host }}{% url 'tag_detail' tag_slug=tag_slug %}" />
@@ -16,10 +16,18 @@
                 Tag
             </p>
             <h1 class="break-words text-[2.65rem] font-black leading-none tracking-normal sm:text-[3.55rem] lg:text-[4.35rem]">
-                {{ tag|title }}
+                {{ tag.name }}
             </h1>
             <p class="max-w-3xl text-[1.02rem] leading-relaxed text-ink-soft sm:text-[1.12rem]">
-                All summarized Hacker News discussions tagged with this topic.
+                {{ topic_lane }}.
+                {% if tag_aliases %}
+                    Also matches
+                    {% for alias in tag_aliases %}
+                        {{ alias.name }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}.
+                {% else %}
+                    All summarized Hacker News discussions tagged with this topic.
+                {% endif %}
             </p>
         </header>
         <div class="my-5 flex flex-wrap items-center justify-between gap-3">
@@ -62,6 +70,16 @@
                         {% endif %}
                     </nav>
                 </div>
+            {% endif %}
+            {% if related_tags %}
+                <section class="mt-8 grid gap-3 border-t border-line pt-5">
+                    <h2 class="text-xl font-black">Related topics</h2>
+                    <div class="flex flex-wrap gap-2">
+                        {% for related_tag in related_tags %}
+                            {% include "components/tag.html" with tag=related_tag %}
+                        {% endfor %}
+                    </div>
+                </section>
             {% endif %}
         {% else %}
             <div class="grid justify-items-center gap-3 rounded-[2px] border border-line bg-paper/95 p-8 text-center shadow-low sm:p-14">

@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 {% block meta %}
-    <title>All Tags - Ask HN Digest</title>
+    <title>Topics - Ask HN Digest</title>
     <meta name="description"
-          content="Browse all tags used in Ask HN Digest discussion summaries." />
+          content="Browse Ask HN Digest discussions by normalized topic lanes and tags." />
     <meta name="robots" content="index, follow" />
     <link rel="canonical"
           href="https://{{ request.get_host }}{% url 'tag_list' %}" />
@@ -26,13 +26,23 @@
                class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-line bg-paper px-4 text-[0.92rem] font-extrabold leading-none text-ink no-underline transition hover:border-line-strong hover:bg-paper-strong focus:outline-none focus:ring-4 focus:ring-accent/20">Browse all discussions</a>
             <span class="inline-flex min-h-8 items-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold text-muted">{{ total_tags }} tag{{ total_tags|pluralize }}</span>
         </div>
-        {% if tags %}
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                {% for tag, count in tags %}
-                    <div class="flex items-center justify-between gap-3 rounded-[2px] border border-line bg-paper p-3 transition hover:border-line-strong">
-                        {% include 'components/tag.html' with tag=tag %}
-                        <span class="whitespace-nowrap text-sm font-extrabold text-muted">{{ count }} post{{ count|pluralize }}</span>
-                    </div>
+        {% if topic_lanes %}
+            <div class="grid gap-8">
+                {% for lane in topic_lanes %}
+                    <section class="grid gap-3">
+                        <div class="flex flex-wrap items-baseline justify-between gap-3 border-b border-line pb-2">
+                            <h2 class="text-xl font-black">{{ lane.label }}</h2>
+                            <span class="text-sm font-extrabold text-muted">{{ lane.tags|length }} tag{{ lane.tags|length|pluralize }}</span>
+                        </div>
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                            {% for tag in lane.tags %}
+                                <div class="flex items-center justify-between gap-3 rounded-[2px] border border-line bg-paper p-3 transition hover:border-line-strong">
+                                    {% include 'components/tag.html' with tag=tag %}
+                                    <span class="whitespace-nowrap text-sm font-extrabold text-muted">{{ tag.summary_count }} post{{ tag.summary_count|pluralize }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </section>
                 {% endfor %}
             </div>
         {% else %}
