@@ -7,13 +7,12 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from django.utils.text import slugify
 from django.views.generic import DetailView, ListView, TemplateView
 from django_q.tasks import async_task
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
 from core.forms import SendNewsletterForm, SummarizeHNDiscussionForm
-from core.models import HNDiscussionSummary
+from core.models import HNDiscussionSummary, Tag, TagAlias, TopicLane
 
 logger = get_ask_hn_digest_logger(__name__)
 
@@ -36,12 +35,19 @@ class SearchView(ListView):
     def get_queryset(self):
         query = self.request.GET.get("q")
         if query:
-            return HNDiscussionSummary.objects.filter(
-                Q(title__icontains=query)
-                | Q(short_summary__icontains=query)
-                | Q(long_summary__icontains=query)
-                | Q(description__icontains=query)
-            ).order_by("-date_analyzed")
+            return (
+                HNDiscussionSummary.objects.filter(
+                    Q(title__icontains=query)
+                    | Q(short_summary__icontains=query)
+                    | Q(long_summary__icontains=query)
+                    | Q(description__icontains=query)
+                    | Q(tags__name__iexact=query)
+                    | Q(tags__aliases__name__iexact=query)
+                )
+                .prefetch_related("tags")
+                .distinct()
+                .order_by("-date_analyzed")
+            )
         return HNDiscussionSummary.objects.none()
 
     def get_context_data(self, **kwargs):
@@ -54,14 +60,19 @@ class BlogView(ListView):
     model = HNDiscussionSummary
     template_name = "blog/blog_posts.html"
     context_object_name = "blog_posts"
-    ordering = ["-date_analyzed"]
     paginate_by = 10
+
+    def get_queryset(self):
+        return HNDiscussionSummary.objects.prefetch_related("tags").order_by("-date_analyzed")
 
 
 class BlogPostView(DetailView):
     model = HNDiscussionSummary
     template_name = "blog/blog_post.html"
     context_object_name = "blog_post"
+
+    def get_queryset(self):
+        return HNDiscussionSummary.objects.prefetch_related("tags")
 
 
 def test_mjml(request):
@@ -154,15 +165,27 @@ class AdminPanelView(UserPassesTestMixin, TemplateView):
 
 
 class TagListView(ListView):
+    model = Tag
     template_name = "pages/tag_list.html"
     context_object_name = "tags"
 
     def get_queryset(self):
-        return HNDiscussionSummary.get_all_tags_with_counts()
+        return Tag.objects.visible().order_by("topic_lane", "-summary_count", "name")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["total_tags"] = len(context["tags"])
+        tags = list(context["tags"])
+        context["tags"] = tags
+        context["total_tags"] = len(tags)
+        context["topic_lanes"] = [
+            {
+                "name": lane_name,
+                "label": lane_label,
+                "tags": [tag for tag in tags if tag.topic_lane == lane_name],
+            }
+            for lane_name, lane_label in TopicLane.choices
+            if any(tag.topic_lane == lane_name for tag in tags)
+        ]
         return context
 
 
@@ -172,29 +195,35 @@ class TagDetailView(ListView):
     context_object_name = "summaries"
     paginate_by = 10
 
-    def get_queryset(self):
-        self.tag = self.kwargs.get("tag_slug")
+    def dispatch(self, request, *args, **kwargs):
+        tag_slug = self.kwargs.get("tag_slug")
+        if not tag_slug:
+            raise Http404("Tag not found")
+
+        self.tag = Tag.objects.prefetch_related("aliases").filter(slug=tag_slug).first()
         if not self.tag:
+            alias = TagAlias.objects.select_related("tag").filter(slug=tag_slug).first()
+            if alias:
+                return redirect("tag_detail", tag_slug=alias.tag.slug, permanent=True)
             raise Http404("Tag not found")
 
-        # Find the actual tag name from the slug
-        all_tags = HNDiscussionSummary.get_all_tags_with_counts()
-        actual_tag = None
-        for tag_name, _count in all_tags:
-            if slugify(tag_name).lower() == self.tag.lower():
-                actual_tag = tag_name
-                break
+        return super().dispatch(request, *args, **kwargs)
 
-        if not actual_tag:
-            raise Http404("Tag not found")
-
-        self.actual_tag = actual_tag
-        return HNDiscussionSummary.get_summaries_by_tag(actual_tag)
+    def get_queryset(self):
+        return HNDiscussionSummary.get_summaries_by_tag(self.tag)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["tag"] = self.actual_tag
-        context["tag_slug"] = self.tag
+        context["tag"] = self.tag
+        context["tag_slug"] = self.tag.slug
+        context["tag_aliases"] = list(self.tag.aliases.all())
+        context["topic_lane"] = self.tag.get_topic_lane_display()
+        context["related_tags"] = (
+            Tag.objects.visible()
+            .filter(topic_lane=self.tag.topic_lane)
+            .exclude(id=self.tag.id)
+            .order_by("-summary_count", "name")[:12]
+        )
         return context
 
 
