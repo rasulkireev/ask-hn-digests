@@ -17,15 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
-from django.views.generic import TemplateView
 
 from ask_hn_digest.sitemaps import sitemaps
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("accounts/", include("allauth.urls")),
     path("anymail/", include("anymail.urls")),
-    path("uses", TemplateView.as_view(template_name="pages/uses.html"), name="uses"),
     path("", include("core.urls")),
     path(
         "sitemap.xml",

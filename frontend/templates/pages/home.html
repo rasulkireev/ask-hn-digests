@@ -23,27 +23,6 @@
       <!-- <div class="mt-6 text-sm text-center text-gray-400">Join <span class="font-semibold text-orange-500">hundreds</span> of readers staying informed!</div> -->
     </div>
   </div>
-
-  <!-- Latest Discussions Section -->
-  <div class="flex justify-center mt-8">
-    <div class="px-8 py-6 w-full max-w-2xl rounded-2xl border border-orange-100 shadow bg-white/90">
-      <h2 class="mb-6 text-2xl font-bold text-center text-gray-900">Latest Discussions</h2>
-      {% if latest_summaries %}
-        <div class="space-y-6">
-          {% for summary in latest_summaries %}
-            {% include "components/article_card.html" with article=summary %}
-          {% endfor %}
-        </div>
-      {% else %}
-        <p class="text-center text-gray-400">No HN summaries yet. Check back soon!</p>
-      {% endif %}
-      <div class="flex flex-row justify-center mt-6 space-x-4">
-        <a href="{% url 'blog_posts' %}" class="text-sm text-center text-blue-400 hover:text-blue-500 hover:underline">See all</a>
-        <span class="text-gray-400">|</span>
-        <a href="{% url 'tag_list' %}" class="text-sm text-center text-blue-400 hover:text-blue-500 hover:underline">Browse tags</a>
-      </div>
-    </div>
-  </div>
 </div>
 
 {% if show_confetti %}
