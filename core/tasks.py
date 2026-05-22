@@ -1,13 +1,13 @@
-import json
 from datetime import datetime, timedelta
 
 import requests
 from django.conf import settings
 from django.utils.text import slugify
 from django_q.tasks import async_task
-from google import genai
+from pydantic import BaseModel
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
+from core.ai import generate_structured, generate_text
 from core.hn_utils import HAS_ASYNCPG, AsyncHackerNewsFetcher, get_ask_hn_story_ids
 from core.models import HNDiscussionSummary
 from core.utils import (
@@ -20,16 +20,21 @@ from core.utils import (
 
 logger = get_ask_hn_digest_logger(__name__)
 
-gemini_client = genai.Client(api_key=settings.GEMINI_API_KEY)
+
+class HNDiscussionAnalysis(BaseModel):
+    short_summary: str
+    long_summary: str
+    title: str
+    slug: str
+    description: str
+    tags: str = ""
 
 
 def summarize_hn_discussion(discussion_id):
     # TODO: Split AI request into separate parts
 
     # Get the main discussion data
-    discussion_resp = requests.get(
-        f"https://hacker-news.firebaseio.com/v0/item/{discussion_id}.json"
-    )
+    discussion_resp = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{discussion_id}.json")
     discussion_data = discussion_resp.json()
 
     if not discussion_data or "kids" not in discussion_data:
@@ -57,42 +62,42 @@ def summarize_hn_discussion(discussion_id):
     {comments_string}  # Limit text length to avoid token limits
     ---
 
-    Provide your analysis as a JSON object with the following keys:
-    - "short_summary"
+    Generate the following fields:
+    - short_summary
       - This summary will be featured in an email newsletter that includes a total of 7 summaries.
       - It needs to be concise enough to fit well within this format, yet detailed enough to offer a meaningful understanding of the discussion.
       - Highlight any useful tips, tricks, or productive arguments shared.
       - The primary goal is to provide immediate value to the newsletter reader.
-      - Do not talk abour HN or Hacker News in the summary.
+      - Do not talk about HN or Hacker News in the summary.
 
-    - "long_summary"
+    - long_summary
       - This summary will be published as a blog post on a website.
       - It should be a more comprehensive version of the short_summary.
       - Elaborate on the key themes, useful tips and tricks, insightful points, and any productive arguments from the discussion.
       - The aim is to deliver significant value to someone reading it as a standalone piece.
       - Don't start with a header/subheader. Do a text intro first, then add headers/subheader as you see fit.
-      - Do not talk abour HN or Hacker News in the summary.
+      - Do not talk about HN or Hacker News in the summary.
       - Do not talk about the discussion in the summary. Write it as if you are writing a blog post with the discussion as a reference.
 
-    - "title"
+    - title
       - A concise, SEO-friendly blog post title for this discussion.
       - Do not use generic titles.
       - Make it specific and engaging.
       - Do not use HN or Hacker News in the title.
 
-    - "slug"
+    - slug
       - A URL-friendly version of the title
       - Lowercase
       - Words separated by hyphens
       - No special characters
       - On the shorter side
 
-    - "description"
+    - description
       - A 1-2 sentence summary of the discussion
       - Suitable for meta description tags
       - Should entice a reader to click and read the post
 
-    - "tags"
+    - tags
       - A comma-separated list of tags for the blog post
       - Use the tags from the discussion and the comments
       - Do not include HN or Hacker News in the tags
@@ -101,53 +106,20 @@ def summarize_hn_discussion(discussion_id):
 
     - All summaries and fields should be in valid markdown format where appropriate.
     - For markdown lists make sure there is a blank line before and after the list.
-    - IMPORTANT: Only return the JSON object, nothing else.
-
-    ---
-
-    IMPORTANT: Return your analysis as a JSON object with the following format:
-    {{
-      "short_summary": "Brief markdown summary here",
-      "long_summary": "Detailed markdown summary here",
-      "title": "SEO-friendly blog post title here",
-      "slug": "url-friendly-slug-here",
-      "description": "Meta description here"
-    }}
     """  # noqa: E501
 
-    response = gemini_client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
-    summary_response = getattr(response, "text", None)
-
-    try:
-        summary_data = json.loads(summary_response)
-    except json.JSONDecodeError:
-        # Try to extract JSON from the response if possible
-        import re
-
-        match = re.search(r"\{.*\}", summary_response, re.DOTALL)
-        if match:
-            try:
-                summary_data = json.loads(match.group(0))
-            except Exception as e2:
-                logger.error(
-                    "Gemini response not valid JSON after extraction",
-                    error=str(e2),
-                    raw=summary_response,
-                )
-                raise
-        else:
-            raise
+    summary_data = generate_structured(prompt, HNDiscussionAnalysis)
 
     summary = HNDiscussionSummary.objects.create(
         discussion_id=discussion_id,
         discussion_title=title,
         comment_ids=comment_ids,
-        short_summary=summary_data.get("short_summary", ""),
-        long_summary=summary_data.get("long_summary", ""),
-        title=summary_data.get("title", title),
-        slug=summary_data.get("slug", slugify(title)),
-        description=summary_data.get("description", summary_data.get("long_summary", "")[:200]),
-        tags=summary_data.get("tags", ""),
+        short_summary=summary_data.short_summary,
+        long_summary=summary_data.long_summary,
+        title=summary_data.title or title,
+        slug=summary_data.slug or slugify(summary_data.title or title),
+        description=summary_data.description or summary_data.long_summary[:200],
+        tags=summary_data.tags,
     )
 
     async_task("core.tasks.generate_summary_tags", summary, group="Generate Summary Tags")
@@ -261,8 +233,7 @@ def generate_twitter_thread(summary: HNDiscussionSummary):
     IMPORTANT: Only return the thread, nothing else.
     """  # noqa: E501
 
-    response = gemini_client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
-    thread = getattr(response, "text", None)
+    thread = generate_text(prompt)
 
     if thread:
         summary.twitter_thread = thread
@@ -313,8 +284,7 @@ def generate_single_tweet(summary: HNDiscussionSummary):
     IMPORTANT: Only return the tweet text, nothing else.
     """  # noqa: E501
 
-    response = gemini_client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
-    tweet = getattr(response, "text", None)
+    tweet = generate_text(prompt)
 
     if tweet:
         # Clean up any potential extra whitespace or quotes
@@ -389,8 +359,7 @@ def generate_reddit_post(summary: HNDiscussionSummary):
         Content: [Post Body]
     """  # noqa: E501
 
-    response = gemini_client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
-    reddit_response = getattr(response, "text", None)
+    reddit_response = generate_text(prompt)
 
     if reddit_response:
         summary.reddit_post = reddit_response
@@ -436,11 +405,7 @@ def generate_summary_tags(summary: HNDiscussionSummary):
     """  # noqa: E501
 
     try:
-        response = gemini_client.models.generate_content(
-            model="gemini-2.5-flash",  # Using the same model as generate_twitter_thread
-            contents=prompt,
-        )
-        generated_tags = getattr(response, "text", None)
+        generated_tags = generate_text(prompt)
 
         if generated_tags:
             # Basic cleaning: remove potential extra quotes or newlines
@@ -456,7 +421,7 @@ def generate_summary_tags(summary: HNDiscussionSummary):
             return "Success"
         else:
             logger.error(
-                "Failed to generate summary tags: No text in Gemini response",
+                "Failed to generate summary tags: No text in AI response",
                 summary_id=summary.id,
                 discussion_id=summary.discussion_id,
             )
@@ -497,9 +462,7 @@ def sync_hn_data_async():
             )
 
             # Create fetcher instance
-            fetcher = AsyncHackerNewsFetcher(
-                concurrent_requests=concurrent_requests, batch_size=batch_size
-            )
+            fetcher = AsyncHackerNewsFetcher(concurrent_requests=concurrent_requests, batch_size=batch_size)
 
             try:
                 # Run the async fetch with defaults (auto-resume, auto-detect max)
@@ -528,9 +491,7 @@ def schedule_ask_hn_summaries():
 
     story_ids = get_ask_hn_story_ids()
 
-    story_ids_to_analyze = [
-        s for s in story_ids if not HNDiscussionSummary.objects.filter(discussion_id=s).exists()
-    ]
+    story_ids_to_analyze = [s for s in story_ids if not HNDiscussionSummary.objects.filter(discussion_id=s).exists()]
 
     for story_id in story_ids_to_analyze:
         async_task(

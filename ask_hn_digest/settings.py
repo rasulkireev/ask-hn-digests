@@ -366,7 +366,14 @@ if ENVIRONMENT == "prod" and SENTRY_DSN:
 POSTHOG_API_KEY = env("POSTHOG_API_KEY")
 
 BUTTONDOWN_API_KEY = env("BUTTONDOWN_API_KEY")
-GEMINI_API_KEY = env("GEMINI_API_KEY")
+
+OPENROUTER_API_KEY = env("OPENROUTER_API_KEY")
+OPENROUTER_BASE_URL = env("OPENROUTER_BASE_URL", default="https://openrouter.ai/api/v1")
+OPENROUTER_APP_URL = env("OPENROUTER_APP_URL", default="https://askhndigests.com")
+OPENROUTER_APP_TITLE = env("OPENROUTER_APP_TITLE", default="Ask HN Digest")
+
+AI_CONTENT_MODEL = env("AI_CONTENT_MODEL", default="google/gemini-2.5-flash")
+AI_EMBEDDING_MODEL = env("AI_EMBEDDING_MODEL", default="openai/text-embedding-3-small")
 
 MJML_BACKEND_MODE = "httpserver"
 MJML_HTTPSERVERS = [
