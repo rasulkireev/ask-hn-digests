@@ -21,6 +21,11 @@ logger = get_ask_hn_digest_logger(__name__)
 class HomeView(TemplateView):
     template_name = "pages/home.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["latest_summaries"] = HNDiscussionSummary.objects.order_by("-date_analyzed")[:3]
+        return context
+
 
 class SearchView(ListView):
     model = HNDiscussionSummary

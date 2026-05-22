@@ -56,6 +56,35 @@
             </div>
         </div>
     </section>
+    {% if latest_summaries %}
+        <section class="mx-auto max-w-7xl px-4 pb-12 sm:px-6 sm:pb-16">
+            <div class="grid min-w-0 items-start gap-8 lg:grid-cols-[4.5rem_minmax(0,1fr)] lg:gap-10">
+                <div class="hidden border-t-4 border-accent pt-3 text-[0.68rem] font-black uppercase leading-tight tracking-[0.18em] text-muted lg:block">
+                    02
+                    <span class="mt-2 block text-ink">Latest</span>
+                </div>
+                <div>
+                    <div class="mb-3 flex flex-wrap items-end justify-between gap-3">
+                        <div>
+                            <p class="mb-2 inline-flex items-center gap-2 text-sm font-extrabold text-accent-dark before:h-2 before:w-2 before:rounded-[2px] before:bg-accent before:shadow-[0_0_0_3px_oklch(0.68_0.18_48_/_0.16)] before:content-['']">
+                                Latest discussions
+                            </p>
+                            <h2 class="break-words text-[2rem] font-black leading-none tracking-normal sm:text-[2.75rem]">
+                                Recent briefs from the archive.
+                            </h2>
+                        </div>
+                        <a href="{% url 'blog_posts' %}"
+                           class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-line bg-paper px-4 text-[0.92rem] font-extrabold leading-none text-ink no-underline transition hover:border-line-strong hover:bg-paper-strong focus:outline-none focus:ring-4 focus:ring-accent/20">See all</a>
+                    </div>
+                    <div class="grid gap-3">
+                        {% for summary in latest_summaries %}
+                            {% include "components/article_card.html" with article=summary %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
     {% if show_confetti %}
         <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
         <script>
