@@ -86,9 +86,7 @@ def generate_buttondown_newsletter_subject(body: str):
     Only return the subject line, nothing else.
     """  # noqa: E501
 
-    subject = generate_text(prompt)
-
-    return subject.strip()
+    return generate_text(prompt)
 
 
 def get_item_data(item_id):

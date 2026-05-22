@@ -122,10 +122,6 @@ def _cached_embedding_model(model_name: str, base_url: str, api_key: str) -> Ope
     )
 
 
-def _embedding_model(model_name: str | None = None) -> OpenAIEmbeddingModel:
-    return _cached_embedding_model(*_embedding_model_settings(model_name))
-
-
 @lru_cache
 def _cached_embedder(model_name: str, base_url: str, api_key: str) -> Embedder:
     return Embedder(_cached_embedding_model(model_name, base_url, api_key))
