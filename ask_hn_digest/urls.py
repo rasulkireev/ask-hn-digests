@@ -25,6 +25,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path("anymail/", include("anymail.urls")),
+    path("pricing/", TemplateView.as_view(template_name="pages/pricing.html"), name="pricing"),
     path("uses", TemplateView.as_view(template_name="pages/uses.html"), name="uses"),
     path("", include("core.urls")),
     path(

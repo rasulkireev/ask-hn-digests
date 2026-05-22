@@ -27,15 +27,10 @@ export default class extends Controller {
   }
 
   openFeedback() {
-    // Display the overlay
-    this.overlayTarget.classList.remove("opacity-0", "pointer-events-none");
-    this.overlayTarget.classList.add("opacity-100", "pointer-events-auto");
-
-    // Scale up the form with animation
-    setTimeout(() => {
-      this.formContainerTarget.classList.remove("scale-95");
-      this.formContainerTarget.classList.add("scale-100");
-    }, 10);
+    this.overlayTarget.classList.remove("pointer-events-none", "opacity-0");
+    this.overlayTarget.classList.add("pointer-events-auto", "opacity-100");
+    this.formContainerTarget.classList.remove("translate-y-2", "scale-[0.98]");
+    this.formContainerTarget.classList.add("translate-y-0", "scale-100");
 
     // Focus the input field
     setTimeout(() => {
@@ -46,14 +41,11 @@ export default class extends Controller {
   }
 
   closeFeedback() {
-    // Scale down the form with animation
-    this.formContainerTarget.classList.remove("scale-100");
-    this.formContainerTarget.classList.add("scale-95");
-
-    // Hide the overlay with animation
+    this.formContainerTarget.classList.remove("translate-y-0", "scale-100");
+    this.formContainerTarget.classList.add("translate-y-2", "scale-[0.98]");
     setTimeout(() => {
-      this.overlayTarget.classList.remove("opacity-100", "pointer-events-auto");
-      this.overlayTarget.classList.add("opacity-0", "pointer-events-none");
+      this.overlayTarget.classList.remove("pointer-events-auto", "opacity-100");
+      this.overlayTarget.classList.add("pointer-events-none", "opacity-0");
     }, 100);
 
     this.isOpen = false;

@@ -1,62 +1,87 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
-
 {% block meta %}
-  <title>Admin Panel</title>
+    <title>Admin Panel</title>
 {% endblock meta %}
-
 {% block content %}
-  <div class="container px-4 py-8 mx-auto max-w-3xl bg-white lg:min-w-0 md:pt-10 lg:flex-1">
-    <h1 class="mb-4 text-3xl font-bold">Admin Panel</h1>
-    <p>Welcome, superuser! This is the admin panel. You can add admin-only features here.</p>
-
-    <div class="mt-8">
-      <h2 class="mb-2 text-xl font-semibold">Summarize HN Discussion</h2>
-      <form method="post" class="space-y-4">
-        {% csrf_token %}
-        {{ summarize_form.non_field_errors }}
-        <div>
-          <label for="id_discussion_ids" class="block text-sm font-medium text-gray-700">Hacker News Discussion IDs</label>
-          {{ summarize_form.discussion_ids.errors }}
-          {{ summarize_form.discussion_ids|add_class:'block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm' }}
-          {% if summarize_form.discussion_ids.help_text %}
-            <p class="mt-1 text-xs text-gray-500">{{ summarize_form.discussion_ids.help_text }}</p>
-          {% endif %}
+    <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
+        <header class="mb-6 grid gap-3">
+            <p class="mb-1 inline-flex items-center gap-2 text-sm font-extrabold text-accent-dark before:h-2 before:w-2 before:rounded-[2px] before:bg-accent before:shadow-[0_0_0_3px_oklch(0.68_0.18_48_/_0.16)] before:content-['']">
+                Operations
+            </p>
+            <h1 class="break-words text-[2.65rem] font-black leading-none tracking-normal sm:text-[3.55rem] lg:text-[4.35rem]">
+                Admin panel
+            </h1>
+            <p class="max-w-3xl text-[1.02rem] leading-relaxed text-ink-soft sm:text-[1.12rem]">
+                Run the small set of editorial and data tasks that keep the digest moving.
+            </p>
+        </header>
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <section class="flex min-h-[15rem] flex-col justify-between gap-4 rounded-[2px] border border-line bg-paper p-4">
+                <div>
+                    <h2 class="text-lg font-black">Summarize HN discussion</h2>
+                    <p class="mt-2 text-sm leading-relaxed text-muted">Queue one or more Hacker News item IDs for analysis.</p>
+                </div>
+                <form method="post" class="grid gap-3">
+                    {% csrf_token %}
+                    {{ summarize_form.non_field_errors }}
+                    <div>
+                        <label for="id_discussion_ids"
+                               class="mb-2 block text-sm font-extrabold text-ink-soft">
+                            Hacker News discussion IDs
+                        </label>
+                        {{ summarize_form.discussion_ids.errors }}
+                        {{ summarize_form.discussion_ids|add_class:'w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-[inset_0_1px_0_oklch(0.995_0.004_100_/_0.42) ] transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15' }}
+                        {% if summarize_form.discussion_ids.help_text %}
+                            <p class="mt-2 text-sm leading-snug text-muted">{{ summarize_form.discussion_ids.help_text }}</p>
+                        {% endif %}
+                    </div>
+                    <button type="submit"
+                            class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-accent-dark bg-accent-dark px-4 text-[0.92rem] font-extrabold leading-none text-paper no-underline transition focus:outline-none focus:ring-4 focus:ring-accent/20 disabled:opacity-60">
+                        Summarize
+                    </button>
+                </form>
+            </section>
+            <section class="flex min-h-[15rem] flex-col justify-between gap-4 rounded-[2px] border border-line bg-paper p-4">
+                <div>
+                    <h2 class="text-lg font-black">Send newsletter</h2>
+                    <p class="mt-2 text-sm leading-relaxed text-muted">Send the current digest selection to subscribers.</p>
+                </div>
+                <form method="post" class="grid gap-3">
+                    {% csrf_token %}
+                    {{ send_newsletter_form.non_field_errors }}
+                    <div>
+                        <label for="id_summary_ids"
+                               class="mb-2 block text-sm font-extrabold text-ink-soft">Summary IDs</label>
+                        {{ send_newsletter_form.summary_ids.errors }}
+                        {{ send_newsletter_form.summary_ids|add_class:'w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-[inset_0_1px_0_oklch(0.995_0.004_100_/_0.42) ] transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15' }}
+                        {% if send_newsletter_form.summary_ids.help_text %}
+                            <p class="mt-2 text-sm leading-snug text-muted">{{ send_newsletter_form.summary_ids.help_text }}</p>
+                        {% endif %}
+                    </div>
+                    <button type="submit"
+                            name="send_newsletter"
+                            class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-accent-dark bg-accent-dark px-4 text-[0.92rem] font-extrabold leading-none text-paper no-underline transition focus:outline-none focus:ring-4 focus:ring-accent/20 disabled:opacity-60">
+                        Send Newsletter
+                    </button>
+                </form>
+            </section>
+            <section class="flex min-h-[15rem] flex-col justify-between gap-4 rounded-[2px] border border-line bg-paper p-4">
+                <div>
+                    <h2 class="text-lg font-black">Sync HN data</h2>
+                    <p class="mt-2 text-sm leading-relaxed text-muted">
+                        Refresh the Hacker News dataset. This can take several hours and runs in the background.
+                    </p>
+                </div>
+                <form method="post" class="grid gap-3">
+                    {% csrf_token %}
+                    <button type="submit"
+                            name="sync_hn_data"
+                            class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-accent-dark bg-accent-dark px-4 text-[0.92rem] font-extrabold leading-none text-paper no-underline transition focus:outline-none focus:ring-4 focus:ring-accent/20 disabled:opacity-60">
+                        Start data sync
+                    </button>
+                </form>
+            </section>
         </div>
-        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-md border border-transparent shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
-          Summarize
-        </button>
-      </form>
-    </div>
-
-    <div class="mt-8">
-      <h2 class="mb-2 text-xl font-semibold">Send Newsletter</h2>
-      <form method="post" class="space-y-4">
-        {% csrf_token %}
-        {{ send_newsletter_form.non_field_errors }}
-        <div>
-          <label for="id_summary_ids" class="block text-sm font-medium text-gray-700">Summary IDs</label>
-          {{ send_newsletter_form.summary_ids.errors }}
-          {{ send_newsletter_form.summary_ids|add_class:'block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm' }}
-          {% if send_newsletter_form.summary_ids.help_text %}
-            <p class="mt-1 text-xs text-gray-500">{{ send_newsletter_form.summary_ids.help_text }}</p>
-          {% endif %}
-        </div>
-        <button type="submit" name="send_newsletter" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md border border-transparent shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-          Send Newsletter
-        </button>
-      </form>
-    </div>
-
-    <div class="mt-8">
-      <h2 class="mb-2 text-xl font-semibold">Sync HN Data</h2>
-      <p class="mb-4 text-sm text-gray-600">Sync all Hacker News data. This process can take several hours to complete and runs in the background.</p>
-      <form method="post" class="space-y-4">
-        {% csrf_token %}
-        <button type="submit" name="sync_hn_data" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md border border-transparent shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-          Start HN Data Sync
-        </button>
-      </form>
-    </div>
-  </div>
+    </section>
 {% endblock content %}

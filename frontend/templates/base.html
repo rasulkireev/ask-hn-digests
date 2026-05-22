@@ -1,112 +1,165 @@
 {% load webpack_loader static %}
-
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <!-- Required meta tags -->
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
-  <!-- Other meta stuff -->
-  <link rel="apple-touch-icon" href="{% static 'vendors/images/logo.png' %}" />
-  <link rel="apple-touch-icon" href="{% static 'vendors/images/logo.png' %}" />
-  <link rel="icon" type="image/png" sizes="16x16 32x32 500x500" href="{% static 'vendors/images/logo.png' %}" />
-
-  {% block meta %}
-  <title>Ask HN Digest</title>
-  <meta name="description" content="Get Summaries of the most engaging discussions on Hacker News" />
-  <meta name="keywords" content="django" />
-  <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://{{ request.get_host }}/" />
-
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Ask HN Digest" />
-  <meta property="og:url" content="https://{{ request.get_host }}/" />
-  <meta property="og:description" content="Get Summaries of the most engaging discussions on Hacker News" />
-  <meta property="og:image" content="https://osig.app/g?site=meta&style=logo&font=markerfelt&title=Ask HN Digest&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
-  <meta property="og:locale" content="en_US" />
-
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:creator" content="@rasulkireev" />
-  <meta name="twitter:site" content="@rasulkireev" />
-  <meta name="twitter:title" content="Ask HN Digest" />
-  <meta name="twitter:description" content="Get Summaries of the most engaging discussions on Hacker News" />
-  <meta name="twitter:image" content="https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
-  {% endblock meta %}
-
-  <script defer data-domain="askhndigests.com" src="https://plausible-v2.cr.lvtd.dev/js/script.js"></script>
-
-  {% stylesheet_pack 'index' %}
-  {% javascript_pack 'index' attrs='defer' %}
-</head>
-
-<body class="min-h-screen bg-gradient-to-br from-orange-50 to-white">
-  <nav class="fixed top-0 z-50 w-full shadow-md backdrop-blur-sm bg-white/90">
-    <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-        <div class="flex items-center">
-          <a href="{% url 'home' %}">
-            <img class="h-8" src="{% static 'vendors/images/logo.svg' %}" alt="Ask HN Digest" />
-          </a>
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <!-- Other meta stuff -->
+        <link rel="apple-touch-icon" href="{% static 'vendors/images/logo.svg' %}" />
+        <link rel="icon"
+              type="image/svg+xml"
+              href="{% static 'vendors/images/logo.svg' %}" />
+        {% block meta %}
+            <title>Ask HN Digest</title>
+            <meta name="description"
+                  content="Get Summaries of the most engaging discussions on Hacker News" />
+            <meta name="keywords" content="Hacker News, summaries, newsletter, digest" />
+            <meta name="robots" content="index, follow" />
+            <link rel="canonical" href="https://{{ request.get_host }}/" />
+            <meta property="og:type" content="website" />
+            <meta property="og:title" content="Ask HN Digest" />
+            <meta property="og:url" content="https://{{ request.get_host }}/" />
+            <meta property="og:description"
+                  content="Get Summaries of the most engaging discussions on Hacker News" />
+            <meta property="og:image"
+                  content="https://osig.app/g?site=meta&style=logo&font=markerfelt&title=Ask HN Digest&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.svg' %}" />
+            <meta property="og:locale" content="en_US" />
+            <meta name="twitter:card" content="summary" />
+            <meta name="twitter:creator" content="@rasulkireev" />
+            <meta name="twitter:site" content="@rasulkireev" />
+            <meta name="twitter:title" content="Ask HN Digest" />
+            <meta name="twitter:description"
+                  content="Get Summaries of the most engaging discussions on Hacker News" />
+            <meta name="twitter:image"
+                  content="https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.svg' %}" />
+        {% endblock meta %}
+        <script defer
+                data-domain="askhndigests.com"
+                src="https://plausible-v2.cr.lvtd.dev/js/script.js"></script>
+        {% stylesheet_pack 'index' %}
+        {% javascript_pack 'index' attrs='defer' %}
+    </head>
+    <body data-controller="scroll-progress"
+          class="min-h-screen overflow-x-hidden bg-page bg-page-grid bg-[length:40px_40px] font-sans tracking-normal text-ink selection:bg-accent-dark selection:text-paper">
+        <div data-scroll-progress-target="bar"
+             class="fixed left-0 top-0 z-[60] h-0.5 w-full origin-left scale-x-0 bg-accent-dark motion-reduce:hidden">
         </div>
-        <div class="flex items-center space-x-1 sm:space-x-4">
-          <a href="{% url 'home' %}" class="px-2 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-orange-600 sm:px-3">Home</a>
-          <a href="{% url 'blog_posts' %}" class="px-2 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-orange-600 sm:px-3">Posts</a>
-          <a href="{% url 'tag_list' %}" class="px-2 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-orange-600 sm:px-3">Tags</a>
-          <a href="{% url 'liked_articles' %}" class="px-2 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-red-600 sm:px-3" title="Liked Articles">❤️</a>
-          <a href="{% url 'bookmarked_articles' %}" class="px-2 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-blue-600 sm:px-3" title="Bookmarked Articles">🔖</a>
-          <div class="flex flex-1 justify-center px-2 sm:px-0">
-            <form method="get" action="{% url 'search' %}" class="w-full max-w-xs">
-              <div class="relative">
-                <span class="flex absolute inset-y-0 left-0 items-center pl-3">
-                  <svg class="w-5 h-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                  </svg>
-                </span>
-                <input type="text" name="q" placeholder="Search..." class="block py-2 pr-3 pl-10 w-full text-sm placeholder-gray-500 bg-white rounded-md border border-gray-300 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400 focus:ring-1 focus:ring-orange-500 focus:border-orange-500" value="{{ request.GET.q }}" />
-              </div>
-            </form>
-          </div>
+        {% with current=request.resolver_match.url_name %}
+            <header class="sticky top-0 z-40 border-b border-line-strong bg-paper/95">
+                <div class="mx-auto grid min-h-[4.75rem] max-w-7xl grid-cols-1 gap-3 px-4 py-3 lg:grid-cols-[minmax(190px,1fr)_auto_minmax(220px,340px)] lg:items-center lg:px-6 lg:py-0">
+                    <a href="{% url 'home' %}"
+                       class="inline-flex min-w-0 items-center gap-3 no-underline"
+                       aria-label="Ask HN Digest home">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-[2px] border border-line-strong bg-paper shadow-emblem">
+                            <img src="{% static 'vendors/images/logo.svg' %}" alt="" class="h-6 w-6" />
+                        </span>
+                        <span class="grid gap-0.5 text-[0.95rem] font-black leading-none">
+                            Ask HN Digest
+                            <span class="text-[0.68rem] font-black uppercase tracking-[0.16em] text-muted">Weekly HN signal</span>
+                        </span>
+                    </a>
+                    <nav class="flex w-fit max-w-full flex-wrap items-center justify-start gap-0 lg:justify-center"
+                         aria-label="Primary navigation">
+                        <a href="{% url 'home' %}"
+                           class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none no-underline transition-colors sm:min-h-[2.35rem] sm:px-3 {% if current == 'home' %}bg-ink text-paper{% else %}text-ink-soft hover:bg-paper-strong hover:text-ink{% endif %}">Home</a>
+                        <a href="{% url 'blog_posts' %}"
+                           class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none no-underline transition-colors sm:min-h-[2.35rem] sm:px-3 {% if current == 'blog_posts' or current == 'blog_post' %}bg-ink text-paper{% else %}text-ink-soft hover:bg-paper-strong hover:text-ink{% endif %}">Archive</a>
+                        <a href="{% url 'tag_list' %}"
+                           class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none no-underline transition-colors sm:min-h-[2.35rem] sm:px-3 {% if current == 'tag_list' or current == 'tag_detail' %}bg-ink text-paper{% else %}text-ink-soft hover:bg-paper-strong hover:text-ink{% endif %}">Tags</a>
+                        <a href="{% url 'pricing' %}"
+                           class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none no-underline transition-colors sm:min-h-[2.35rem] sm:px-3 {% if current == 'pricing' %}bg-ink text-paper{% else %}text-ink-soft hover:bg-paper-strong hover:text-ink{% endif %}">Support</a>
+                        <a href="{% url 'liked_articles' %}"
+                           class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none no-underline transition-colors sm:min-h-[2.35rem] sm:px-3 {% if current == 'liked_articles' %}bg-ink text-paper{% else %}text-ink-soft hover:bg-paper-strong hover:text-ink{% endif %}"
+                           title="Liked articles"
+                           aria-label="Liked articles">
+                            <svg class="h-4 w-4"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24"
+                                 aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 0 1 6.364 0L12 7.636l1.318-1.318a4.5 4.5 0 1 1 6.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 0 1 0-6.364z">
+                                </path>
+                            </svg>
+                            Liked
+                        </a>
+                        <a href="{% url 'bookmarked_articles' %}"
+                           class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none no-underline transition-colors sm:min-h-[2.35rem] sm:px-3 {% if current == 'bookmarked_articles' %}bg-ink text-paper{% else %}text-ink-soft hover:bg-paper-strong hover:text-ink{% endif %}"
+                           title="Bookmarked articles"
+                           aria-label="Bookmarked articles">
+                            <svg class="h-4 w-4"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24"
+                                 aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16l-7-3.5L5 21V5z">
+                                </path>
+                            </svg>
+                            Saved
+                        </a>
+                        {% if user.is_superuser %}
+                            <a href="{% url 'admin_panel' %}"
+                               class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none no-underline transition-colors sm:min-h-[2.35rem] sm:px-3 {% if current == 'admin_panel' %}bg-ink text-paper{% else %}text-ink-soft hover:bg-paper-strong hover:text-ink{% endif %}">Admin</a>
+                        {% endif %}
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'settings' %}"
+                               class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none text-accent-dark no-underline transition-colors hover:bg-accent-soft hover:text-accent-dark sm:min-h-[2.35rem] sm:px-3 {% if current == 'settings' %}bg-accent-soft{% endif %}">Settings</a>
+                        {% else %}
+                            <a href="{% url 'account_login' %}"
+                               class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none text-accent-dark no-underline transition-colors hover:bg-accent-soft hover:text-accent-dark sm:min-h-[2.35rem] sm:px-3">Sign in</a>
+                        {% endif %}
+                    </nav>
+                    <form method="get"
+                          action="{% url 'search' %}"
+                          class="relative min-w-0"
+                          role="search">
+                        <svg viewBox="0 0 20 20"
+                             fill="currentColor"
+                             aria-hidden="true"
+                             class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM2 8a6 6 0 1 1 10.89 3.476l4.817 4.817a1 1 0 0 1-1.414 1.414l-4.816-4.816A6 6 0 0 1 2 8z" clip-rule="evenodd" />
+                        </svg>
+                        <label for="site-search-input" class="sr-only">Search discussions</label>
+                        <input id="site-search-input"
+                               type="search"
+                               name="q"
+                               placeholder="Search summaries"
+                               value="{{ request.GET.q }}"
+                               class="h-10 w-full rounded-[2px] border border-line bg-paper py-0 pl-9 pr-3 text-sm text-ink transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20" />
+                    </form>
+                </div>
+            </header>
+        {% endwith %}
+        {% block default_messages %}
+            {% include 'components/messages.html' with messages=messages %}
+        {% endblock default_messages %}
+        <!-- Include the feedback component -->
+        {% if user.is_authenticated %}
+            {% include 'components/feedback.html' %}
+        {% endif %}
+        <div class="flex min-h-screen flex-col">
+            <main class="min-h-[calc(100vh-9rem)]">
+                {% block content %}
+                {% endblock content %}
+            </main>
+            <footer class="border-t border-line bg-paper-strong/75">
+                <div class="mx-auto flex max-w-7xl flex-col items-start justify-between gap-3 px-4 py-5 text-sm font-semibold text-muted sm:flex-row sm:items-center sm:px-6">
+                    <span>&copy; 2026 <a href="https://lvtd.dev?ref={{ request.get_host }}"
+    class="font-extrabold text-cobalt underline underline-offset-[0.18em] transition hover:text-accent-dark">LVTD, LLC</a></span>
+                    <span>Curated summaries for people who read the thread before they read the takes.</span>
+                </div>
+            </footer>
         </div>
-      </div>
-    </div>
-  </nav>
-  <div class="h-16"></div>
-  {% block default_messages %}
-    {% include 'components/messages.html' with messages=messages %}
-  {% endblock default_messages %}
-
-  <!-- Include the feedback component -->
-  {% if user.is_authenticated %}
-    {% include 'components/feedback.html' %}
-  {% endif %}
-
-  <div class="flex flex-col min-h-screen">
-    <main class="flex flex-col flex-1">
-      <div class="px-2 sm:px-0">
-        {% block content %}
-        {% endblock content %}
-      </div>
-    </main>
-    <footer class="mt-12 shadow-inner bg-white/80">
-      <div class="flex flex-col justify-center items-center px-6 py-8 mx-auto max-w-7xl lg:px-8">
-        <p class="text-xs leading-5 text-center text-gray-500">
-          &copy; 2025 <a href="https://lvtd.dev?ref={{ request.get_host }}" class="transition hover:text-orange-600">LVTD, LLC</a>. All rights reserved.
-        </p>
-      </div>
-    </footer>
-  </div>
-
-  {% block schema %}
-  <script type="application/ld+json">
+        {% block schema %}
+            <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Ask HN Digest",
       "description": "Get Summaries of the most engaging discussions on Hacker News",
-      "thumbnailUrl": "https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}",
+      "thumbnailUrl": "https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.svg' %}",
       "url": "https://{{ request.get_host }}/",
       "author": {
         "@type": "Person",
@@ -115,9 +168,7 @@
         "url": "https://rasulkireev.com/"
       }
     }
-    </script>
-  {% endblock schema %}
-
-</body>
-
+            </script>
+        {% endblock schema %}
+    </body>
 </html>

@@ -1,56 +1,58 @@
 {% extends "base.html" %}
-
-{% block title %}{{ page_title }}{% endblock title %}
-
+{% block title %}
+    {{ page_title }}
+{% endblock title %}
 {% block meta %}
-<meta name="description" content="{{ page_description }}" />
-<meta property="og:title" content="{{ page_title }}" />
-<meta property="og:description" content="{{ page_description }}" />
-<meta name="twitter:title" content="{{ page_title }}" />
-<meta name="twitter:description" content="{{ page_description }}" />
+    <title>{{ page_title }} - Ask HN Digest</title>
+    <meta name="description" content="{{ page_description }}" />
+    <meta property="og:title" content="{{ page_title }}" />
+    <meta property="og:description" content="{{ page_description }}" />
+    <meta name="twitter:title" content="{{ page_title }}" />
+    <meta name="twitter:description" content="{{ page_description }}" />
 {% endblock meta %}
-
 {% block content %}
-<div class="container px-4 py-8 mx-auto md:relative">
-  <div class="mx-auto max-w-3xl">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-3xl font-bold text-center">{{ page_title }}</h1>
-      <div class="flex space-x-4">
-        <a href="{% url 'liked_articles' %}" class="px-4 py-2 bg-red-100 text-red-700 rounded-md font-medium">
-          ❤️ Liked
-        </a>
-        <a href="{% url 'bookmarked_articles' %}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-blue-100 hover:text-blue-700">
-          🔖 Bookmarked
-        </a>
-      </div>
-    </div>
-    
-    <div class="mb-8 text-center text-gray-600">
-      Articles you've liked will appear here
-    </div>
-
-    <!-- Container for liked articles -->
-    <div data-controller="saved-articles" 
-         data-saved-articles-type-value="liked"
-         class="space-y-6">
-      
-      <!-- Articles will be loaded here by JavaScript -->
-      <div data-saved-articles-target="container"></div>
-      
-      <!-- Empty state message -->
-      <div data-saved-articles-target="emptyMessage" class="text-center py-12">
-        <div class="mb-4">
-          <svg class="w-16 h-16 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-          </svg>
+    <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
+        <header class="mb-6 grid gap-3">
+            <p class="mb-1 inline-flex items-center gap-2 text-sm font-extrabold text-accent-dark before:h-2 before:w-2 before:rounded-[2px] before:bg-accent before:shadow-[0_0_0_3px_oklch(0.68_0.18_48_/_0.16)] before:content-['']">
+                Saved reading
+            </p>
+            <h1 class="break-words text-[2.65rem] font-black leading-none tracking-normal sm:text-[3.55rem] lg:text-[4.35rem]">
+                {{ page_title }}
+            </h1>
+            <p class="max-w-3xl text-[1.02rem] leading-relaxed text-ink-soft sm:text-[1.12rem]">
+                Articles you liked in this browser are collected here for quick return visits.
+            </p>
+        </header>
+        <div class="my-5 flex flex-wrap items-center justify-between gap-3">
+            <div class="inline-flex gap-1 rounded-[2px] border border-line bg-paper-strong/80 p-1"
+                 aria-label="Saved article views">
+                <a href="{% url 'liked_articles' %}"
+                   class="inline-flex min-h-[2.35rem] items-center rounded-md bg-paper px-3 text-sm font-extrabold text-ink no-underline shadow-[0_1px_0_oklch(0.19_0.035_145_/_0.05)]">Liked</a>
+                <a href="{% url 'bookmarked_articles' %}"
+                   class="inline-flex min-h-[2.35rem] items-center rounded-md px-3 text-sm font-extrabold text-ink-soft no-underline hover:bg-paper hover:text-ink">Bookmarked</a>
+            </div>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">No liked articles yet</h3>
-        <p class="text-gray-500 mb-6">Start liking articles to see them here!</p>
-        <a href="{% url 'blog_posts' %}" class="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors">
-          Browse Articles
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
+        <div data-controller="saved-articles"
+             data-saved-articles-type-value="liked"
+             class="grid gap-4">
+            <div data-saved-articles-target="container" class="grid gap-3"></div>
+            <div data-saved-articles-target="emptyMessage"
+                 class="grid justify-items-center gap-3 rounded-[2px] border border-line bg-paper/95 p-8 text-center shadow-low sm:p-14">
+                <svg fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24"
+                     class="h-12 w-12 text-muted"
+                     aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 0 1 6.364 0L12 7.636l1.318-1.318a4.5 4.5 0 1 1 6.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 0 1 0-6.364z">
+                    </path>
+                </svg>
+                <h3 class="text-xl font-black">No liked articles yet</h3>
+                <p class="max-w-xl leading-relaxed text-muted">
+                    Use the heart action on any summary to build a lightweight reading list.
+                </p>
+                <a href="{% url 'blog_posts' %}"
+                   class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-accent-dark bg-accent-dark px-4 text-[0.92rem] font-extrabold leading-none text-paper no-underline transition focus:outline-none focus:ring-4 focus:ring-accent/20 disabled:opacity-60">Browse archive</a>
+            </div>
+        </div>
+    </section>
 {% endblock content %}

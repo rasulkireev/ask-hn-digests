@@ -4,7 +4,7 @@ export function showMessage(message, type = 'error') {
 
   const messageId = Date.now();
   const messageHTML = `
-    <div data-reveal-target="item" data-message-id="${messageId}" class="rounded-lg border ${type === 'error' ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'} p-4 shadow-sm transition-all duration-300 ease-in-out opacity-0 transform translate-x-full max-w-sm">
+    <div data-reveal-target="item" data-message-id="${messageId}" class="rounded-[2px] border p-4 shadow-low transition duration-300 ${type === 'error' ? 'border-danger/25 bg-danger-soft' : 'border-success/25 bg-success-soft'} translate-x-full transform opacity-0">
       <div class="flex items-start">
         <div class="flex-shrink-0 mr-3">
           <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -13,12 +13,12 @@ export function showMessage(message, type = 'error') {
           </svg>
         </div>
         <div class="flex-grow">
-          <p class="text-sm ${type === 'error' ? 'text-red-800' : 'text-green-800'}">
+          <p class="text-sm font-bold text-ink">
             ${message}
           </p>
         </div>
         <div class="flex-shrink-0 ml-3">
-          <button onclick="this.closest('[data-reveal-target=item]').remove()" type="button" class="inline-flex justify-center items-center h-5 w-5 rounded-md ${type === 'error' ? 'text-red-600 hover:text-red-800' : 'text-green-600 hover:text-green-800'} focus:outline-none focus:ring-2 focus:ring-offset-2 ${type === 'error' ? 'focus:ring-red-500' : 'focus:ring-green-500'}">
+          <button onclick="this.closest('[data-reveal-target=item]').remove()" type="button" class="inline-flex h-7 w-7 items-center justify-center rounded-[2px] border border-line bg-paper text-muted transition hover:border-accent/35 hover:bg-accent-soft hover:text-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/20">
             <span class="sr-only">Dismiss</span>
             <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -40,7 +40,7 @@ export function showMessage(message, type = 'error') {
 
 function createMessagesContainer() {
   const container = document.createElement('div');
-  container.className = 'fixed top-4 right-4 z-50 space-y-4 messages-container';
+  container.className = 'messages-container fixed right-4 top-[5.4rem] z-50 grid w-[min(24rem,calc(100vw_-_2rem))] gap-3';
   document.body.appendChild(container);
   return container;
 }

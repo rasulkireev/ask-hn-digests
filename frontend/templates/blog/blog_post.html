@@ -1,111 +1,117 @@
 {% extends "base.html" %}
 {% load webpack_loader static %}
 {% load markdown_extras %}
-
 {% block meta %}
-<title>{{ blog_post.title }} | Ask HN Digest Blog</title>
-<meta name="description" content="{{ blog_post.description }}" />
-<meta name="keywords" content="{{ blog_post.tags }}" />
-<meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://{{ request.get_host }}{{ blog_post.get_absolute_url }}" />
-
-<meta property="og:type" content="article" />
-<meta property="og:title" content="{{ blog_post.title }}" />
-<meta property="og:url" content="https://{{ request.get_host }}{{ blog_post.get_absolute_url }}" />
-<meta property="og:description" content="{{ blog_post.description }}" />
-<meta property="og:image" content="https://osig.app/g?site=x&style=base&font=markerfelt&title={{ blog_post.title }} | Ask HN Digest Blog&subtitle={{ blog_post.description }}&image_url={{ blog_post.image.url }}" />
-<meta property="og:locale" content="en_US" />
-
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:creator" content="@rasulkireev" />
-<meta name="twitter:site" content="@rasulkireev" />
-<meta name="twitter:title" content="{{ blog_post.title }}" />
-<meta name="twitter:description" content="{{ blog_post.description }}" />
-<meta name="twitter:image" content="https://osig.app/g?site=x&style=base&font=markerfelt&title={{ blog_post.title }} | Ask HN Digest Blog&subtitle={{ blog_post.description }}&image_url={{ blog_post.image.url }}" />
+    <title>{{ blog_post.title }} | Ask HN Digest Blog</title>
+    <meta name="description" content="{{ blog_post.description }}" />
+    <meta name="keywords" content="{{ blog_post.tags }}" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical"
+          href="https://{{ request.get_host }}{{ blog_post.get_absolute_url }}" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="{{ blog_post.title }}" />
+    <meta property="og:url"
+          content="https://{{ request.get_host }}{{ blog_post.get_absolute_url }}" />
+    <meta property="og:description" content="{{ blog_post.description }}" />
+    <meta property="og:image"
+          content="https://osig.app/g?site=x&style=base&font=markerfelt&title={{ blog_post.title }} | Ask HN Digest Blog&subtitle={{ blog_post.description }}&image_url={{ blog_post.image.url }}" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@rasulkireev" />
+    <meta name="twitter:site" content="@rasulkireev" />
+    <meta name="twitter:title" content="{{ blog_post.title }}" />
+    <meta name="twitter:description" content="{{ blog_post.description }}" />
+    <meta name="twitter:image"
+          content="https://osig.app/g?site=x&style=base&font=markerfelt&title={{ blog_post.title }} | Ask HN Digest Blog&subtitle={{ blog_post.description }}&image_url={{ blog_post.image.url }}" />
 {% endblock meta %}
-
 {% block content %}
-<div class="pt-10 mx-auto max-w-3xl">
-  <a href="{% url 'home' %}" class="text-sm text-gray-500 underline hover:text-orange-600">← back home</a>
-</div>
-
-<article class="container px-4 py-8 mx-auto md:relative" 
-         data-controller="likes" 
-         data-likes-article-id-value="{{ blog_post.id }}"
-         data-likes-article-slug-value="{{ blog_post.slug }}"
-         data-likes-article-title-value="{{ blog_post.title }}">
-  <div class="mx-auto max-w-3xl">
-    <!-- Like and Bookmark buttons -->
-    <div class="flex justify-between items-start mb-6">
-      <h1 class="text-3xl font-bold flex-1 mr-4">{{ blog_post.title }}</h1>
-      <div class="flex space-x-2 flex-shrink-0">
-        <!-- Like button -->
-        <button data-action="click->likes#like" 
-                data-likes-target="likeButton"
-                class="p-3 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-red-500"
-                title="Like this article">
-          <svg data-likes-target="likeIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-          </svg>
-        </button>
-        
-        <!-- Bookmark button -->
-        <button data-action="click->likes#bookmark" 
-                data-likes-target="bookmarkButton"
-                class="p-3 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-blue-500"
-                title="Bookmark this article">
-          <svg data-likes-target="bookmarkIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
-          </svg>
-        </button>
-      </div>
+    <article class="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16"
+             data-controller="likes"
+             data-likes-article-id-value="{{ blog_post.id }}"
+             data-likes-article-slug-value="{{ blog_post.slug }}"
+             data-likes-article-title-value="{{ blog_post.title }}">
+        <a href="{% url 'blog_posts' %}"
+           class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-transparent px-4 text-[0.92rem] font-extrabold leading-none text-ink-soft no-underline transition hover:border-line-strong hover:bg-paper-strong focus:outline-none focus:ring-4 focus:ring-accent/20">Back to archive</a>
+        <h1 class="mt-3 break-words text-[2.65rem] font-black leading-none tracking-normal sm:text-[3.55rem] lg:text-[4.4rem] lg:leading-[0.98]">
+            {{ blog_post.title }}
+        </h1>
+        <div class="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm font-bold text-muted">
+            <span>{{ blog_post.created_at|date:"F j, Y" }}</span>
+            <a href="https://news.ycombinator.com/item?id={{ blog_post.discussion_id }}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="font-extrabold text-cobalt underline underline-offset-[0.18em] transition hover:text-accent-dark">Original HN discussion</a>
+        </div>
+        <div class="mt-4 flex items-center gap-2">
+            <button data-action="click->likes#like"
+                    data-likes-target="likeButton"
+                    class="inline-flex h-9 w-9 items-center justify-center rounded-[2px] border border-line bg-paper text-muted transition hover:border-accent/35 hover:bg-accent-soft hover:text-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/20"
+                    title="Like this article">
+                <svg data-likes-target="likeIcon"
+                     class="w-6 h-6"
+                     fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                    </path>
+                </svg>
+            </button>
+            <button data-action="click->likes#bookmark"
+                    data-likes-target="bookmarkButton"
+                    class="inline-flex h-9 w-9 items-center justify-center rounded-[2px] border border-line bg-paper text-muted transition hover:border-accent/35 hover:bg-accent-soft hover:text-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/20"
+                    title="Bookmark this article">
+                <svg data-likes-target="bookmarkIcon"
+                     class="w-6 h-6"
+                     fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z">
+                    </path>
+                </svg>
+            </button>
+        </div>
+        {% if blog_post.tags %}
+            <div class="mt-4 flex flex-wrap gap-2">
+                {% for tag in blog_post.tags|split:"," %}
+                    {% if tag.strip %}
+                        {% include 'components/tag.html' with tag=tag.strip %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </article>
+    <div class="mx-auto max-w-3xl px-4 pb-10 sm:px-6 sm:pb-16">
+        <div class="prose prose-lg max-w-none text-ink prose-a:font-bold prose-a:text-cobalt prose-a:underline-offset-[0.18em] prose-blockquote:max-w-[68ch] prose-blockquote:rounded-r-lg prose-blockquote:border-l prose-blockquote:border-line-strong prose-blockquote:bg-paper-strong/70 prose-blockquote:text-ink-soft prose-code:rounded prose-code:border prose-code:border-line prose-code:bg-accent-soft prose-code:px-1 prose-code:font-bold prose-code:text-accent-dark prose-headings:font-black prose-headings:tracking-normal prose-headings:text-ink prose-ol:max-w-[68ch] prose-p:max-w-[68ch] prose-ul:max-w-[68ch] text-[1.06rem] leading-[1.82]">
+            {{ blog_post.long_summary|markdown|safe }}
+        </div>
     </div>
-
-    <!-- Date information -->
-    <div class="mb-4 text-sm text-gray-500">
-      {{ blog_post.created_at|date:"F j, Y" }}
-    </div>
-
-    <!-- Tags -->
-    {% if blog_post.tags %}
-      <div class="flex flex-wrap gap-2 mb-6">
-        {% for tag in blog_post.tags|split:"," %}
-          {% if tag.strip %}
-            {% include 'components/tag.html' with tag=tag.strip %}
-          {% endif %}
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    <div class="mb-6">
-      <a href="https://news.ycombinator.com/item?id={{ blog_post.discussion_id }}" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-500 underline hover:text-orange-600">
-        View original discussion on Hacker News
-      </a>
-    </div>
-
-    <div class="max-w-none prose prose-lg">
-      {{ blog_post.long_summary|markdown|safe }}
-    </div>
-  </div>
-</article>
-
-<div class="py-16">
-  <div class="flex flex-col items-center p-10 mx-auto w-full max-w-xl rounded-2xl border border-orange-100 shadow-xl bg-white/90">
-    <p class="mb-6 text-lg text-center text-gray-700">Get the most insightful discussions and trending stories delivered to your inbox, every Wednesday.</p>
-    <div data-controller="newsletter" class="flex flex-col items-center w-full">
-      <form data-action="submit->newsletter#submit" class="flex flex-col gap-3 w-full sm:flex-row">
-        {% csrf_token %}
-        <input type="email" name="email" required placeholder="Enter your email address" class="flex-1 px-4 py-3 text-base rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500" />
-        <button type="submit" class="px-6 py-3 text-base font-bold text-white bg-gradient-to-r from-orange-500 to-orange-600 rounded-md shadow-md transition-all hover:from-orange-600 hover:to-orange-500">Get My Weekly Digest</button>
-      </form>
-      <div data-newsletter-target="message" class="mt-3 w-full text-center"></div>
-    </div>
-  </div>
-</div>
+    <section class="mx-auto mb-10 max-w-5xl rounded-[2px] border border-line-strong bg-ink p-5 text-paper sm:mb-16 sm:p-8">
+        <p class="mb-4 max-w-2xl text-[1.05rem] leading-relaxed text-page">
+            Get the most interesting Hacker News discussions delivered as a weekly brief.
+        </p>
+        <div data-controller="newsletter">
+            <form data-action="submit->newsletter#submit"
+                  class="grid w-full max-w-[40rem] grid-cols-1 gap-3 sm:grid-cols-[minmax(16rem,1fr)_auto]">
+                {% csrf_token %}
+                <label for="post-newsletter-email" class="sr-only">Email address</label>
+                <input id="post-newsletter-email"
+                       type="email"
+                       name="email"
+                       required
+                       placeholder="you@example.com"
+                       class="w-full rounded-[2px] border border-paper/35 bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-[inset_0_1px_0_oklch(0.995_0.004_100_/_0.42)] transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15" />
+                <button type="submit"
+                        class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-accent-dark bg-accent-dark px-4 text-[0.92rem] font-extrabold leading-none text-paper no-underline transition focus:outline-none focus:ring-4 focus:ring-accent/20 disabled:opacity-60">
+                    Get the digest
+                </button>
+            </form>
+            <div data-newsletter-target="message"
+                 class="mt-3 min-h-[1.35rem] text-sm font-semibold text-page"></div>
+        </div>
+    </section>
 {% endblock content %}
-
 {% block schema %}
-<script type="application/ld+json">
+    <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -125,7 +131,7 @@
       "name": "Ask HN Digest",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}"
+        "url": "https://{{ request.get_host }}{% static 'vendors/images/logo.svg' %}"
       }
     },
     "articleBody": "{{ blog_post.long_summary|safe|replace_quotes }}",
@@ -134,5 +140,5 @@
       "@id": "https://{{ request.get_host }}{{ blog_post.get_absolute_url }}"
     }
   }
-</script>
+    </script>
 {% endblock schema %}

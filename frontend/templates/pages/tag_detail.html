@@ -1,76 +1,82 @@
 {% extends "base.html" %}
 {% load static %}
 {% load markdown_extras %}
-
 {% block meta %}
-<title>{{ tag|title }} - Ask HN Digest</title>
-<meta name="description" content="Browse all discussion summaries tagged with {{ tag }}." />
-<meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://{{ request.get_host }}{% url 'tag_detail' tag_slug=tag_slug %}" />
+    <title>{{ tag|title }} - Ask HN Digest</title>
+    <meta name="description"
+          content="Browse all discussion summaries tagged with {{ tag }}." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical"
+          href="https://{{ request.get_host }}{% url 'tag_detail' tag_slug=tag_slug %}" />
 {% endblock meta %}
-
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-orange-50 to-white">
-  <div class="container px-4 py-8 mx-auto max-w-4xl">
-    <div class="mb-8">
-      <h1 class="mb-4 text-4xl font-bold text-center text-gray-900">{{ tag|title }}</h1>
-      <p class="mb-6 text-center text-gray-600">All discussions tagged with this topic</p>
-      <div class="text-center">
-        <a href="{% url 'tag_list' %}" class="font-medium text-blue-600 hover:text-blue-700">← Browse all tags</a>
-      </div>
-    </div>
-
-    {% if summaries %}
-      <div class="mb-4 text-center text-gray-600">
-        Found {{ page_obj.paginator.count }} discussion{{ page_obj.paginator.count|pluralize }}
-      </div>
-
-      <div class="space-y-6">
-        {% for summary in summaries %}
-          {% include "components/article_card.html" with article=summary %}
-        {% endfor %}
-      </div>
-
-      {% if page_obj.paginator.num_pages > 1 %}
-        <div class="flex justify-center mt-8">
-          <nav class="flex space-x-2">
-            {% if page_obj.has_previous %}
-              <a href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white rounded-md border border-gray-300 hover:bg-gray-50">First</a>
-              <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white rounded-md border border-gray-300 hover:bg-gray-50">Previous</a>
+    <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
+        <header class="mb-6 grid gap-3">
+            <p class="mb-1 inline-flex items-center gap-2 text-sm font-extrabold text-accent-dark before:h-2 before:w-2 before:rounded-[2px] before:bg-accent before:shadow-[0_0_0_3px_oklch(0.68_0.18_48_/_0.16)] before:content-['']">
+                Tag
+            </p>
+            <h1 class="break-words text-[2.65rem] font-black leading-none tracking-normal sm:text-[3.55rem] lg:text-[4.35rem]">
+                {{ tag|title }}
+            </h1>
+            <p class="max-w-3xl text-[1.02rem] leading-relaxed text-ink-soft sm:text-[1.12rem]">
+                All summarized Hacker News discussions tagged with this topic.
+            </p>
+        </header>
+        <div class="my-5 flex flex-wrap items-center justify-between gap-3">
+            <a href="{% url 'tag_list' %}"
+               class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-line bg-paper px-4 text-[0.92rem] font-extrabold leading-none text-ink no-underline transition hover:border-line-strong hover:bg-paper-strong focus:outline-none focus:ring-4 focus:ring-accent/20">Browse all tags</a>
+            {% if summaries %}
+                <span class="inline-flex min-h-8 items-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold text-muted">{{ page_obj.paginator.count }} discussion{{ page_obj.paginator.count|pluralize }}</span>
             {% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-              {% if page_obj.number == num %}
-                <span class="px-3 py-2 text-sm font-medium text-white bg-orange-600 rounded-md border border-orange-600">{{ num }}</span>
-              {% elif num in page_obj.paginator.get_elided_page_range %}
-                <a href="?page={{ num }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white rounded-md border border-gray-300 hover:bg-gray-50">{{ num }}</a>
-              {% endif %}
-            {% endfor %}
-
-            {% if page_obj.has_next %}
-              <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white rounded-md border border-gray-300 hover:bg-gray-50">Next</a>
-              <a href="?page={{ page_obj.paginator.num_pages }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white rounded-md border border-gray-300 hover:bg-gray-50">Last</a>
+        </div>
+        {% if summaries %}
+            <div class="grid gap-3">
+                {% for summary in summaries %}
+                    {% include "components/article_card.html" with article=summary %}
+                {% endfor %}
+            </div>
+            {% if page_obj.paginator.num_pages > 1 %}
+                <div class="mt-6 flex justify-center">
+                    <nav class="flex flex-wrap justify-center gap-1.5"
+                         aria-label="Tag pagination">
+                        {% if page_obj.has_previous %}
+                            <a href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}"
+                               class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">First</a>
+                            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}"
+                               class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">Previous</a>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <span class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-ink bg-ink px-3 text-sm font-extrabold text-paper"
+                                      aria-current="page">{{ num }}</span>
+                            {% elif num in page_obj.paginator.get_elided_page_range %}
+                                <a href="?page={{ num }}"
+                                   class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}"
+                               class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">Next</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}"
+                               class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">Last</a>
+                        {% endif %}
+                    </nav>
+                </div>
             {% endif %}
-          </nav>
-        </div>
-      {% endif %}
-    {% else %}
-      <div class="py-12 text-center">
-        <div class="mb-4 text-gray-600">
-          <svg class="mx-auto mb-4 w-16 h-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <p class="text-lg font-medium">No discussions found for this tag</p>
-          <p class="text-sm">Try browsing other tags or check out our latest discussions.</p>
-        </div>
-
-        <div class="mt-8">
-          <a href="{% url 'tag_list' %}" class="font-medium text-blue-600 hover:text-blue-700">← Browse all tags</a>
-          <span class="mx-2 text-gray-400">|</span>
-          <a href="{% url 'blog_posts' %}" class="font-medium text-blue-600 hover:text-blue-700">Browse All Discussions</a>
-        </div>
-      </div>
-    {% endif %}
-  </div>
-</div>
+        {% else %}
+            <div class="grid justify-items-center gap-3 rounded-[2px] border border-line bg-paper/95 p-8 text-center shadow-low sm:p-14">
+                <svg fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor"
+                     class="h-12 w-12 text-muted"
+                     aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 0 1 5.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414A1 1 0 0 1 19 9.414V19a2 2 0 0 1-2 2z" />
+                </svg>
+                <h2 class="text-xl font-black">No discussions found for this tag</h2>
+                <p class="max-w-xl leading-relaxed text-muted">Try another tag or browse the full archive.</p>
+                <a href="{% url 'blog_posts' %}"
+                   class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-line bg-paper px-4 text-[0.92rem] font-extrabold leading-none text-ink no-underline transition hover:border-line-strong hover:bg-paper-strong focus:outline-none focus:ring-4 focus:ring-accent/20">Browse archive</a>
+            </div>
+        {% endif %}
+    </section>
 {% endblock content %}

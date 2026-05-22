@@ -1,55 +1,45 @@
-<div data-controller="feedback" class="fixed right-2 bottom-2 z-50 md:right-6 md:bottom-6">
-  <!-- Feedback button -->
-  <button
-    data-feedback-target="toggleButton"
-    data-action="click->feedback#toggleFeedback"
-    class="flex justify-center items-center w-10 h-10 text-white bg-blue-600 rounded-full shadow-lg transition-all duration-300 hover:bg-blue-700 md:w-16 md:h-16"
-    aria-label="Provide feedback"
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-    </svg>
-  </button>
-
-  <!-- Feedback form overlay -->
-  <div
-    data-feedback-target="overlay"
-    data-action="click->feedback#closeIfClickedOutside"
-    class="flex fixed inset-0 z-40 justify-center items-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300 pointer-events-none"
-  >
-    <div
-      data-feedback-target="formContainer"
-      class="p-6 mx-4 w-full max-w-md bg-white rounded-lg shadow-xl transition-transform duration-300 transform scale-95"
-    >
-      <h3 class="mb-4 text-lg font-medium text-gray-900">Share your feedback</h3>
-
-      <form data-action="submit->feedback#submitFeedback">
-        <div class="mb-4">
-          <textarea
-            data-feedback-target="feedbackInput"
-            class="px-3 py-2 w-full rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows="4"
-            placeholder="What's on your mind?"
-            required
-          ></textarea>
+<div data-controller="feedback"
+     class="fixed right-2 bottom-2 z-50 md:right-6 md:bottom-6">
+    <button data-feedback-target="toggleButton"
+            data-action="click->feedback#toggleFeedback"
+            class="inline-flex h-12 w-12 items-center justify-center rounded-[2px] border border-line-strong bg-ink text-paper shadow-mid transition hover:bg-accent-dark focus:outline-none focus:ring-4 focus:ring-accent/20"
+            aria-label="Provide feedback">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             class="w-6 h-6"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+        </svg>
+    </button>
+    <div data-feedback-target="overlay"
+         data-action="click->feedback#closeIfClickedOutside"
+         class="pointer-events-none fixed inset-0 z-40 flex items-center justify-center bg-ink/55 p-4 opacity-0 transition-opacity duration-200">
+        <div data-feedback-target="formContainer"
+             class="w-full max-w-lg translate-y-2 scale-[0.98] rounded-[2px] border border-line bg-paper p-5 shadow-mid transition-transform duration-200">
+            <h3 class="mb-4 text-xl font-black">Share your feedback</h3>
+            <form data-action="submit->feedback#submitFeedback">
+                <div class="grid gap-3">
+                    <label for="feedback-input" class="sr-only">Feedback</label>
+                    <textarea id="feedback-input"
+                              data-feedback-target="feedbackInput"
+                              class="min-h-32 w-full resize-y rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-[inset_0_1px_0_oklch(0.995_0.004_100_/_0.42)] transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15"
+                              rows="4"
+                              placeholder="What's on your mind?"
+                              required></textarea>
+                    <div class="mt-2 flex flex-wrap items-center gap-3">
+                        <button type="button"
+                                data-action="click->feedback#closeFeedback"
+                                class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-line bg-paper px-4 text-[0.92rem] font-extrabold leading-none text-ink no-underline transition hover:border-line-strong hover:bg-paper-strong focus:outline-none focus:ring-4 focus:ring-accent/20">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-accent-dark bg-accent-dark px-4 text-[0.92rem] font-extrabold leading-none text-paper no-underline transition focus:outline-none focus:ring-4 focus:ring-accent/20 disabled:opacity-60">
+                            Send feedback
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
-
-        <div class="flex justify-end space-x-3">
-          <button
-            type="button"
-            data-action="click->feedback#closeFeedback"
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md transition-colors hover:bg-gray-200"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md transition-colors hover:bg-blue-700"
-          >
-            Send Feedback
-          </button>
-        </div>
-      </form>
     </div>
-  </div>
 </div>

@@ -62,8 +62,9 @@ export default class extends Controller {
 
     // Update like button
     if (this.hasLikeButtonTarget) {
-      this.likeButtonTarget.classList.toggle('text-red-500', isLiked);
-      this.likeButtonTarget.classList.toggle('text-gray-400', !isLiked);
+      this.likeButtonTarget.classList.toggle('border-danger/25', isLiked);
+      this.likeButtonTarget.classList.toggle('bg-danger-soft', isLiked);
+      this.likeButtonTarget.classList.toggle('text-danger', isLiked);
     }
 
     if (this.hasLikeIconTarget) {
@@ -72,8 +73,9 @@ export default class extends Controller {
 
     // Update bookmark button
     if (this.hasBookmarkButtonTarget) {
-      this.bookmarkButtonTarget.classList.toggle('text-blue-500', isBookmarked);
-      this.bookmarkButtonTarget.classList.toggle('text-gray-400', !isBookmarked);
+      this.bookmarkButtonTarget.classList.toggle('border-cobalt/25', isBookmarked);
+      this.bookmarkButtonTarget.classList.toggle('bg-cobalt-soft', isBookmarked);
+      this.bookmarkButtonTarget.classList.toggle('text-cobalt', isBookmarked);
     }
 
     if (this.hasBookmarkIconTarget) {
