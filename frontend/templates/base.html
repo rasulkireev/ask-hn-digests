@@ -48,7 +48,7 @@
              class="fixed left-0 top-0 z-[60] h-0.5 w-full origin-left scale-x-0 bg-accent-dark motion-reduce:hidden">
         </div>
         {% with current=request.resolver_match.url_name %}
-            <header class="sticky top-0 z-40 border-b border-line-strong bg-paper/95">
+            <header class="sticky top-0 z-40 border-b border-line-strong bg-paper">
                 <div class="mx-auto grid min-h-[4.75rem] max-w-7xl grid-cols-1 gap-3 px-4 py-3 lg:grid-cols-[minmax(190px,1fr)_auto_minmax(220px,340px)] lg:items-center lg:px-6 lg:py-0">
                     <a href="{% url 'home' %}"
                        class="inline-flex min-w-0 items-center gap-3 no-underline"
@@ -69,8 +69,6 @@
                            class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none no-underline transition-colors sm:min-h-[2.35rem] sm:px-3 {% if current == 'blog_posts' or current == 'blog_post' %}bg-ink text-paper{% else %}text-ink-soft hover:bg-paper-strong hover:text-ink{% endif %}">Archive</a>
                         <a href="{% url 'tag_list' %}"
                            class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none no-underline transition-colors sm:min-h-[2.35rem] sm:px-3 {% if current == 'tag_list' or current == 'tag_detail' %}bg-ink text-paper{% else %}text-ink-soft hover:bg-paper-strong hover:text-ink{% endif %}">Tags</a>
-                        <a href="{% url 'pricing' %}"
-                           class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none no-underline transition-colors sm:min-h-[2.35rem] sm:px-3 {% if current == 'pricing' %}bg-ink text-paper{% else %}text-ink-soft hover:bg-paper-strong hover:text-ink{% endif %}">Support</a>
                         <a href="{% url 'liked_articles' %}"
                            class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none no-underline transition-colors sm:min-h-[2.35rem] sm:px-3 {% if current == 'liked_articles' %}bg-ink text-paper{% else %}text-ink-soft hover:bg-paper-strong hover:text-ink{% endif %}"
                            title="Liked articles"
@@ -102,13 +100,6 @@
                         {% if user.is_superuser %}
                             <a href="{% url 'admin_panel' %}"
                                class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none no-underline transition-colors sm:min-h-[2.35rem] sm:px-3 {% if current == 'admin_panel' %}bg-ink text-paper{% else %}text-ink-soft hover:bg-paper-strong hover:text-ink{% endif %}">Admin</a>
-                        {% endif %}
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'settings' %}"
-                               class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none text-accent-dark no-underline transition-colors hover:bg-accent-soft hover:text-accent-dark sm:min-h-[2.35rem] sm:px-3 {% if current == 'settings' %}bg-accent-soft{% endif %}">Settings</a>
-                        {% else %}
-                            <a href="{% url 'account_login' %}"
-                               class="inline-flex min-h-9 items-center gap-1.5 border border-line px-2.5 text-[0.76rem] font-black uppercase tracking-[0.12em] leading-none text-accent-dark no-underline transition-colors hover:bg-accent-soft hover:text-accent-dark sm:min-h-[2.35rem] sm:px-3">Sign in</a>
                         {% endif %}
                     </nav>
                     <form method="get"

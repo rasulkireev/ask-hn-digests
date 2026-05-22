@@ -1,35 +1,25 @@
-from allauth.account.adapter import get_adapter
-from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.mail import EmailMultiAlternatives
 from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
-from django.urls import reverse, reverse_lazy
 from django.utils.html import strip_tags
 from django.utils.text import slugify
-from django.views.generic import DetailView, ListView, TemplateView, UpdateView
+from django.views.generic import DetailView, ListView, TemplateView
 from django_q.tasks import async_task
 
 from ask_hn_digest.utils import get_ask_hn_digest_logger
-from core.forms import ProfileUpdateForm, SendNewsletterForm, SummarizeHNDiscussionForm
-from core.models import HNDiscussionSummary, Profile
+from core.forms import SendNewsletterForm, SummarizeHNDiscussionForm
+from core.models import HNDiscussionSummary
 
 logger = get_ask_hn_digest_logger(__name__)
 
 
 class HomeView(TemplateView):
     template_name = "pages/home.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["latest_summaries"] = HNDiscussionSummary.objects.order_by("-date_analyzed")[:3]
-        return context
 
 
 class SearchView(ListView):
@@ -53,39 +43,6 @@ class SearchView(ListView):
         context = super().get_context_data(**kwargs)
         context["query"] = self.request.GET.get("q", "")
         return context
-
-
-class UserSettingsView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
-    login_url = "account_login"
-    model = Profile
-    form_class = ProfileUpdateForm
-    success_message = "User Profile Updated"
-    success_url = reverse_lazy("settings")
-    template_name = "pages/user-settings.html"
-
-    def get_object(self):
-        return self.request.user.profile
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-
-        email_address = EmailAddress.objects.get_for_user(user, user.email)
-        context["email_verified"] = email_address.verified
-        context["resend_confirmation_url"] = reverse("resend_confirmation")
-
-        return context
-
-
-@login_required
-def resend_confirmation_email(request):
-    user = request.user
-    adapter = get_adapter(request)
-    emailaddress = EmailAddress.objects.get_for_user(user, user.email)
-
-    adapter.send_confirmation_mail(request, emailaddress, signup=False)
-
-    return redirect("settings")
 
 
 class BlogView(ListView):
@@ -120,7 +77,6 @@ def test_mjml(request):
 
 class AdminPanelView(UserPassesTestMixin, TemplateView):
     template_name = "pages/admin_panel.html"
-    login_url = "account_login"
 
     def test_func(self):
         return self.request.user.is_superuser

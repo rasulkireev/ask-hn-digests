@@ -8,7 +8,6 @@ urlpatterns = [
     # pages
     path("", views.HomeView.as_view(), name="home"),
     path("search/", views.SearchView.as_view(), name="search"),
-    path("settings/", views.UserSettingsView.as_view(), name="settings"),
     path("liked/", LikedArticlesView.as_view(), name="liked_articles"),
     path("bookmarked/", BookmarkedArticlesView.as_view(), name="bookmarked_articles"),
     # blog
@@ -20,6 +19,5 @@ urlpatterns = [
     # app
     path("api/", api.urls),
     # utils
-    path("resend-confirmation/", views.resend_confirmation_email, name="resend_confirmation"),
     path("admin-panel", AdminPanelView.as_view(), name="admin_panel"),
 ]
