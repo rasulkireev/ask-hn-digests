@@ -4,7 +4,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5436:5432"
     environment:
       - POSTGRES_DB=ask_hn_digest
       - POSTGRES_USER=ask_hn_digest
@@ -19,7 +19,7 @@ services:
     image: redis:7-alpine
     command: redis-server --requirepass ask_hn_digest
     ports:
-      - "6379:6379"
+      - "6376:6379"
     volumes:
       - redis_data:/data
     environment:
@@ -34,7 +34,7 @@ services:
     volumes:
       - .:/app
     ports:
-      - "8000:8000"
+      - "8006:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -70,16 +70,14 @@ services:
     ports:
       - "9091:9091"
 
-  mailhog:
-    image: mailhog/mailhog
-    expose:
-      - 1025
-      - 8025
-    ports:
-      - "1025:1025"
-      - "8025:8025"
-
-
+  # mailhog:
+  #   image: mailhog/mailhog
+  #   expose:
+  #     - 1025
+  #     - 8025
+  #   ports:
+  #     - "1025:1025"
+  #     - "8025:8025"
 
   minio:
     image: minio/minio
