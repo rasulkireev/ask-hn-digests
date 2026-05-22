@@ -1,93 +1,109 @@
 {% extends "base.html" %}
 {% load static %}
 {% load markdown_extras %}
-
 {% block meta %}
-<title>Search Results{% if query %} for "{{ query }}"{% endif %} - Ask HN Digest</title>
-<meta name="description" content="Search results for HN discussion summaries{% if query %} matching '{{ query }}'{% endif %}" />
-<meta name="robots" content="noindex, follow" />
+    <title>Search Results
+        {% if query %}for "{{ query }}"{% endif %}
+    - Ask HN Digest</title>
+    <meta name="description"
+          content="Search results for HN discussion summaries{% if query %} matching '{{ query }}'{% endif %}" />
+    <meta name="robots" content="noindex, follow" />
 {% endblock meta %}
-
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-orange-50 to-white">
-  <div class="container px-4 py-8 mx-auto max-w-4xl">
-    <div class="mb-8">
-      <h1 class="mb-4 text-4xl font-bold text-center text-gray-900">Search Results</h1>
-      {% if query %}
-        <p class="mb-6 text-center text-gray-600">Results for: <span class="font-semibold">"{{ query }}"</span></p>
-      {% endif %}
-
-      <!-- Search Bar -->
-      <div class="mx-auto max-w-2xl">
-        <form method="get" action="{% url 'search' %}" class="flex flex-col gap-3 w-full sm:flex-row">
-          <input type="text" name="q" placeholder="Search discussions..." class="flex-1 px-4 py-3 text-base rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500" value="{{ query }}" />
-          <button type="submit" class="px-6 py-3 text-base font-bold text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-md shadow-md transition-all hover:from-blue-600 hover:to-blue-500">Search</button>
+    <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
+        <header class="mb-6 grid gap-3">
+            <p class="mb-1 inline-flex items-center gap-2 text-sm font-extrabold text-accent-dark before:h-2 before:w-2 before:rounded-[2px] before:bg-accent before:shadow-[0_0_0_3px_oklch(0.68_0.18_48_/_0.16)] before:content-['']">
+                Search
+            </p>
+            <h1 class="break-words text-[2.65rem] font-black leading-none tracking-normal sm:text-[3.55rem] lg:text-[4.35rem]">
+                {% if query %}
+                    Results for "{{ query }}"
+                {% else %}
+                    Search the brief archive.
+                {% endif %}
+            </h1>
+            <p class="max-w-3xl text-[1.02rem] leading-relaxed text-ink-soft sm:text-[1.12rem]">
+                Look across titles, descriptions, and long summaries to find the thread you remember.
+            </p>
+        </header>
+        <form method="get"
+              action="{% url 'search' %}"
+              class="grid w-full max-w-[40rem] grid-cols-1 gap-3 sm:grid-cols-[minmax(16rem,1fr)_auto]">
+            <label for="search-page-input" class="sr-only">Search discussions</label>
+            <input id="search-page-input"
+                   type="search"
+                   name="q"
+                   placeholder="Search discussions"
+                   class="w-full rounded-[2px] border border-line bg-paper px-4 py-3 text-[0.96rem] text-ink shadow-input transition focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15"
+                   value="{{ query }}" />
+            <button type="submit"
+                    class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-accent-dark bg-accent-dark px-4 text-[0.92rem] font-extrabold leading-none text-paper no-underline transition focus:outline-none focus:ring-4 focus:ring-accent/20 disabled:opacity-60">
+                Search
+            </button>
         </form>
-      </div>
-    </div>
-
-    {% if search_results %}
-      <div class="mb-4 text-center text-gray-600">
-        Found {{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }}
-      </div>
-
-      <div class="space-y-6">
-        {% for summary in search_results %}
-          {% include "components/article_card.html" with article=summary %}
-        {% endfor %}
-      </div>
-
-      <!-- Pagination -->
-      {% if page_obj.paginator.num_pages > 1 %}
-        <div class="flex justify-center mt-8">
-          <nav class="flex space-x-2">
-            {% if page_obj.has_previous %}
-              <a href="?q={{ query|urlencode }}&page=1" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white rounded-md border border-gray-300 hover:bg-gray-50">First</a>
-              <a href="?q={{ query|urlencode }}&page={{ page_obj.previous_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white rounded-md border border-gray-300 hover:bg-gray-50">Previous</a>
+        {% if search_results %}
+            <div class="my-5 flex flex-wrap items-center justify-between gap-3">
+                <span class="inline-flex min-h-8 items-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold text-muted">{{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }}</span>
+            </div>
+            <div class="grid gap-3">
+                {% for summary in search_results %}
+                    {% include "components/article_card.html" with article=summary %}
+                {% endfor %}
+            </div>
+            {% if page_obj.paginator.num_pages > 1 %}
+                <div class="mt-6 flex justify-center">
+                    <nav class="flex flex-wrap justify-center gap-1.5"
+                         aria-label="Search pagination">
+                        {% if page_obj.has_previous %}
+                            <a href="?q={{ query|urlencode }}&page=1"
+                               class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">First</a>
+                            <a href="?q={{ query|urlencode }}&page={{ page_obj.previous_page_number }}"
+                               class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">Previous</a>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <span class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-ink bg-ink px-3 text-sm font-extrabold text-paper"
+                                      aria-current="page">{{ num }}</span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?q={{ query|urlencode }}&page={{ num }}"
+                                   class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                            <a href="?q={{ query|urlencode }}&page={{ page_obj.next_page_number }}"
+                               class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">Next</a>
+                            <a href="?q={{ query|urlencode }}&page={{ page_obj.paginator.num_pages }}"
+                               class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">Last</a>
+                        {% endif %}
+                    </nav>
+                </div>
             {% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-              {% if page_obj.number == num %}
-                <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md border border-blue-600">{{ num }}</span>
-              {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                <a href="?q={{ query }}&page={{ num }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white rounded-md border border-gray-300 hover:bg-gray-50">{{ num }}</a>
-              {% endif %}
-            {% endfor %}
-
-            {% if page_obj.has_next %}
-              <a href="?q={{ query }}&page={{ page_obj.next_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white rounded-md border border-gray-300 hover:bg-gray-50">Next</a>
-              <a href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white rounded-md border border-gray-300 hover:bg-gray-50">Last</a>
-            {% endif %}
-          </nav>
-        </div>
-      {% endif %}
-    {% else %}
-      <div class="py-12 text-center">
-        {% if query %}
-          <div class="mb-4 text-gray-600">
-            <svg class="mx-auto mb-4 w-16 h-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <p class="text-lg font-medium">No results found for "{{ query }}"</p>
-            <p class="text-sm">Try searching with different keywords or check out our latest discussions below.</p>
-          </div>
         {% else %}
-          <div class="mb-4 text-gray-600">
-            <svg class="mx-auto mb-4 w-16 h-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <p class="text-lg font-medium">Enter a search term to find discussions</p>
-            <p class="text-sm">Search through our curated collection of HN discussion summaries.</p>
-          </div>
+            <div class="mt-6 grid justify-items-center gap-3 rounded-[2px] border border-line bg-paper/95 p-8 text-center shadow-low sm:p-14">
+                {% if query %}
+                    <svg fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor"
+                         class="h-12 w-12 text-muted"
+                         aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 0 1 5.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414A1 1 0 0 1 19 9.414V19a2 2 0 0 1-2 2z" />
+                    </svg>
+                    <h2 class="text-xl font-black">No results found for "{{ query }}"</h2>
+                    <p class="max-w-xl leading-relaxed text-muted">Try a broader keyword or browse the latest summaries.</p>
+                {% else %}
+                    <svg fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor"
+                         class="h-12 w-12 text-muted"
+                         aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" />
+                    </svg>
+                    <h2 class="text-xl font-black">Enter a search term</h2>
+                    <p class="max-w-xl leading-relaxed text-muted">Search through the curated collection of HN discussion summaries.</p>
+                {% endif %}
+                <a href="{% url 'blog_posts' %}"
+                   class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-line bg-paper px-4 text-[0.92rem] font-extrabold leading-none text-ink no-underline transition hover:border-line-strong hover:bg-paper-strong focus:outline-none focus:ring-4 focus:ring-accent/20">Browse archive</a>
+            </div>
         {% endif %}
-
-        <div class="mt-8">
-          <a href="{% url 'home' %}" class="font-medium text-blue-600 hover:text-blue-700">← Back to Home</a>
-          <span class="mx-2 text-gray-400">|</span>
-          <a href="{% url 'blog_posts' %}" class="font-medium text-blue-600 hover:text-blue-700">Browse All Discussions</a>
-        </div>
-      </div>
-    {% endif %}
-  </div>
-</div>
+    </section>
 {% endblock content %}

@@ -1,5 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 
+const MESSAGE_BASE_CLASSES = 'mt-3 min-h-[1.35rem] text-sm font-semibold';
+
 export default class extends Controller {
   static targets = ["message"];
 
@@ -47,7 +49,8 @@ export default class extends Controller {
     if (!this.hasMessageTarget) return;
     this.messageTarget.textContent = message;
     if (message) {
-      this.messageTarget.className = `mt-2 text-center ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
+      const statusClasses = type === 'success' ? 'text-success' : 'text-danger';
+      this.messageTarget.className = `${MESSAGE_BASE_CLASSES} ${statusClasses}`;
     }
   }
 }
