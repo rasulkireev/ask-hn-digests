@@ -3,7 +3,7 @@
 {% load core_extras %}
 {% block content %}
     <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:py-20">
-        <div class="grid min-w-0 items-start gap-8 lg:grid-cols-[4.5rem_minmax(0,1fr)_minmax(320px,0.78fr)] lg:gap-10">
+        <div class="grid min-w-0 items-start gap-8 lg:grid-cols-[4.5rem_minmax(0,1fr)] lg:gap-10">
             <div class="hidden border-t-4 border-accent pt-3 text-[0.68rem] font-black uppercase leading-tight tracking-[0.18em] text-muted lg:block">
                 01
                 <span class="mt-2 block text-ink">Brief</span>
@@ -54,93 +54,7 @@
                     </div>
                 </div>
             </div>
-            <aside class="relative min-w-0 overflow-hidden border border-line-strong bg-paper lg:max-w-[38rem]"
-                   aria-label="Sample digest briefing">
-                <div class="pointer-events-none absolute inset-0 bg-signal-grid bg-[length:24px_24px] opacity-70"></div>
-                <div class="relative flex items-center justify-between border-b border-line bg-paper px-4 py-3 text-[0.68rem] font-black uppercase tracking-[0.16em]">
-                    <span>ASK HN DIGEST</span>
-                    <span>Issue queue / 03</span>
-                </div>
-                <div class="relative grid p-4">
-                    <svg class="pointer-events-none absolute left-[2.65rem] top-[4.8rem] hidden h-[12.6rem] w-8 text-accent sm:block"
-                         viewBox="0 0 24 150"
-                         fill="none"
-                         aria-hidden="true">
-                        <path d="M12 0V150" stroke="currentColor" stroke-width="2" stroke-dasharray="150" stroke-dashoffset="150" class="motion-safe:animate-line-draw" />
-                    </svg>
-                    <div class="grid grid-cols-[2.4rem_1fr] items-start gap-3 border-b border-line bg-paper/85 py-4 sm:grid-cols-[2.4rem_1fr_auto]">
-                        <span class="relative z-10 inline-flex h-10 w-10 items-center justify-center border border-ink bg-ink text-sm font-black text-paper">01</span>
-                        <div>
-                            <p class="text-base font-black leading-tight">A practical thread becomes a map of tradeoffs.</p>
-                            <div class="mt-2 flex flex-wrap gap-3 text-[0.68rem] font-black uppercase tracking-[0.14em] text-muted">
-                                <span>launch lessons</span>
-                                <span>founder notes</span>
-                            </div>
-                        </div>
-                        <span class="col-start-2 inline-flex min-h-8 min-w-[3.25rem] items-center justify-center border border-accent/40 bg-accent-soft px-2 text-[0.72rem] font-black uppercase tracking-[0.12em] text-accent-dark sm:col-start-auto">Hot</span>
-                    </div>
-                    <div class="grid grid-cols-[2.4rem_1fr] items-start gap-3 border-b border-line bg-paper/85 py-4 sm:grid-cols-[2.4rem_1fr_auto]">
-                        <span class="relative z-10 inline-flex h-10 w-10 items-center justify-center border border-ink bg-ink text-sm font-black text-paper">02</span>
-                        <div>
-                            <p class="text-base font-black leading-tight">The comment section separates taste from fashion.</p>
-                            <div class="mt-2 flex flex-wrap gap-3 text-[0.68rem] font-black uppercase tracking-[0.14em] text-muted">
-                                <span>design</span>
-                                <span>tools</span>
-                            </div>
-                        </div>
-                        <span class="col-start-2 inline-flex min-h-8 min-w-[3.25rem] items-center justify-center border border-accent/40 bg-accent-soft px-2 text-[0.72rem] font-black uppercase tracking-[0.12em] text-accent-dark sm:col-start-auto">Sharp</span>
-                    </div>
-                    <div class="grid grid-cols-[2.4rem_1fr] items-start gap-3 bg-paper/85 py-4 sm:grid-cols-[2.4rem_1fr_auto]">
-                        <span class="relative z-10 inline-flex h-10 w-10 items-center justify-center border border-ink bg-ink text-sm font-black text-paper">03</span>
-                        <div>
-                            <p class="text-base font-black leading-tight">A quiet technical answer explains the whole system.</p>
-                            <div class="mt-2 flex flex-wrap gap-3 text-[0.68rem] font-black uppercase tracking-[0.14em] text-muted">
-                                <span>engineering</span>
-                                <span>systems</span>
-                            </div>
-                        </div>
-                        <span class="col-start-2 inline-flex min-h-8 min-w-[3.25rem] items-center justify-center border border-accent/40 bg-accent-soft px-2 text-[0.72rem] font-black uppercase tracking-[0.12em] text-accent-dark sm:col-start-auto">Save</span>
-                    </div>
-                </div>
-            </aside>
         </div>
-    </section>
-    <section class="mx-auto max-w-7xl border-t border-line px-4 py-8 sm:px-6 sm:py-10">
-        <div class="mb-5 grid gap-4 lg:grid-cols-[4.5rem_1fr_auto] lg:items-end">
-            <div class="hidden border-t-4 border-ink pt-3 text-[0.68rem] font-black uppercase leading-tight tracking-[0.18em] text-muted lg:block">
-                02
-                <span class="mt-2 block text-ink">Archive</span>
-            </div>
-            <div>
-                <p class="mb-4 border-l-4 border-accent pl-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-accent-dark">
-                    Latest briefing
-                </p>
-                <h2 class="text-[2rem] font-black leading-none tracking-normal sm:text-[2.55rem]">New discussions worth your time</h2>
-                <p class="mt-2 max-w-2xl leading-relaxed text-muted">
-                    Recent summaries from the archive, edited for quick scanning and deeper reading.
-                </p>
-            </div>
-            <div class="mt-2 flex flex-wrap items-center gap-2 lg:mt-0">
-                <a href="{% url 'blog_posts' %}"
-                   class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-line bg-paper px-4 text-[0.82rem] font-black uppercase tracking-[0.12em] leading-none text-ink no-underline transition hover:border-line-strong hover:bg-paper-strong focus:outline-none focus:ring-2 focus:ring-accent/20">See archive</a>
-                <a href="{% url 'tag_list' %}"
-                   class="inline-flex min-h-[2.7rem] items-center justify-center gap-2 rounded-[2px] border border-transparent px-4 text-[0.82rem] font-black uppercase tracking-[0.12em] leading-none text-ink-soft no-underline transition hover:border-line-strong hover:bg-paper-strong focus:outline-none focus:ring-2 focus:ring-accent/20">Browse tags</a>
-            </div>
-        </div>
-        {% if latest_summaries %}
-            <div class="grid gap-3">
-                {% for summary in latest_summaries %}
-                    {% include "components/article_card.html" with article=summary %}
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="grid justify-items-center gap-3 rounded-[2px] border border-line bg-paper/95 p-8 text-center shadow-low sm:p-14">
-                <h3 class="text-xl font-black">No summaries yet</h3>
-                <p class="max-w-xl leading-relaxed text-muted">
-                    The first digest will appear here once Hacker News discussions have been analyzed.
-                </p>
-            </div>
-        {% endif %}
     </section>
     {% if show_confetti %}
         <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
