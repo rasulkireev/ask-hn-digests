@@ -9,9 +9,7 @@ DEFAULT_FONT = "markerfelt"
 
 
 def absolute_url(request, path_or_url):
-    if path_or_url.startswith(("http://", "https://")):
-        return path_or_url
-    return f"https://{request.get_host()}{path_or_url}"
+    return request.build_absolute_uri(path_or_url)
 
 
 def static_url(request, path):

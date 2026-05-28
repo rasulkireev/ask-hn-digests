@@ -1,5 +1,6 @@
 from django.contrib import sitemaps
 from django.contrib.sitemaps import GenericSitemap
+from django.db.models import Max
 from django.urls import reverse
 
 from core.models import HNDiscussionSummary
@@ -42,10 +43,15 @@ class TagSitemap(sitemaps.Sitemap):
     protocol = "https"
 
     def items(self):
-        return HNDiscussionSummary.get_all_tags_with_counts()
+        return HNDiscussionSummary.get_all_tags_with_counts().annotate(
+            latest_summary_updated_at=Max("summaries__updated_at")
+        )
 
     def location(self, item):
         return reverse("tag_detail", kwargs={"tag_slug": item.slug})
+
+    def lastmod(self, item):
+        return item.latest_summary_updated_at or item.updated_at
 
 
 sitemaps = {

@@ -18,6 +18,7 @@ from core.seo import (
     DEFAULT_DESCRIPTION,
     absolute_url,
     blog_post_schema,
+    clean_text,
     discussion_description,
     discussion_title,
     post_image_url,
@@ -151,17 +152,19 @@ class BlogPostView(DetailView):
         summary = self.object
         post_url = absolute_url(self.request, summary.get_absolute_url())
         seo_title = f"{discussion_title(summary)} | Ask HN Digest"
+        social_title = clean_text(summary.title)
         seo_description = discussion_description(summary)
         image_url = post_image_url(self.request, summary)
         generated_social_image_url = social_image_url(
             self.request,
-            title=seo_title,
+            title=social_title,
             description=seo_description,
             image_url=image_url,
         )
 
         context["canonical_url"] = post_url
         context["seo_title"] = seo_title
+        context["social_title"] = social_title
         context["seo_description"] = seo_description
         context["social_image_url"] = generated_social_image_url
         context["blog_post_schema"] = blog_post_schema(
