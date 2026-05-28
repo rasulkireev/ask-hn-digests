@@ -20,6 +20,7 @@ class StaticViewSitemap(sitemaps.Sitemap):
         return [
             "home",
             "blog_posts",
+            "tag_list",
         ]
 
     def location(self, item):
@@ -34,12 +35,26 @@ class StaticViewSitemap(sitemaps.Sitemap):
         return reverse(item)
 
 
+class TagSitemap(sitemaps.Sitemap):
+    """Generate sitemap entries for public tag archive pages."""
+
+    priority = 0.6
+    protocol = "https"
+
+    def items(self):
+        return HNDiscussionSummary.get_all_tags_with_counts()
+
+    def location(self, item):
+        return reverse("tag_detail", kwargs={"tag_slug": item.slug})
+
+
 sitemaps = {
     "static": StaticViewSitemap,
+    "tags": TagSitemap,
     "blog": GenericSitemap(
         {
             "queryset": HNDiscussionSummary.objects.all(),
-            "date_field": "created_at",
+            "date_field": "updated_at",
         },
         priority=0.85,
         protocol="https",

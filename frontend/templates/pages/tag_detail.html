@@ -2,12 +2,11 @@
 {% load static %}
 {% load markdown_extras %}
 {% block meta %}
-    <title>{{ tag.name }} - Ask HN Digest</title>
+    <title>{{ tag.name }} - Ask HN Digest{{ page_suffix }}</title>
     <meta name="description"
-          content="Browse all discussion summaries tagged with {{ tag.name }}." />
+          content="Browse summarized Hacker News discussions tagged with {{ tag.name }}{{ page_suffix }}." />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical"
-          href="https://{{ request.get_host }}{% url 'tag_detail' tag_slug=tag_slug %}" />
+    <link rel="canonical" href="{{ canonical_url }}" />
 {% endblock meta %}
 {% block content %}
     <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
@@ -23,8 +22,10 @@
                 {% if tag_aliases %}
                     Also matches
                     {% for alias in tag_aliases %}
-                        {{ alias.name }}{% if not forloop.last %}, {% endif %}
-                    {% endfor %}.
+                        {{ alias.name }}
+                        {% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                    .
                 {% else %}
                     All summarized Hacker News discussions tagged with this topic.
                 {% endif %}
@@ -48,9 +49,9 @@
                     <nav class="flex flex-wrap justify-center gap-1.5"
                          aria-label="Tag pagination">
                         {% if page_obj.has_previous %}
-                            <a href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}"
+                            <a href="?page=1"
                                class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">First</a>
-                            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}"
+                            <a href="?page={{ page_obj.previous_page_number }}"
                                class="inline-flex min-h-[2.35rem] min-w-[2.35rem] items-center justify-center rounded-[2px] border border-line bg-paper px-3 text-sm font-extrabold no-underline hover:border-line-strong">Previous</a>
                         {% endif %}
                         {% for num in page_obj.paginator.page_range %}

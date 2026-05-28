@@ -2,31 +2,28 @@
 {% load webpack_loader static %}
 {% load markdown_extras %}
 {% load core_extras %}
+{% load seo_extras %}
 {% block meta %}
-    <title>Ask HN Digest Blog</title>
+    <title>Ask HN Digest Archive{{ page_suffix }}</title>
     <meta name="description"
-          content="Get Summaries of the most engaging discussions on Hacker News" />
+          content="Browse summarized Hacker News discussions from Ask HN Digest{{ page_suffix }}." />
     <meta name="keywords" content="" />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical"
-          href="https://{{ request.get_host }}{% url 'blog_posts' %}" />
+    <link rel="canonical" href="{{ canonical_url }}" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Ask HN Digest Blog" />
-    <meta property="og:url"
-          content="https://{{ request.get_host }}{% url 'blog_posts' %}" />
+    <meta property="og:title" content="Ask HN Digest Archive{{ page_suffix }}" />
+    <meta property="og:url" content="{{ canonical_url }}" />
     <meta property="og:description"
-          content="Get Summaries of the most engaging discussions on Hacker News" />
-    <meta property="og:image"
-          content="https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest Blog&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.svg' %}" />
+          content="Browse summarized Hacker News discussions from Ask HN Digest{{ page_suffix }}." />
+    <meta property="og:image" content="{{ social_image_url }}" />
     <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@rasulkireev" />
     <meta name="twitter:site" content="@rasulkireev" />
-    <meta name="twitter:title" content="Ask HN Digest Blog" />
+    <meta name="twitter:title" content="Ask HN Digest Archive{{ page_suffix }}" />
     <meta name="twitter:description"
-          content="Get Summaries of the most engaging discussions on Hacker News" />
-    <meta name="twitter:image"
-          content="https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest Blog&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.svg' %}" />
+          content="Browse summarized Hacker News discussions from Ask HN Digest{{ page_suffix }}." />
+    <meta name="twitter:image" content="{{ social_image_url }}" />
 {% endblock meta %}
 {% block content %}
     <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
@@ -91,20 +88,5 @@
     </section>
 {% endblock content %}
 {% block schema %}
-    <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Ask HN Digest Blog",
-    "description": "Get Summaries of the most engaging discussions on Hacker News",
-    "thumbnailUrl": "https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest Blog&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.svg' %}",
-    "url": "https://{{ request.get_host }}{% url 'blog_posts' %}",
-    "author": {
-      "@type": "Person",
-      "givenName": "Rasul",
-      "familyName": "Kireev",
-      "url": "https://rasulkireev.com/"
-    }
-  }
-    </script>
+    <script type="application/ld+json">{{ website_schema|json_ld }}</script>
 {% endblock schema %}
