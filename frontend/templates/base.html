@@ -1,4 +1,5 @@
 {% load webpack_loader static %}
+{% load seo_extras %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -15,26 +16,28 @@
         {% block meta %}
             <title>Ask HN Digest</title>
             <meta name="description"
-                  content="Get Summaries of the most engaging discussions on Hacker News" />
+                  content="{{ seo_description|default:'Get summaries of the most engaging discussions on Hacker News.' }}" />
             <meta name="keywords" content="Hacker News, summaries, newsletter, digest" />
             <meta name="robots" content="index, follow" />
-            <link rel="canonical" href="https://{{ request.get_host }}/" />
+            <link rel="canonical"
+                  href="{% if canonical_url %}{{ canonical_url }}{% else %}https://{{ request.get_host }}/{% endif %}" />
             <meta property="og:type" content="website" />
             <meta property="og:title" content="Ask HN Digest" />
-            <meta property="og:url" content="https://{{ request.get_host }}/" />
+            <meta property="og:url"
+                  content="{% if canonical_url %}{{ canonical_url }}{% else %}https://{{ request.get_host }}/{% endif %}" />
             <meta property="og:description"
-                  content="Get Summaries of the most engaging discussions on Hacker News" />
+                  content="{{ seo_description|default:'Get summaries of the most engaging discussions on Hacker News.' }}" />
             <meta property="og:image"
-                  content="https://osig.app/g?site=meta&style=logo&font=markerfelt&title=Ask HN Digest&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.svg' %}" />
+                  content="{% if social_image_url %}{{ social_image_url }}{% else %}https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}{% endif %}" />
             <meta property="og:locale" content="en_US" />
             <meta name="twitter:card" content="summary" />
             <meta name="twitter:creator" content="@rasulkireev" />
             <meta name="twitter:site" content="@rasulkireev" />
             <meta name="twitter:title" content="Ask HN Digest" />
             <meta name="twitter:description"
-                  content="Get Summaries of the most engaging discussions on Hacker News" />
+                  content="{{ seo_description|default:'Get summaries of the most engaging discussions on Hacker News.' }}" />
             <meta name="twitter:image"
-                  content="https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.svg' %}" />
+                  content="{% if social_image_url %}{{ social_image_url }}{% else %}https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}{% endif %}" />
         {% endblock meta %}
         <script defer
                 data-domain="askhndigests.com"
@@ -145,12 +148,15 @@
         </div>
         {% block schema %}
             <script type="application/ld+json">
+                {% if website_schema %}
+                    {{ website_schema|json_ld }}
+                {% else %}
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Ask HN Digest",
-      "description": "Get Summaries of the most engaging discussions on Hacker News",
-      "thumbnailUrl": "https://osig.app/g?site=x&style=logo&font=markerfelt&title=Ask HN Digest&subtitle=Get Summaries of the most engaging discussions on Hacker News&image_url=https://{{ request.get_host }}{% static 'vendors/images/logo.svg' %}",
+      "description": "Get summaries of the most engaging discussions on Hacker News.",
+      "thumbnailUrl": "https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}",
       "url": "https://{{ request.get_host }}/",
       "author": {
         "@type": "Person",
@@ -159,6 +165,7 @@
         "url": "https://rasulkireev.com/"
       }
     }
+                {% endif %}
             </script>
         {% endblock schema %}
     </body>

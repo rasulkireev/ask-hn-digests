@@ -19,10 +19,12 @@ from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
 
 from ask_hn_digest.sitemaps import sitemaps
+from core.views import robots_txt
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("anymail/", include("anymail.urls")),
+    path("robots.txt", robots_txt, name="robots_txt"),
     path("", include("core.urls")),
     path(
         "sitemap.xml",

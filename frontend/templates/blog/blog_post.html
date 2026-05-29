@@ -1,28 +1,25 @@
 {% extends "base.html" %}
 {% load webpack_loader static %}
 {% load markdown_extras %}
+{% load seo_extras %}
 {% block meta %}
-    <title>{{ blog_post.title }} | Ask HN Digest Blog</title>
-    <meta name="description" content="{{ blog_post.description }}" />
+    <title>{{ seo_title }}</title>
+    <meta name="description" content="{{ seo_description }}" />
     <meta name="keywords" content="{{ blog_post.tag_keywords }}" />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical"
-          href="https://{{ request.get_host }}{{ blog_post.get_absolute_url }}" />
+    <link rel="canonical" href="{{ canonical_url }}" />
     <meta property="og:type" content="article" />
-    <meta property="og:title" content="{{ blog_post.title }}" />
-    <meta property="og:url"
-          content="https://{{ request.get_host }}{{ blog_post.get_absolute_url }}" />
-    <meta property="og:description" content="{{ blog_post.description }}" />
-    <meta property="og:image"
-          content="https://osig.app/g?site=x&style=base&font=markerfelt&title={{ blog_post.title }} | Ask HN Digest Blog&subtitle={{ blog_post.description }}&image_url={{ blog_post.image.url }}" />
+    <meta property="og:title" content="{{ social_title }}" />
+    <meta property="og:url" content="{{ canonical_url }}" />
+    <meta property="og:description" content="{{ seo_description }}" />
+    <meta property="og:image" content="{{ social_image_url }}" />
     <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@rasulkireev" />
     <meta name="twitter:site" content="@rasulkireev" />
-    <meta name="twitter:title" content="{{ blog_post.title }}" />
-    <meta name="twitter:description" content="{{ blog_post.description }}" />
-    <meta name="twitter:image"
-          content="https://osig.app/g?site=x&style=base&font=markerfelt&title={{ blog_post.title }} | Ask HN Digest Blog&subtitle={{ blog_post.description }}&image_url={{ blog_post.image.url }}" />
+    <meta name="twitter:title" content="{{ social_title }}" />
+    <meta name="twitter:description" content="{{ seo_description }}" />
+    <meta name="twitter:image" content="{{ social_image_url }}" />
 {% endblock meta %}
 {% block content %}
     <article class="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16"
@@ -111,34 +108,5 @@
     </section>
 {% endblock content %}
 {% block schema %}
-    <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": "{{ blog_post.title }}",
-    "description": "{{ blog_post.description }}",
-    "image": "https://osig.app/g?site=x&style=base&font=markerfelt&title={{ blog_post.title }} | Ask HN Digest Blog&subtitle={{ blog_post.description }}&image_url={{ blog_post.image.url }}",
-    "url": "https://{{ request.get_host }}{{ blog_post.get_absolute_url }}",
-    "datePublished": "{{ blog_post.created_at|date:'c' }}",
-    "dateModified": "{{ blog_post.updated_at|date:'c' }}",
-    "author": {
-      "@type": "Person",
-      "name": "Rasul Kireev",
-      "url": "https://rasulkireev.com/"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Ask HN Digest",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://{{ request.get_host }}{% static 'vendors/images/logo.svg' %}"
-      }
-    },
-    "articleBody": "{{ blog_post.long_summary|safe|replace_quotes }}",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": "https://{{ request.get_host }}{{ blog_post.get_absolute_url }}"
-    }
-  }
-    </script>
+    <script type="application/ld+json">{{ blog_post_schema|json_ld }}</script>
 {% endblock schema %}

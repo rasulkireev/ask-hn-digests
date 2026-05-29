@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.html import strip_tags
 from django.views.generic import DetailView, ListView, TemplateView
 from django_q.tasks import async_task
@@ -13,8 +14,40 @@ from django_q.tasks import async_task
 from ask_hn_digest.utils import get_ask_hn_digest_logger
 from core.forms import SendNewsletterForm, SummarizeHNDiscussionForm
 from core.models import HNDiscussionSummary, Tag, TagAlias, TopicLane
+from core.seo import (
+    DEFAULT_DESCRIPTION,
+    absolute_url,
+    blog_post_schema,
+    clean_text,
+    discussion_description,
+    discussion_title,
+    post_image_url,
+    social_image_url,
+    static_url,
+    website_schema,
+)
 
 logger = get_ask_hn_digest_logger(__name__)
+
+
+def paginated_canonical_url(request, view_name, page_obj, **kwargs):
+    path = reverse(view_name, kwargs=kwargs or None)
+    if page_obj.number > 1:
+        path = f"{path}?page={page_obj.number}"
+    return absolute_url(request, path)
+
+
+def robots_txt(request):
+    lines = [
+        "User-agent: *",
+        "Disallow: /admin/",
+        "Disallow: /admin-panel",
+        "Disallow: /api/",
+        "",
+        f"Sitemap: {absolute_url(request, '/sitemap.xml')}",
+        "",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
 
 
 class HomeView(TemplateView):
@@ -22,6 +55,24 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        canonical_url = absolute_url(self.request, reverse("home"))
+        social_image = social_image_url(
+            self.request,
+            title="Ask HN Digest",
+            description=DEFAULT_DESCRIPTION,
+            image_url=static_url(self.request, "vendors/images/logo.png"),
+            style="logo",
+            site="meta",
+        )
+        context["canonical_url"] = canonical_url
+        context["seo_description"] = DEFAULT_DESCRIPTION
+        context["social_image_url"] = social_image
+        context["website_schema"] = website_schema(
+            self.request,
+            url=canonical_url,
+            description=DEFAULT_DESCRIPTION,
+            image_url=social_image,
+        )
         context["latest_summaries"] = HNDiscussionSummary.objects.order_by("-date_analyzed")[:3]
         return context
 
@@ -65,6 +116,28 @@ class BlogView(ListView):
     def get_queryset(self):
         return HNDiscussionSummary.objects.prefetch_related("tags").order_by("-date_analyzed")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        page_obj = context["page_obj"]
+        page_suffix = f" - Page {page_obj.number}" if page_obj.number > 1 else ""
+        context["page_suffix"] = page_suffix
+        context["canonical_url"] = paginated_canonical_url(self.request, "blog_posts", page_obj)
+        context["social_image_url"] = social_image_url(
+            self.request,
+            title=f"Ask HN Digest Archive{page_suffix}",
+            description=DEFAULT_DESCRIPTION,
+            image_url=static_url(self.request, "vendors/images/logo.png"),
+            style="logo",
+        )
+        context["website_schema"] = website_schema(
+            self.request,
+            url=context["canonical_url"],
+            name="Ask HN Digest Archive",
+            description=DEFAULT_DESCRIPTION,
+            image_url=context["social_image_url"],
+        )
+        return context
+
 
 class BlogPostView(DetailView):
     model = HNDiscussionSummary
@@ -73,6 +146,34 @@ class BlogPostView(DetailView):
 
     def get_queryset(self):
         return HNDiscussionSummary.objects.prefetch_related("tags")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        summary = self.object
+        post_url = absolute_url(self.request, summary.get_absolute_url())
+        seo_title = f"{discussion_title(summary)} | Ask HN Digest"
+        social_title = clean_text(summary.title)
+        seo_description = discussion_description(summary)
+        image_url = post_image_url(self.request, summary)
+        generated_social_image_url = social_image_url(
+            self.request,
+            title=social_title,
+            description=seo_description,
+            image_url=image_url,
+        )
+
+        context["canonical_url"] = post_url
+        context["seo_title"] = seo_title
+        context["social_title"] = social_title
+        context["seo_description"] = seo_description
+        context["social_image_url"] = generated_social_image_url
+        context["blog_post_schema"] = blog_post_schema(
+            self.request,
+            summary,
+            url=post_url,
+            image_url=generated_social_image_url,
+        )
+        return context
 
 
 def test_mjml(request):
@@ -214,6 +315,7 @@ class TagDetailView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        page_obj = context["page_obj"]
         context["tag"] = self.tag
         context["tag_slug"] = self.tag.slug
         context["tag_aliases"] = list(self.tag.aliases.all())
@@ -223,6 +325,13 @@ class TagDetailView(ListView):
             .filter(topic_lane=self.tag.topic_lane)
             .exclude(id=self.tag.id)
             .order_by("-summary_count", "name")[:12]
+        )
+        context["page_suffix"] = f" - Page {page_obj.number}" if page_obj.number > 1 else ""
+        context["canonical_url"] = paginated_canonical_url(
+            self.request,
+            "tag_detail",
+            page_obj,
+            tag_slug=self.tag.slug,
         )
         return context
 
